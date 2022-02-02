@@ -1,6 +1,6 @@
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:cloudflare_sdk/src/utils/params.dart';
+import 'package:cloudflare/src/utils/params.dart';
 
 part 'pagination.g.dart';
 

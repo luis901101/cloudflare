@@ -1,5 +1,5 @@
 
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/jsonable.dart';
 
 class JsonUtils {
   static Map<String, dynamic>? jsonableToJson(Jsonable? value) => value?.toJson();

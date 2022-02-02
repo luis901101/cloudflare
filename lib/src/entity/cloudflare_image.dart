@@ -1,4 +1,4 @@
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_image.g.dart';

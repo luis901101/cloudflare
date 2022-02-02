@@ -1,5 +1,5 @@
 
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'error_info.g.dart';

@@ -1,8 +1,8 @@
-import 'package:cloudflare_sdk/src/model/error_info.dart';
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/model/error_info.dart';
+import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:cloudflare_sdk/src/utils/params.dart';
-import 'package:cloudflare_sdk/src/model/pagination.dart';
+import 'package:cloudflare/src/utils/params.dart';
+import 'package:cloudflare/src/model/pagination.dart';
 
 
 part 'cloudflare_response.g.dart';

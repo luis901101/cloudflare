@@ -1,6 +1,6 @@
 // import 'package:flutter_test/flutter_test.dart';
 //
-// import 'package:cloudflare_sdk/cloudflare_sdk.dart';
+// import 'package:cloudflare/cloudflare_sdk.dart';
 //
 // void main() {
 //   test('adds one to input values', () {

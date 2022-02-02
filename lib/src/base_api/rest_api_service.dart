@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:cloudflare_sdk/src/entity/cloudflare_response.dart';
-import 'package:cloudflare_sdk/src/model/error_info.dart';
-import 'package:cloudflare_sdk/src/model/error_response.dart';
+import 'package:cloudflare/src/entity/cloudflare_response.dart';
+import 'package:cloudflare/src/model/error_info.dart';
+import 'package:cloudflare/src/model/error_response.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:cloudflare_sdk/src/base_api/c_response.dart';
-import 'package:cloudflare_sdk/src/base_api/rest_api.dart' as rest_api;
-import 'package:cloudflare_sdk/src/utils/jsonable.dart';
+import 'package:cloudflare/src/base_api/c_response.dart';
+import 'package:cloudflare/src/base_api/rest_api.dart' as rest_api;
+import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 

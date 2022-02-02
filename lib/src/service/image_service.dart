@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:cloudflare_sdk/src/base_api/rest_api_service.dart';
-import 'package:cloudflare_sdk/src/entity/cloudflare_response.dart';
-import 'package:cloudflare_sdk/src/utils/params.dart';
+import 'package:cloudflare/src/base_api/rest_api_service.dart';
+import 'package:cloudflare/src/entity/cloudflare_response.dart';
+import 'package:cloudflare/src/utils/params.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' hide Headers;
 import 'dart:convert'; //used by generated code with jsonEncode(...)

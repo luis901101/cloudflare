@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:cloudflare_sdk/src/utils/callbacks.dart';
+import 'package:cloudflare/src/utils/callbacks.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/adapter.dart';
 
