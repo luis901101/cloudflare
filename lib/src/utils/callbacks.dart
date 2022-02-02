@@ -1,0 +1,2 @@
+
+typedef TokenCallback = String Function();
