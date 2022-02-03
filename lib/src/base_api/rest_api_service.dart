@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/model/error_response.dart';
+import 'package:cloudflare/src/model/pagination.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:cloudflare/src/base_api/c_response.dart';
-import 'package:cloudflare/src/base_api/rest_api.dart' as rest_api;
+import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-
 
 abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
 
@@ -22,73 +22,72 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   I service;
   DataType? dataType;
   ErrorType? errorType;
-  rest_api.RestAPI restAPI;
+  RestAPI restAPI;
 
-  RestAPIService(
-      this.service, {
-        this.dataType,
-        this.errorType,
-        rest_api.RestAPI? restAPI,
-      }) : restAPI = restAPI ?? rest_api.restAPI
-  ;
+  RestAPIService({
+    required this.restAPI,
+    required this.service,
+    this.dataType,
+    this.errorType,
+  });
 
-  Future<CResponse<CloudflareResponse>> getSaveResponse(Future futureResponse) async {
-    CResponse<CloudflareResponse> response = CResponse(
+  Future<CResponse> getSaveResponse<ContainerDataTypeGeneric>(Future futureResponse, {bool parseCloudflareResponse = true}) async {
+    CResponse response = CResponse(
       http.Response('', HttpStatus.notFound),
       null,
     );
 
-    CResponse<CloudflareResponse> httpResponseToCustomHttpResponse(HttpResponse response) {
-      CloudflareResponse? body;
-      if(response.data is CloudflareResponse) {
-        body = response.data as CloudflareResponse;
-      } else if(response.data is Map<String, dynamic>) {
-        body = CloudflareResponse.fromJson(response.data);
-      } else if(response.data is String) {
-        body = CloudflareResponse().fromJsonString(response.data);
-      }
+    CResponse httpResponseToCustomHttpResponse(HttpResponse response) {
+      dynamic body = response.data;
       ErrorResponse? error;
-      if(body != null && !body.success) {
-        error = ErrorResponse(
-          errors: body.errors,
-          messages: body.messages,
-        );
+      if(parseCloudflareResponse) {
+        if(body is Map<String, dynamic>) {
+          body = CloudflareResponse.fromJson(body);
+        } else if(body is String) {
+          body = CloudflareResponse().fromJsonString(body);
+        }
+        if(body is CloudflareResponse && !body.success) {
+          error = ErrorResponse(
+            errors: body.errors,
+            messages: body.messages,
+          );
+        }
       }
-      return CResponse<CloudflareResponse>(
-          http.Response(
-            '',
-            response.response.statusCode ?? HttpStatus.notFound,
-            headers: response.response.headers.map.map((key, value) => MapEntry(key, value.join('; '))),
-            isRedirect: response.response.isRedirect ?? false,
-            request: http.Request(
-              response.response.requestOptions.method,
-              response.response.requestOptions.uri,
-            ),
+      return CResponse(
+        http.Response(
+          '',
+          response.response.statusCode ?? HttpStatus.notFound,
+          headers: response.response.headers.map.map((key, value) => MapEntry(key, value.join('; '))),
+          isRedirect: response.response.isRedirect ?? false,
+          request: http.Request(
+            response.response.requestOptions.method,
+            response.response.requestOptions.uri,
           ),
-          body,
-          error: error,
-          extraData: response
+        ),
+        body,
+        error: error,
+        extraData: response
       );
     }
 
     CResponse<CloudflareResponse> dioErrorToCustomHttpResponse(dio.DioError error) =>
-        CResponse(
-            http.Response(
-              '',
-              error.response?.statusCode ?? HttpStatus.notFound,
-              headers: error.response?.headers.map.map((key, value) => MapEntry(key, value.join('; '))) ?? {},
-              isRedirect: error.response?.isRedirect ?? false,
-              request: http.Request(
-                error.response?.requestOptions.method ?? HttpMethod.GET,
-                error.response?.requestOptions.uri ?? Uri(),
-              ),
-            ),
-            null,
-            error: error.response?.data ?? ErrorResponse(
-              errors: [ErrorInfo(message: error.message)],
-            ),
-            extraData: error
-        );
+      CResponse(
+        http.Response(
+          '',
+          error.response?.statusCode ?? HttpStatus.notFound,
+          headers: error.response?.headers.map.map((key, value) => MapEntry(key, value.join('; '))) ?? {},
+          isRedirect: error.response?.isRedirect ?? false,
+          request: http.Request(
+            error.response?.requestOptions.method ?? HttpMethod.GET,
+            error.response?.requestOptions.uri ?? Uri(),
+          ),
+        ),
+        null,
+        error: error.response?.data ?? ErrorResponse(
+          errors: [ErrorInfo(message: error.message)],
+        ),
+        extraData: error
+      );
 
     try {
       final HttpResponse httpResponse = await futureResponse;
@@ -114,86 +113,109 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     return response;
   }
 
-  Future<CResponse<DataType>> parseResponse(Future futureResponse) async {
-    return genericParseResponse(futureResponse, dataType: dataType);
+  Future<CResponse<DataType>> parseResponse(Future futureResponse, {bool parseCloudflareResponse = true}) async {
+    return genericParseResponse(futureResponse, dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
   }
 
   Future<CResponse<List<DataType>>> parseResponseAsList(
-      Future futureResponse) async {
-    return genericParseResponseAsList(futureResponse, dataType: dataType);
+      Future futureResponse, {bool parseCloudflareResponse = true}) async {
+    return genericParseResponseAsList(futureResponse, dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
   }
 
-  Future<CResponse<DataTypeGeneric>> genericParseResponse<DataTypeGeneric extends Jsonable?>(
-      Future futureResponse, {DataTypeGeneric? dataType}) async {
-    CResponse<CloudflareResponse> response = await getSaveResponse(futureResponse);
+  Future<CResponse<DataTypeGeneric>> genericParseResponse<DataTypeGeneric>(
+      Future futureResponse, {DataTypeGeneric? dataType, bool parseCloudflareResponse = true}) async {
+    CResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
     try {
       DataTypeGeneric? dataTypeResult;
-      if (dataType != null) {
-        if(response.body?.result is DataTypeGeneric) {
-          dataTypeResult = response.body?.result;
+      dynamic body = response.body;
+      if(body is CloudflareResponse) body = response.body?.result;
+
+      if(body is DataTypeGeneric) {
+        dataTypeResult = body;
+      } else
+      if (dataType is Jsonable) {
+        if(body is Map<String, dynamic>) {
+          dataTypeResult = dataType.fromJsonMap(body) as DataTypeGeneric?;
         } else
-        if(response.body?.result is String) {
-          dataTypeResult = dataType.fromJsonString(response.body?.result) as DataTypeGeneric?;
-        } else
-        if(response.body?.result is Map) {
-          dataTypeResult = dataType.fromJsonMap(response.body?.result) as DataTypeGeneric?;
+        if(body is String) {
+          dataTypeResult = dataType.fromJsonString(body) as DataTypeGeneric?;
         }
       }
       return CResponse<DataTypeGeneric>(response.base, dataTypeResult, error: response.error);
     } catch (e) {
       String message = e.toString();
-      response = CResponse(
-          http.Response(
-            response.body?.toString() ?? '',
-            Jsonable.jsonParserError,
-            headers: response.base.headers,
-            isRedirect: response.base.isRedirect,
-            persistentConnection: response.base.persistentConnection,
-            reasonPhrase: response.base.reasonPhrase,
-            request: response.base.request,
-          ),
-          response.body,
-          error: message);
       print(e);
+      return CResponse<DataTypeGeneric>(
+        http.Response(
+          response.body?.toString() ?? '',
+          Jsonable.jsonParserError,
+          headers: response.base.headers,
+          isRedirect: response.base.isRedirect,
+          persistentConnection: response.base.persistentConnection,
+          reasonPhrase: response.base.reasonPhrase,
+          request: response.base.request,
+        ),
+        null,
+        error: message
+      );
     }
-    return CResponse<DataTypeGeneric>(response.base, null, error: response.error);
   }
 
   Future<CResponse<List<DataTypeGeneric>>>
   genericParseResponseAsList<DataTypeGeneric extends Jsonable?>(
-      Future futureResponse, {DataTypeGeneric? dataType}) async {
-    CResponse response = await getSaveResponse(futureResponse);
+      Future futureResponse, {DataTypeGeneric? dataType, bool parseCloudflareResponse = true}) async {
+    CResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
     try {
       List<DataTypeGeneric>? dataList;
-      if (dataType != null) {
+      dynamic body = response.body;
+      if(response.body is CloudflareResponse) {
+        body = response.body?.result;
+        Pagination? pagination = (response.body as CloudflareResponse).paginationInfo;
+        if(pagination != null) {
+          response.base.headers.addAll({
+            Pagination.countHeader: '${pagination.count}',
+            Pagination.totalCountHeader: '${pagination.totalCount}',
+          });
+        }
+      }
 
-        if(response.body?.result is List<DataTypeGeneric>) {
-          dataList = response.body?.result;
+      if(body is Map){
+        for(dynamic value in body.values) {
+          if(value is List<dynamic>) {
+            body = value;
+            break;
+          }
+        }
+      }
+
+      if(body is List<DataTypeGeneric>) {
+        dataList = body;
+      } else
+      if (dataType is Jsonable) {
+        if(body is List<dynamic>) {
+          dataList = dataType.fromJsonList(body) as List<DataTypeGeneric>?;
         } else
-        if(response.body?.result is String) {
-          dataList = dataType.fromJsonStringList(response.body?.result) as List<DataTypeGeneric>?;
-        } else
-        if(response.body?.result is Map) {
-          dataList = dataType.fromJsonList(response.body?.result) as List<DataTypeGeneric>?;
+        if(body is String) {
+          dataList = dataType.fromJsonString(body) as List<DataTypeGeneric>?;
         }
       }
       return CResponse<List<DataTypeGeneric>>(response.base, dataList, error: response.error);
     } catch (e) {
       String message = e.toString();
-      response = CResponse(
-          http.Response(
-            response.body?.toString() ?? '',
-            Jsonable.jsonParserError,
-            headers: response.base.headers,
-            isRedirect: response.base.isRedirect,
-            persistentConnection: response.base.persistentConnection,
-            reasonPhrase: response.base.reasonPhrase,
-            request: response.base.request,
-          ),
-          response.body,
-          error: message);
       print(e);
+      return CResponse<List<DataTypeGeneric>>(
+        http.Response(
+          response.body?.toString() ?? '',
+          Jsonable.jsonParserError,
+          headers: response.base.headers,
+          isRedirect: response.base.isRedirect,
+          persistentConnection: response.base.persistentConnection,
+          reasonPhrase: response.base.reasonPhrase,
+          request: response.base.request,
+        ),
+        null,
+        error: message
+      );
     }
-    return CResponse<List<DataTypeGeneric>>(response.base, null, error: response.error);
   }
 }

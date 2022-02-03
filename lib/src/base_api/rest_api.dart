@@ -4,20 +4,14 @@ import 'package:cloudflare/src/utils/callbacks.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/adapter.dart';
 
-final restAPI = RestAPI();
-
 class RestAPI {
   Dio dio = Dio();
 
   HttpClient? httpClient;
 
   Duration? timeout;
-  late String apiUrl;
+  String apiUrl = '';
   TokenCallback? tokenCallback;
-
-  RestAPI() {
-    apiUrl = '';
-  }
 
   void init({String? apiUrl, Duration? timeout, HttpClient? httpClient, TokenCallback? tokenCallback}) {
     if ((apiUrl?.isNotEmpty ?? true)) this.apiUrl = apiUrl!;
@@ -40,7 +34,7 @@ class RestAPI {
     // Adding auth token to each request
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
       if(tokenCallback != null) {
-        final token = tokenCallback!.call();
+        final String token = await tokenCallback!.call();
         options.headers.addAll({
           HttpHeaders.authorizationHeader: 'Bearer $token',
           // HttpHeaders.contentTypeHeader: Headers.jsonContentType,
