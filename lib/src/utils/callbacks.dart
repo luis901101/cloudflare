@@ -1,2 +1,2 @@
 
-typedef TokenCallback = String Function();
+typedef TokenCallback = Future<String> Function();

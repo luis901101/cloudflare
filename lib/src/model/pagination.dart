@@ -9,6 +9,9 @@ part 'pagination.g.dart';
 @JsonSerializable(includeIfNull: false)
 class Pagination extends Jsonable<Pagination>{
 
+  static const String countHeader = 'X-Count';
+  static const String totalCountHeader = 'X-Total-Count';
+
   /// The requested page.
   /// default value: 1
   int page;
