@@ -4,8 +4,8 @@ import 'package:cloudflare/src/base_api/c_response.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/cloudflare_image.dart';
-import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/model/error_response.dart';
+import 'package:cloudflare/src/service/image_service.dart';
 import 'package:dio/dio.dart';
 
 class ImageAPI
@@ -103,7 +103,7 @@ class ImageAPI
     required String id,
   }) async {
     final response = await genericParseResponse<List<int>>(
-      service.get(
+      service.getBase(
         id: id,
       ), parseCloudflareResponse: false
     );

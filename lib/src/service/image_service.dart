@@ -48,8 +48,9 @@ abstract class ImageService {
   });
 
   @GET('/{id}/blob')
+  @DioResponseType(ResponseType.bytes)
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> getBase({
+  Future<HttpResponse> getBase({
     @Path() required String id,
   });
 

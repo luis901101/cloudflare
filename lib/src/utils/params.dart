@@ -5,4 +5,5 @@ class Params {
   static const String page = 'page';
   static const String perPage = 'per_page';
   static const String totalCount = 'total_count';
+  static const String contentType = 'content-type';
 }
