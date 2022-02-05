@@ -10,7 +10,7 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
     CloudflareImage(
       id: json['id'] as String?,
       filename: json['filename'] as String?,
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      meta: json['meta'] as Map<String, dynamic>?,
       requireSignedURLs: json['requireSignedURLs'] as bool?,
       variants: (json['variants'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -32,7 +32,7 @@ Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
     }
   }
 
-  writeNotNull('metadata', instance.metadata);
+  writeNotNull('meta', instance.meta);
   val['requireSignedURLs'] = instance.requireSignedURLs;
   val['variants'] = instance.variants;
   val['uploaded'] = instance.uploaded.toIso8601String();

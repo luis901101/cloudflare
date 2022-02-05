@@ -33,7 +33,7 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   /// {
   ///   "meta": "metaID"
   /// }
-  Map<String, dynamic>?  metadata;
+  Map<String, dynamic>?  meta;
 
   /// Indicates whether the image can be a accessed only using it's UID.
   /// If set to true, a signed token needs to be generated with a signing key
@@ -67,7 +67,7 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   CloudflareImage({
     String? id,
     String? filename,
-    this.metadata,
+    this.meta,
     bool? requireSignedURLs,
     List<String>? variants,
     DateTime? uploaded,
