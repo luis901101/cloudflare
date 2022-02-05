@@ -91,4 +91,49 @@ void main() async {
       expect(response.body!.meta, metadata);
     });
   });
+
+  group('Update/Delete image tests', () {
+    late final File imageFile;
+    String? imageId;
+    final metadata = {
+      'system_id': "image-test-system-id'",
+      'description': 'This is an image test',
+    };
+    setUpAll(() async {
+      imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
+      final response = await cloudflare.imageAPI.upload(
+        file: imageFile,
+        // requireSignedURLs: true,
+        metadata: metadata,
+
+      );
+      imageId = response.body?.id;
+    });
+
+    test('Update image', () async {
+      if(imageId == null) {
+        throw Exception('No image available to update');
+      }
+      metadata['system_id'] = '${metadata['system_id']}-updated';
+      metadata['description'] = '${metadata['description']}-updated';
+      final response = await cloudflare.imageAPI.update(
+        id: imageId!,
+        // requireSignedURLs: false,
+        metadata: metadata,
+      );
+      expect(response, ImageMatcher());
+      // expect(response.body!.requireSignedURLs, false);
+      expect(response.body!.meta, metadata);
+    });
+
+    test('Delete image', () async {
+      if(imageId == null) {
+        throw Exception('No image available to delete');
+      }
+      final response = await cloudflare.imageAPI.delete(
+        id: imageId!,
+      );
+      expect(response.isSuccessful, true);
+    });
+  });
 }

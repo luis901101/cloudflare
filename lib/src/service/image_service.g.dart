@@ -57,21 +57,17 @@ class _ImageService implements ImageService {
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = FormData();
-    if (requireSignedURLs != null) {
-      _data.fields
-          .add(MapEntry('requireSignedURLs', requireSignedURLs.toString()));
-    }
-    _data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
+    final _data = {
+      'requireSignedURLs': requireSignedURLs,
+      'metadata': metadata
+    };
+    _data.removeWhere((k, v) => v == null);
     final _result = await _dio.fetch<Map<String, dynamic>?>(
-        _setStreamType<HttpResponse<CloudflareResponse>>(Options(
-                method: 'PATCH',
-                headers: _headers,
-                extra: _extra,
-                contentType: 'multipart/form-data')
-            .compose(_dio.options, '/${id}',
-                queryParameters: queryParameters, data: _data)
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+        _setStreamType<HttpResponse<CloudflareResponse>>(
+            Options(method: 'PATCH', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/${id}',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);

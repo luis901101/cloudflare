@@ -26,12 +26,11 @@ abstract class ImageService {
   });
 
   @PATCH('/{id}')
-  @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> update({
     @Path() required String id,
-    @Part() bool? requireSignedURLs,
-    @Part() Map<String, dynamic>? metadata,
+    @Field() bool? requireSignedURLs,
+    @Field() Map<String, dynamic>? metadata,
   });
 
   @GET('')
