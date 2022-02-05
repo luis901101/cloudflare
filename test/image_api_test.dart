@@ -4,7 +4,6 @@ import 'package:test/test.dart';
 
 import 'base_tests.dart';
 
-
 void main() async {
 
   await init();
@@ -14,7 +13,6 @@ void main() async {
     String? imageId;
     setUpAll(() async {
       responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
-      print(responseList);
     });
 
     test('Get image list', () async {
