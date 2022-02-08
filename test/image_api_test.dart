@@ -19,7 +19,7 @@ void main() async {
     });
 
     test('Get image list', () async {
-      expect(responseList.isSuccessful, true);
+      expect(responseList, ResponseMatcher());
       expect(responseList.body, isNotNull);
       expect(responseList.body, isNotEmpty);
       imageId = responseList.body![0].id;
@@ -39,7 +39,7 @@ void main() async {
         throw Exception('No base image available to get by Id');
       }
       final response = await cloudflare.imageAPI.getBase(id: imageId!);
-      expect(response.isSuccessful, true);
+      expect(response, ResponseMatcher());
       expect(response.body, isNotNull);
     });
   });
@@ -57,6 +57,7 @@ void main() async {
       final response = await cloudflare.imageAPI.upload(
         file: imageFile
       );
+      expect(response, ResponseMatcher());
       expect(response, ImageMatcher());
     });
 
@@ -133,7 +134,7 @@ void main() async {
       final response = await cloudflare.imageAPI.delete(
         id: imageId!,
       );
-      expect(response.isSuccessful, true);
+      expect(response, ResponseMatcher());
     });
   });
 }

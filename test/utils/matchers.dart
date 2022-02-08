@@ -2,6 +2,7 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/c_response.dart';
 import 'package:test/expect.dart';
+import 'package:test/scaffolding.dart';
 
 class GenericMatcher extends Matcher {
 
@@ -19,14 +20,32 @@ class GenericMatcher extends Matcher {
       onDescribe?.call(description) ?? description;
 }
 
-class ImageMatcher extends GenericMatcher {
+bool printAndReturnOnFailure(String message) {
+  printOnFailure(message);
+  return false;
+}
 
-  ImageMatcher() : super(
-    onMatches: (response, matchState) {
-      if(response is! CResponse<CloudflareImage>) return false;
-      return response.isSuccessful &&
-          response.body != null &&
-          response.body!.variants.isNotEmpty;
+class ResponseMatcher extends GenericMatcher {
+  ResponseMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    if(response is! CResponse) return false;
+    if(!response.isSuccessful) {
+      // fail('Unsuccessful response: ${response.error?.toString()}');
+      return printAndReturnOnFailure('Unsuccessful response: ${response.error?.toString()}');
     }
-  );
+    return true;
+  }
+}
+
+class ImageMatcher extends ResponseMatcher {
+  ImageMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    super.matches(response, matchState);
+    if(response is! CResponse<CloudflareImage>) return false;
+    return response.body != null && response.body!.variants.isNotEmpty;
+  }
 }
