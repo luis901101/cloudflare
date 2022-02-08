@@ -151,6 +151,17 @@ class ImageAPI
     return response;
   }
 
-
+  /// Delete a list of images on Cloudflare Images. On success, all copies of the images
+  /// are deleted and purged from Cache.
+  Future<List<CResponse>> deleteMultiple({
+    required List<String> ids,
+  }) async {
+    List<CResponse> responses = [];
+    for (final id in ids) {
+      final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
+      responses.add(response);
+    }
+    return responses;
+  }
 
 }

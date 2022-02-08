@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/c_response.dart';
@@ -29,7 +30,7 @@ void main() async {
     test('Get image byId', () async {
       if(imageId == null) {
         // markTestSkipped('Get image byId skipped: No image available to get by Id');
-        throw Exception('No image available to get by Id');
+        fail('No image available to get by Id');
       }
       final response = await cloudflare.imageAPI.get(id: imageId!);
       expect(response, ImageMatcher());
@@ -37,7 +38,7 @@ void main() async {
 
     test('Get base image byId', () async {
       if(imageId == null) {
-        throw Exception('No base image available to get by Id');
+        fail('No base image available to get by Id');
       }
       final response = await cloudflare.imageAPI.getBase(id: imageId!);
       expect(response, ResponseMatcher());
@@ -55,7 +56,7 @@ void main() async {
 
     test('Simple upload image from file', () async {
       if(!imageFile.existsSync()) {
-        throw Exception('No image file available to upload');
+        fail('No image file available to upload');
       }
       final response = await cloudflare.imageAPI.uploadFromFile(
         content: DataTransmit<File>(data: imageFile)
@@ -65,7 +66,7 @@ void main() async {
 
     test('Simple upload image from file with progress update', () async {
       if(!imageFile.existsSync()) {
-        throw Exception('No image file available to upload');
+        fail('No image file available to upload');
       }
       final response = await cloudflare.imageAPI.uploadFromFile(
         content: DataTransmit<File>(data: imageFile, progressCallback: (count, total) {
@@ -77,7 +78,7 @@ void main() async {
 
     test('Multiple upload image from file with progress update', () async {
       if(!imageFile.existsSync() || !imageFile1.existsSync() || !imageFile2.existsSync()) {
-        throw Exception('imageFile and imageFile1 and imageFile2 are required for multiple upload test. Check if you set each image file for each env var.');
+        fail('imageFile and imageFile1 and imageFile2 are required for multiple upload test. Check if you set each image file for each env var.');
       }
       final files = [imageFile, imageFile1, imageFile2];
       List<DataTransmit<File>> contents = [];
@@ -98,7 +99,7 @@ void main() async {
 
     test('Upload image with requireSignedURLs and metadata', () async {
       if(!imageFile.existsSync()) {
-        throw Exception('No image file available to upload');
+        fail('No image file available to upload');
       }
       final metadata = {
         'system_id': "image-test-system-id'",
@@ -135,7 +136,7 @@ void main() async {
 
     test('Update image', () async {
       if(imageId == null) {
-        throw Exception('No image available to update');
+        fail('No image available to update');
       }
       metadata['system_id'] = '${metadata['system_id']}-updated';
       metadata['description'] = '${metadata['description']}-updated';
@@ -151,12 +152,29 @@ void main() async {
 
     test('Delete image', () async {
       if(imageId == null) {
-        throw Exception('No image available to delete');
+        fail('No image available to delete');
       }
       final response = await cloudflare.imageAPI.delete(
         id: imageId!,
       );
       expect(response, ResponseMatcher());
     });
+  });
+
+  test('Delete multiple images', () async {
+    final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
+    if(responseList.body?.isEmpty ?? true) fail('There are no uploaded images to test multi delete.');
+
+    List<String> ids = [];
+    for (int i = 0, length = min(3, responseList.body!.length); i < length; ++i) {
+      ids.add(responseList.body![i].id);
+    }
+
+    final responses = await cloudflare.imageAPI.deleteMultiple(
+      ids: ids,
+    );
+    for (final response in responses) {
+      expect(response, ResponseMatcher());
+    }
   });
 }
