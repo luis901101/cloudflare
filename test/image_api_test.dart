@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/c_response.dart';
+import 'package:cloudflare/src/model/data_transmit.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -45,34 +46,55 @@ void main() async {
   });
 
   group('Upload image tests', () {
-    late final File imageFile;
+    late final File imageFile, imageFile1, imageFile2;
     setUpAll(() async {
       imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
+      imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? '');
+      imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
     });
 
     test('Simple upload image from file', () async {
       if(!imageFile.existsSync()) {
         throw Exception('No image file available to upload');
       }
-      final response = await cloudflare.imageAPI.upload(
-        file: imageFile
+      final response = await cloudflare.imageAPI.uploadFromFile(
+        content: DataTransmit<File>(data: imageFile)
       );
-      expect(response, ResponseMatcher());
       expect(response, ImageMatcher());
     });
 
-    test('Upload image from file with progress update', () async {
+    test('Simple upload image from file with progress update', () async {
       if(!imageFile.existsSync()) {
         throw Exception('No image file available to upload');
       }
-      final response = await cloudflare.imageAPI.upload(
-        file: imageFile,
-        onUploadProgress: (count, total) {
-          print('Upload image from file: $count/$total');
-        }
+      final response = await cloudflare.imageAPI.uploadFromFile(
+        content: DataTransmit<File>(data: imageFile, progressCallback: (count, total) {
+          print('Simple upload image from file progress: $count/$total');
+        })
       );
       expect(response, ImageMatcher());
     });
+
+    test('Multiple upload image from file with progress update', () async {
+      if(!imageFile.existsSync() || !imageFile1.existsSync() || !imageFile2.existsSync()) {
+        throw Exception('imageFile and imageFile1 and imageFile2 are required for multiple upload test. Check if you set each image file for each env var.');
+      }
+      final files = [imageFile, imageFile1, imageFile2];
+      List<DataTransmit<File>> contents = [];
+      for (final file in files) {
+        contents.add(DataTransmit(data: file, progressCallback: (count, total) {
+          final split = file.path.split(Platform.pathSeparator);
+          String? filename = split.isNotEmpty ? split.last : null;
+          print('Multiple upload image from file: $filename progress: $count/$total');
+        }));
+      }
+      final responses = await cloudflare.imageAPI.uploadFromFiles(
+        contents: contents,
+      );
+      for (final response in responses) {
+        expect(response, ImageMatcher());
+      }
+    }, timeout: Timeout(Duration(minutes: 2)));
 
     test('Upload image with requireSignedURLs and metadata', () async {
       if(!imageFile.existsSync()) {
@@ -82,8 +104,8 @@ void main() async {
         'system_id': "image-test-system-id'",
         'description': 'This is an image test',
       };
-      final response = await cloudflare.imageAPI.upload(
-        file: imageFile,
+      final response = await cloudflare.imageAPI.uploadFromFile(
+        content: DataTransmit<File>(data: imageFile),
         requireSignedURLs: true,
         metadata: metadata,
       );
@@ -102,8 +124,8 @@ void main() async {
     };
     setUpAll(() async {
       imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
-      final response = await cloudflare.imageAPI.upload(
-        file: imageFile,
+      final response = await cloudflare.imageAPI.uploadFromFile(
+        content: DataTransmit<File>(data: imageFile),
         // requireSignedURLs: true,
         metadata: metadata,
 

@@ -4,9 +4,9 @@ import 'package:cloudflare/src/base_api/c_response.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/cloudflare_image.dart';
+import 'package:cloudflare/src/model/data_transmit.dart';
 import 'package:cloudflare/src/model/error_response.dart';
 import 'package:cloudflare/src/service/image_service.dart';
-import 'package:dio/dio.dart';
 
 class ImageAPI
     extends RestAPIService<ImageService, CloudflareImage, ErrorResponse> {
@@ -17,9 +17,10 @@ class ImageAPI
       dataType: CloudflareImage()
     );
 
-  Future<CResponse<CloudflareImage?>> upload({
+  /// An image up to 10 Megabytes can be upload.
+  Future<CResponse<CloudflareImage?>> uploadFromFile({
     /// Image file to upload
-    required File file,
+    required DataTransmit<File> content,
 
     /// Indicates whether the image requires a signature token for the access
     /// default value: false
@@ -30,18 +31,48 @@ class ImageAPI
     /// another system of record for managing images.
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
-
-    /// Callback for image file upload progress
-    ProgressCallback? onUploadProgress,
   }) async {
     final response = await parseResponse(service.upload(
-      file: file,
+      file: content.data,
       requireSignedURLs: requireSignedURLs,
       metadata: metadata,
-      onUploadProgress: onUploadProgress,
+      onUploadProgress: content.progressCallback,
     ));
 
     return response;
+  }
+
+  /// Uploads multiple images by repeatedly calling uploadFromFile
+  Future<List<CResponse<CloudflareImage?>>> uploadFromFiles({
+    /// Image file to upload
+    required List<DataTransmit<File>> contents,
+
+    /// Indicates whether the image requires a signature token for the access
+    /// default value: false
+    /// valid values: (true,false)
+    bool? requireSignedURLs,
+
+    /// User modifiable key-value store. Can use used for keeping references to
+    /// another system of record for managing images.
+    /// "{\"meta\": \"metaID\"}"
+    Map<String, dynamic>? metadata,
+  }) async {
+    List<CResponse<CloudflareImage?>> responses = [];
+    // responses = await Future.wait(
+    //     contents.map((content) async => await uploadFromFile(
+    //       content: content,
+    //       requireSignedURLs: requireSignedURLs,
+    //       metadata: metadata,
+    //     )));
+    for (final content in contents) {
+      final response = await uploadFromFile(
+        content: content,
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+      );
+      responses.add(response);
+    }
+    return responses;
   }
 
   /// Update image access control. On access control change,
@@ -119,4 +150,7 @@ class ImageAPI
     final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
     return response;
   }
+
+
+
 }

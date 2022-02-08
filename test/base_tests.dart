@@ -5,7 +5,9 @@ import 'package:cloudflare/cloudflare.dart';
 
 /// Make sure to set all of this environment variables before running tests
 ///
-/// export CLOUDFLARE_IMAGE_FILE=/Users/krrigan/Desktop/flckn-demo-test.jpg
+/// export CLOUDFLARE_IMAGE_FILE=/Users/user/Desktop/image-test.jpg
+/// export CLOUDFLARE_IMAGE_FILE_1=/Users/user/Desktop/image-test-1.jpg
+/// export CLOUDFLARE_IMAGE_FILE_2=/Users/user/Desktop/image-test-2.jpg
 /// export CLOUDFLARE_API_URL=https://api.cloudflare.com/client/v4
 /// export CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 /// export CLOUDFLARE_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxx
