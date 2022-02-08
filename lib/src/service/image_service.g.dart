@@ -16,7 +16,7 @@ class _ImageService implements ImageService {
   String? baseUrl;
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> upload(
+  Future<HttpResponse<CloudflareResponse?>> uploadFromFile(
       {required file, requireSignedURLs, metadata, onUploadProgress}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -27,6 +27,43 @@ class _ImageService implements ImageService {
         'file',
         MultipartFile.fromFileSync(file.path,
             filename: file.path.split(Platform.pathSeparator).last)));
+    if (requireSignedURLs != null) {
+      _data.fields
+          .add(MapEntry('requireSignedURLs', requireSignedURLs.toString()));
+    }
+    _data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
+    final _result = await _dio.fetch<Map<String, dynamic>?>(
+        _setStreamType<HttpResponse<CloudflareResponse>>(Options(
+                method: 'POST',
+                headers: _headers,
+                extra: _extra,
+                contentType: 'multipart/form-data')
+            .compose(_dio.options, '',
+                queryParameters: queryParameters,
+                data: _data,
+                onSendProgress: onUploadProgress)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data == null
+        ? null
+        : CloudflareResponse.fromJson(_result.data!);
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<CloudflareResponse?>> uploadFromBytes(
+      {required bytes, requireSignedURLs, metadata, onUploadProgress}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(MapEntry(
+        'file',
+        MultipartFile.fromBytes(
+          bytes,
+          filename: null,
+        )));
     if (requireSignedURLs != null) {
       _data.fields
           .add(MapEntry('requireSignedURLs', requireSignedURLs.toString()));
