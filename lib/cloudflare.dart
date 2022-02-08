@@ -16,9 +16,10 @@ export 'package:cloudflare/src/model/pagination.dart';
 export 'package:cloudflare/src/apiservice/image_api.dart';
 
 class Cloudflare {
-  static const xAuthKey = 'X-Auth-Key';
-  static const xAuthEmail = 'X-Auth-Email';
-  static const xAuthUserServiceKey = 'X-Auth-User-Service-Key';
+  static const xAuthKeyHeader = 'X-Auth-Key';
+  static const xAuthEmailHeader = 'X-Auth-Email';
+  static const xAuthUserServiceKeyHeader = 'X-Auth-User-Service-Key';
+
 
   /// Cloudflare api url, at the moment of writing this: https://api.cloudflare.com/client/v4
   final String apiUrl;
@@ -92,9 +93,9 @@ class Cloudflare {
     String? token = await tokenCallback();
     Map<String, dynamic> headers = {
       if(token != null) HttpHeaders.authorizationHeader: 'Bearer $token',
-      if(apiKey != null) xAuthKey: apiKey,
-      if(accountEmail != null) xAuthEmail: accountEmail,
-      if(userServiceKey != null) xAuthUserServiceKey: userServiceKey,
+      if(apiKey != null) xAuthKeyHeader: apiKey,
+      if(accountEmail != null) xAuthEmailHeader: accountEmail,
+      if(userServiceKey != null) xAuthUserServiceKeyHeader: userServiceKey,
     };
 
     restAPI.init(

@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:cloudflare/cloudflare.dart';
 
-/// Make sure to set all of this environment variables before running tests
+/// Make sure to set these environment variables before running tests.
+/// Take into account not all envs are necessary, it depends on what kind of
+/// authentication you want to use.
 ///
 /// export CLOUDFLARE_IMAGE_FILE=/Users/user/Desktop/image-test.jpg
 /// export CLOUDFLARE_IMAGE_FILE_1=/Users/user/Desktop/image-test-1.jpg
@@ -38,9 +40,9 @@ Future<void> init() async {
     apiUrl: apiUrl,
     accountId: accountId!,
     token: token,
-    // apiKey: apiKey,
-    // accountEmail: accountEmail,
-    // userServiceKey: userServiceKey,
+    apiKey: apiKey,
+    accountEmail: accountEmail,
+    userServiceKey: userServiceKey,
   );
   await cloudflare.init();
 }

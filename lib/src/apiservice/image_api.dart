@@ -75,6 +75,57 @@ class ImageAPI
     return responses;
   }
 
+  /// An image up to 10 Megabytes can be upload.
+  Future<CResponse<CloudflareImage?>> uploadFromPath({
+    /// Image file to upload
+    required DataTransmit<String> content,
+
+    /// Indicates whether the image requires a signature token for the access
+    /// default value: false
+    /// valid values: (true,false)
+    bool? requireSignedURLs,
+
+    /// User modifiable key-value store. Can use used for keeping references to
+    /// another system of record for managing images.
+    /// "{\"meta\": \"metaID\"}"
+    Map<String, dynamic>? metadata,
+  }) async {
+    return uploadFromFile(
+      content: DataTransmit(
+        data: File(content.data),
+        progressCallback: content.progressCallback),
+      requireSignedURLs: requireSignedURLs,
+      metadata: metadata,
+    );
+  }
+
+  /// Uploads multiple images by repeatedly calling uploadFromFile
+  Future<List<CResponse<CloudflareImage?>>> uploadFromPaths({
+    /// Image file to upload
+    required List<DataTransmit<String>> contents,
+
+    /// Indicates whether the image requires a signature token for the access
+    /// default value: false
+    /// valid values: (true,false)
+    bool? requireSignedURLs,
+
+    /// User modifiable key-value store. Can use used for keeping references to
+    /// another system of record for managing images.
+    /// "{\"meta\": \"metaID\"}"
+    Map<String, dynamic>? metadata,
+  }) async {
+    List<CResponse<CloudflareImage?>> responses = [];
+    for (final content in contents) {
+      final response = await uploadFromPath(
+        content: content,
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+      );
+      responses.add(response);
+    }
+    return responses;
+  }
+
   /// Update image access control. On access control change,
   /// all copies of the image are purged from Cache.
   Future<CResponse<CloudflareImage?>> update({

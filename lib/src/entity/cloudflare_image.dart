@@ -9,6 +9,8 @@ part 'cloudflare_image.g.dart';
 @JsonSerializable(includeIfNull: false)
 class CloudflareImage extends Jsonable<CloudflareImage>{
 
+  static const imageDeliveryUrl = 'https://imagedelivery.net';
+
   /// Image unique identifier
   ///
   /// e.g: "ZxR0pLaXRldlBtaFhhO2FiZGVnaA"
@@ -64,6 +66,8 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   /// read only
   DateTime uploaded;
 
+  String? _baseUrl;
+
   CloudflareImage({
     String? id,
     String? filename,
@@ -78,6 +82,21 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
     variants = variants ?? [],
     uploaded = uploaded ?? DateTime.now()
   ;
+
+  factory CloudflareImage.fromUrl(String url) {
+    final split = url.replaceAll('$imageDeliveryUrl/', '').split('/');
+    String? imageDeliveryId = split.isNotEmpty ? split[0] : null,
+        imageId = split.length > 1 ? split[1] : null;
+    if(!url.startsWith(imageDeliveryUrl) || imageDeliveryId == null || imageId == null) {
+      throw Exception('Invalid CloudflareImage from url');
+    }
+    return CloudflareImage(
+      id: imageDeliveryId,
+      variants: [url],
+    );
+  }
+
+  String get baseUrl => _baseUrl ?? (_baseUrl = variants.isNotEmpty ? variants[0] : '');
 
   @override
   Map<String, dynamic> toJson() => _$CloudflareImageToJson(this);
