@@ -25,7 +25,7 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   ///
   /// max length: 32
   /// read only
-  String filename;
+  String? filename;
 
 
   /// User modifiable key-value store.
@@ -70,14 +70,13 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
 
   CloudflareImage({
     String? id,
-    String? filename,
+    this.filename,
     this.meta,
     bool? requireSignedURLs,
     List<String>? variants,
     DateTime? uploaded,
   }) :
     id = id ?? '',
-    filename = filename ?? '',
     requireSignedURLs = requireSignedURLs ?? false,
     variants = variants ?? [],
     uploaded = uploaded ?? DateTime.now()

@@ -18,9 +18,11 @@ class ImageAPI
     );
 
   /// An image up to 10 Megabytes can be upload.
-  Future<CResponse<CloudflareImage?>> uploadFromFile({
+  Future<CResponse<CloudflareImage?>> upload({
     /// Image file to upload
-    required DataTransmit<File> content,
+    DataTransmit<File>? contentFromFile,
+    DataTransmit<String>? contentFromPath,
+    DataTransmit<List<int>>? contentFromBytes,
 
     /// Indicates whether the image requires a signature token for the access
     /// default value: false
@@ -32,20 +34,43 @@ class ImageAPI
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
-    final response = await parseResponse(service.upload(
-      file: content.data,
-      requireSignedURLs: requireSignedURLs,
-      metadata: metadata,
-      onUploadProgress: content.progressCallback,
-    ));
+    assert(
+        contentFromFile != null ||
+            contentFromPath != null ||
+            contentFromBytes != null,
+        'One of the content must be specified.');
+
+    final CResponse<CloudflareImage?> response;
+    if(contentFromPath != null) {
+      contentFromFile = DataTransmit<File>(
+          data: File(contentFromPath.data),
+          progressCallback: contentFromPath.progressCallback);
+    }
+    if(contentFromFile != null) {
+      response = await parseResponse(service.uploadFromFile(
+        file: contentFromFile.data,
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+        onUploadProgress: contentFromFile.progressCallback,
+      ));
+    } else {
+      response = await parseResponse(service.uploadFromBytes(
+        bytes: contentFromBytes!.data,
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+        onUploadProgress: contentFromBytes.progressCallback,
+      ));
+    }
 
     return response;
   }
 
-  /// Uploads multiple images by repeatedly calling uploadFromFile
-  Future<List<CResponse<CloudflareImage?>>> uploadFromFiles({
+  /// Uploads multiple images by repeatedly calling upload
+  Future<List<CResponse<CloudflareImage?>>> uploadMultiple({
     /// Image file to upload
-    required List<DataTransmit<File>> contents,
+    List<DataTransmit<File>>? contentFromFiles,
+    List<DataTransmit<String>>? contentFromPaths,
+    List<DataTransmit<List<int>>>? contentFromBytes,
 
     /// Indicates whether the image requires a signature token for the access
     /// default value: false
@@ -57,71 +82,41 @@ class ImageAPI
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
+    assert(
+    (contentFromFiles?.isNotEmpty ?? false) ||
+        (contentFromPaths?.isNotEmpty ?? false) ||
+        (contentFromBytes?.isNotEmpty ?? false),
+    'One of the contents must be specified.');
+
     List<CResponse<CloudflareImage?>> responses = [];
-    // responses = await Future.wait(
-    //     contents.map((content) async => await uploadFromFile(
-    //       content: content,
-    //       requireSignedURLs: requireSignedURLs,
-    //       metadata: metadata,
-    //     )));
-    for (final content in contents) {
-      final response = await uploadFromFile(
-        content: content,
-        requireSignedURLs: requireSignedURLs,
-        metadata: metadata,
-      );
-      responses.add(response);
+
+
+    if(contentFromPaths?.isNotEmpty ?? false) {
+      contentFromFiles = [];
+      for (final content in contentFromPaths!) {
+        contentFromFiles.add(DataTransmit<File>(
+            data: File(content.data),
+            progressCallback: content.progressCallback));
+      }
     }
-    return responses;
-  }
-
-  /// An image up to 10 Megabytes can be upload.
-  Future<CResponse<CloudflareImage?>> uploadFromPath({
-    /// Image file to upload
-    required DataTransmit<String> content,
-
-    /// Indicates whether the image requires a signature token for the access
-    /// default value: false
-    /// valid values: (true,false)
-    bool? requireSignedURLs,
-
-    /// User modifiable key-value store. Can use used for keeping references to
-    /// another system of record for managing images.
-    /// "{\"meta\": \"metaID\"}"
-    Map<String, dynamic>? metadata,
-  }) async {
-    return uploadFromFile(
-      content: DataTransmit(
-        data: File(content.data),
-        progressCallback: content.progressCallback),
-      requireSignedURLs: requireSignedURLs,
-      metadata: metadata,
-    );
-  }
-
-  /// Uploads multiple images by repeatedly calling uploadFromFile
-  Future<List<CResponse<CloudflareImage?>>> uploadFromPaths({
-    /// Image file to upload
-    required List<DataTransmit<String>> contents,
-
-    /// Indicates whether the image requires a signature token for the access
-    /// default value: false
-    /// valid values: (true,false)
-    bool? requireSignedURLs,
-
-    /// User modifiable key-value store. Can use used for keeping references to
-    /// another system of record for managing images.
-    /// "{\"meta\": \"metaID\"}"
-    Map<String, dynamic>? metadata,
-  }) async {
-    List<CResponse<CloudflareImage?>> responses = [];
-    for (final content in contents) {
-      final response = await uploadFromPath(
-        content: content,
-        requireSignedURLs: requireSignedURLs,
-        metadata: metadata,
-      );
-      responses.add(response);
+    if(contentFromFiles?.isNotEmpty ?? false) {
+      for (final content in contentFromFiles!) {
+        final response = await upload(
+          contentFromFile: content,
+          requireSignedURLs: requireSignedURLs,
+          metadata: metadata,
+        );
+        responses.add(response);
+      }
+    } else {
+      for (final content in contentFromBytes!) {
+        final response = await upload(
+          contentFromBytes: content,
+          requireSignedURLs: requireSignedURLs,
+          metadata: metadata,
+        );
+        responses.add(response);
+      }
     }
     return responses;
   }

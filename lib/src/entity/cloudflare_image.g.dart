@@ -23,7 +23,6 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
   final val = <String, dynamic>{
     'id': instance.id,
-    'filename': instance.filename,
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -32,6 +31,7 @@ Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
     }
   }
 
+  writeNotNull('filename', instance.filename);
   writeNotNull('meta', instance.meta);
   val['requireSignedURLs'] = instance.requireSignedURLs;
   val['variants'] = instance.variants;
