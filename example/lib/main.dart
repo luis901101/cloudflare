@@ -32,6 +32,7 @@ const String accountEmail = String.fromEnvironment('CLOUDFLARE_ACCOUNT_EMAIL', d
 const String userServiceKey = String.fromEnvironment('CLOUDFLARE_USER_SERVICE_KEY', defaultValue: '');
 
 late Cloudflare cloudflare;
+String? cloudflareInitMessage;
 
 void main() async {
   try {
@@ -45,6 +46,21 @@ void main() async {
     );
     await cloudflare.init();
   } catch (e) {
+    cloudflareInitMessage = '''
+    Check your environment definitions for Cloudflare.
+    Make sure to run this app with:  
+    
+    flutter run
+    --dart-define=CLOUDFLARE_API_URL=https://api.cloudflare.com/client/v4
+    --dart-define=CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    --dart-define=CLOUDFLARE_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    --dart-define=CLOUDFLARE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    --dart-define=CLOUDFLARE_ACCOUNT_EMAIL=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    --dart-define=CLOUDFLARE_USER_SERVICE_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    
+    Exception details:
+    ${e.toString()}
+    ''';
     print(e);
   }
   runApp(const App());

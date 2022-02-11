@@ -1,3 +1,4 @@
+import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/page/image_api_sample_page.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,20 @@ class App extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Cloudflare API Demo'),
         ),
-        body: ListView.builder(
+        body: cloudflareInitMessage != null ?
+        Center(
+          child: Scrollbar(
+            child: SingleChildScrollView(
+              child: Text(cloudflareInitMessage!,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+        ) :
+        ListView.builder(
           itemCount: pages.length,
           itemBuilder: (context, index) {
             final title = pages[0]['title'].toString();

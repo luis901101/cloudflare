@@ -81,11 +81,11 @@ class Cloudflare {
     this.timeout,
     this.httpClient,
   }) :
-      assert(((token != null && tokenCallback == null) || (token == null && tokenCallback != null)) ||
-          (apiKey != null && accountEmail != null) || userServiceKey != null,
-          'A token or tokenCallback or must be specified, only one of both. '
-              'Otherwise an apiKey and accountEmmail must specified. '
-              'Otherwise a userServiceKey must specified.'),
+      assert((((token?.isNotEmpty ?? false) && tokenCallback == null) || ((token?.isEmpty ?? true) && tokenCallback != null)) ||
+          ((apiKey?.isNotEmpty ?? false) && (accountEmail?.isNotEmpty ?? false)) || (userServiceKey?.isNotEmpty ?? false),
+          '\n\nA token or tokenCallback must be specified, only one of both. '
+              '\nOtherwise an apiKey and accountEmmail must specified. '
+              '\nOtherwise a userServiceKey must specified.'),
     apiUrl = apiUrl ?? 'https://api.cloudflare.com/client/v4',
     tokenCallback = tokenCallback ?? (() async => token)
   ;

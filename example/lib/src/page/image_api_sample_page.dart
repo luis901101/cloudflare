@@ -21,7 +21,6 @@ enum FileSource {
 }
 
 class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
-  //Change this values with your own
   static const int loadImage = 1;
   static const int uploadImages = 2;
   static const int deleteUploadedImages = 3;
