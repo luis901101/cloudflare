@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/utils/alert_utils.dart';
+import 'package:cloudflare_example/src/utils/image_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloudflare_example/src/utils/image_utils.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageAPIDemoPage extends StatefulWidget {
@@ -366,7 +367,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         default:
       }
 
-      List<CResponse<CloudflareImage?>> responses = await cloudflare.imageAPI.uploadMultiple(
+      List<CloudflareHTTPResponse<CloudflareImage?>> responses = await cloudflare.imageAPI.uploadMultiple(
         contentFromPaths: contentFromPaths,
         contentFromBytes: contentFromBytes,
       );
@@ -375,8 +376,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         if (response.isSuccessful && response.body != null) {
           cloudflareImages.add(response.body!);
         } else {
-          if(response.error is ErrorResponse && (response.error as ErrorResponse).messages.isNotEmpty) {
-            errorMessage = (response.error as ErrorResponse).messages.first;
+          if(response.error is CloudflareErrorResponse && (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
+            errorMessage = (response.error as CloudflareErrorResponse).messages.first;
           } else {
             errorMessage = response.error?.toString();
           }
@@ -397,7 +398,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
   Future<void> doMultipleDelete() async {
 
-    List<CResponse> responses = await cloudflare.imageAPI.deleteMultiple(images: cloudflareImages,);
+    List<CloudflareHTTPResponse> responses = await cloudflare.imageAPI.deleteMultiple(images: cloudflareImages,);
 
     errorMessage = null;
     List<CloudflareImage> imagesCouldNotDelete = [];
@@ -405,8 +406,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
       final response = responses[i];
       if (!response.isSuccessful) {
         imagesCouldNotDelete.add(cloudflareImages[i]);
-        if(response.error is ErrorResponse && (response.error as ErrorResponse).messages.isNotEmpty) {
-          errorMessage = (response.error as ErrorResponse).messages.first;
+        if(response.error is CloudflareErrorResponse && (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
+          errorMessage = (response.error as CloudflareErrorResponse).messages.first;
         } else {
           errorMessage = response.error?.toString();
         }

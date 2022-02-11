@@ -8,14 +8,14 @@ import 'package:cloudflare/src/utils/callbacks.dart';
 
 export 'package:cloudflare/src/apiservice/image_api.dart';
 
-export 'package:cloudflare/src/base_api/c_response.dart';
+export 'package:cloudflare/src/model/cloudflare_http_response.dart';
 
 export 'package:cloudflare/src/entity/cloudflare_image.dart';
 export 'package:cloudflare/src/entity/cloudflare_response.dart';
 
 export 'package:cloudflare/src/model/data_transmit.dart';
 export 'package:cloudflare/src/model/error_info.dart';
-export 'package:cloudflare/src/model/error_response.dart';
+export 'package:cloudflare/src/model/cloudflare_error_response.dart';
 export 'package:cloudflare/src/model/pagination.dart';
 
 export 'package:cloudflare/src/utils/callbacks.dart';

@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/model/error_info.dart';
-import 'package:cloudflare/src/model/error_response.dart';
+import 'package:cloudflare/src/model/cloudflare_error_response.dart';
 import 'package:cloudflare/src/model/pagination.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:cloudflare/src/base_api/c_response.dart';
+import 'package:cloudflare/src/model/cloudflare_http_response.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:http/http.dart' as http;
@@ -31,15 +31,15 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     this.errorType,
   });
 
-  Future<CResponse> getSaveResponse<ContainerDataTypeGeneric>(Future futureResponse, {bool parseCloudflareResponse = true}) async {
-    CResponse response = CResponse(
+  Future<CloudflareHTTPResponse> getSaveResponse<ContainerDataTypeGeneric>(Future futureResponse, {bool parseCloudflareResponse = true}) async {
+    CloudflareHTTPResponse response = CloudflareHTTPResponse(
       http.Response('', HttpStatus.notFound),
       null,
     );
 
-    CResponse httpResponseToCustomHttpResponse(HttpResponse response) {
+    CloudflareHTTPResponse httpResponseToCustomHttpResponse(HttpResponse response) {
       dynamic body = response.data;
-      ErrorResponse? error;
+      CloudflareErrorResponse? error;
       if(parseCloudflareResponse) {
         if(body is Map<String, dynamic>) {
           body = CloudflareResponse.fromJson(body);
@@ -47,13 +47,13 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
           body = CloudflareResponse().fromJsonString(body);
         }
         if(body is CloudflareResponse && !body.success) {
-          error = ErrorResponse(
+          error = CloudflareErrorResponse(
             errors: body.errors,
             messages: body.messages,
           );
         }
       }
-      return CResponse(
+      return CloudflareHTTPResponse(
         http.Response(
           '',
           response.response.statusCode ?? HttpStatus.notFound,
@@ -70,8 +70,8 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
       );
     }
 
-    CResponse<CloudflareResponse> dioErrorToCustomHttpResponse(dio.DioError error) =>
-      CResponse(
+    CloudflareHTTPResponse<CloudflareResponse> dioErrorToCustomHttpResponse(dio.DioError error) =>
+      CloudflareHTTPResponse(
         http.Response(
           '',
           error.response?.statusCode ?? HttpStatus.notFound,
@@ -83,7 +83,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
           ),
         ),
         null,
-        error: error.response?.data ?? ErrorResponse(
+        error: error.response?.data ?? CloudflareErrorResponse(
           errors: [ErrorInfo(message: error.message)],
         ),
         extraData: error
@@ -113,18 +113,18 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     return response;
   }
 
-  Future<CResponse<DataType>> parseResponse(Future futureResponse, {bool parseCloudflareResponse = true}) async {
+  Future<CloudflareHTTPResponse<DataType>> parseResponse(Future futureResponse, {bool parseCloudflareResponse = true}) async {
     return genericParseResponse(futureResponse, dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
   }
 
-  Future<CResponse<List<DataType>>> parseResponseAsList(
+  Future<CloudflareHTTPResponse<List<DataType>>> parseResponseAsList(
       Future futureResponse, {bool parseCloudflareResponse = true}) async {
     return genericParseResponseAsList(futureResponse, dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
   }
 
-  Future<CResponse<DataTypeGeneric>> genericParseResponse<DataTypeGeneric>(
+  Future<CloudflareHTTPResponse<DataTypeGeneric>> genericParseResponse<DataTypeGeneric>(
       Future futureResponse, {DataTypeGeneric? dataType, bool parseCloudflareResponse = true}) async {
-    CResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
+    CloudflareHTTPResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
     try {
       DataTypeGeneric? dataTypeResult;
       dynamic body = response.body;
@@ -141,11 +141,11 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
           dataTypeResult = dataType.fromJsonString(body) as DataTypeGeneric?;
         }
       }
-      return CResponse<DataTypeGeneric>(response.base, dataTypeResult, error: response.error);
+      return CloudflareHTTPResponse<DataTypeGeneric>(response.base, dataTypeResult, error: response.error);
     } catch (e) {
       String message = e.toString();
       print(e);
-      return CResponse<DataTypeGeneric>(
+      return CloudflareHTTPResponse<DataTypeGeneric>(
         http.Response(
           response.body?.toString() ?? '',
           Jsonable.jsonParserError,
@@ -161,10 +161,10 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     }
   }
 
-  Future<CResponse<List<DataTypeGeneric>>>
+  Future<CloudflareHTTPResponse<List<DataTypeGeneric>>>
   genericParseResponseAsList<DataTypeGeneric extends Jsonable?>(
       Future futureResponse, {DataTypeGeneric? dataType, bool parseCloudflareResponse = true}) async {
-    CResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
+    CloudflareHTTPResponse response = await getSaveResponse(futureResponse, parseCloudflareResponse: parseCloudflareResponse);
     try {
       List<DataTypeGeneric>? dataList;
       dynamic body = response.body;
@@ -199,11 +199,11 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
           dataList = dataType.fromJsonString(body) as List<DataTypeGeneric>?;
         }
       }
-      return CResponse<List<DataTypeGeneric>>(response.base, dataList, error: response.error);
+      return CloudflareHTTPResponse<List<DataTypeGeneric>>(response.base, dataList, error: response.error);
     } catch (e) {
       String message = e.toString();
       print(e);
-      return CResponse<List<DataTypeGeneric>>(
+      return CloudflareHTTPResponse<List<DataTypeGeneric>>(
         http.Response(
           response.body?.toString() ?? '',
           Jsonable.jsonParserError,

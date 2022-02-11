@@ -1,15 +1,12 @@
 import 'dart:io';
 
-import 'package:cloudflare/src/base_api/c_response.dart';
+import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/cloudflare_image.dart';
-import 'package:cloudflare/src/model/data_transmit.dart';
-import 'package:cloudflare/src/model/error_response.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 
 class ImageAPI
-    extends RestAPIService<ImageService, CloudflareImage, ErrorResponse> {
+    extends RestAPIService<ImageService, CloudflareImage, CloudflareErrorResponse> {
   ImageAPI({required RestAPI restAPI, required String accountId})
     : super(
       restAPI: restAPI,
@@ -18,7 +15,7 @@ class ImageAPI
     );
 
   /// An image up to 10 Megabytes can be upload.
-  Future<CResponse<CloudflareImage?>> upload({
+  Future<CloudflareHTTPResponse<CloudflareImage?>> upload({
     /// Image file to upload
     DataTransmit<File>? contentFromFile,
     DataTransmit<String>? contentFromPath,
@@ -40,7 +37,7 @@ class ImageAPI
             contentFromBytes != null,
         'One of the content must be specified.');
 
-    final CResponse<CloudflareImage?> response;
+    final CloudflareHTTPResponse<CloudflareImage?> response;
     if(contentFromPath != null) {
       contentFromFile = DataTransmit<File>(
           data: File(contentFromPath.data),
@@ -66,7 +63,7 @@ class ImageAPI
   }
 
   /// Uploads multiple images by repeatedly calling upload
-  Future<List<CResponse<CloudflareImage?>>> uploadMultiple({
+  Future<List<CloudflareHTTPResponse<CloudflareImage?>>> uploadMultiple({
     /// Image file to upload
     List<DataTransmit<File>>? contentFromFiles,
     List<DataTransmit<String>>? contentFromPaths,
@@ -88,7 +85,7 @@ class ImageAPI
         (contentFromBytes?.isNotEmpty ?? false),
     'One of the contents must be specified.');
 
-    List<CResponse<CloudflareImage?>> responses = [];
+    List<CloudflareHTTPResponse<CloudflareImage?>> responses = [];
 
 
     if(contentFromPaths?.isNotEmpty ?? false) {
@@ -123,7 +120,7 @@ class ImageAPI
 
   /// Update image access control. On access control change,
   /// all copies of the image are purged from Cache.
-  Future<CResponse<CloudflareImage?>> update({
+  Future<CloudflareHTTPResponse<CloudflareImage?>> update({
     String? id,
     CloudflareImage? image,
 
@@ -151,7 +148,7 @@ class ImageAPI
 
   /// Up to 100 images can be listed with one request, use optional parameters
   /// to get a specific range of images.
-  Future<CResponse<List<CloudflareImage>?>> getAll({
+  Future<CloudflareHTTPResponse<List<CloudflareImage>?>> getAll({
     /// Page number of paginated results, default value: 1
     int? page,
 
@@ -167,7 +164,7 @@ class ImageAPI
   }
 
   /// Fetch details of a single image.
-  Future<CResponse<CloudflareImage?>> get({
+  Future<CloudflareHTTPResponse<CloudflareImage?>> get({
     String? id,
     CloudflareImage? image,
   }) async {
@@ -181,7 +178,7 @@ class ImageAPI
   /// Fetch base image. For most images this will be the originally uploaded
   /// file. For larger images it can be a near-lossless version of the original.
   /// Note: the response is <image blob data>
-  Future<CResponse<List<int>?>> getBase({
+  Future<CloudflareHTTPResponse<List<int>?>> getBase({
     String? id,
     CloudflareImage? image,
   }) async {
@@ -199,7 +196,7 @@ class ImageAPI
 
   /// Delete an image on Cloudflare Images. On success, all copies of the image
   /// are deleted and purged from Cache.
-  Future<CResponse> delete({
+  Future<CloudflareHTTPResponse> delete({
     String? id,
     CloudflareImage? image,
   }) async {
@@ -212,7 +209,7 @@ class ImageAPI
 
   /// Delete a list of images on Cloudflare Images. On success, all copies of the images
   /// are deleted and purged from Cache.
-  Future<List<CResponse>> deleteMultiple({
+  Future<List<CloudflareHTTPResponse>> deleteMultiple({
     List<String>? ids,
     List<CloudflareImage>? images,
   }) async {
@@ -221,7 +218,7 @@ class ImageAPI
 
     ids ??= images?.map((image) => image.id).toList();
 
-    List<CResponse> responses = [];
+    List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
       final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
       responses.add(response);

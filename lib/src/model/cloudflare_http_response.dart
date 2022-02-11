@@ -3,20 +3,20 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
-/// A [http.BaseResponse] wrapper representing a response of a network call.
+/// It is a [http.BaseResponse] wrapper representing a response of a network call.
 ///
 /// ```dart
 /// @Get(path: '/something')
-/// Future<Response> fetchSomething();
+/// Future<CHResponse> fetchSomething();
 /// ```
 ///
 /// ```dart
 /// @Get(path: '/items/{id}')
-/// Future<Response<Item>> fetchItem();
+/// Future<CHResponse<Item>> fetchItem();
 /// ```
 @immutable
-class CResponse<BodyType> {
-  /// The [http.BaseResponse] from `package:http` that this [CResponse] wraps.
+class CloudflareHTTPResponse<BodyType> {
+  /// The [http.BaseResponse] from `package:http` that this [CloudflareHTTPResponse] wraps.
   final http.BaseResponse base;
 
   /// The body of the response after conversion by Chopper
@@ -31,16 +31,16 @@ class CResponse<BodyType> {
 
   final dynamic extraData;
 
-  const CResponse(this.base, this.body, {this.error, this.extraData});
+  const CloudflareHTTPResponse(this.base, this.body, {this.error, this.extraData});
 
   /// Makes a copy of this Response, replacing original values with the given ones.
   /// This method can also alter the type of the response body.
-  CResponse<NewBodyType> copyWith<NewBodyType>({
+  CloudflareHTTPResponse<NewBodyType> copyWith<NewBodyType>({
     http.BaseResponse? base,
     NewBodyType? body,
     Object? bodyError,
   }) =>
-      CResponse<NewBodyType>(
+      CloudflareHTTPResponse<NewBodyType>(
         base ?? this.base,
         body ?? (this.body as NewBodyType),
         error: bodyError ?? error,

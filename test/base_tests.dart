@@ -24,7 +24,7 @@ final String? apiKey = Platform.environment['CLOUDFLARE_API_KEY'];
 final String? accountEmail = Platform.environment['CLOUDFLARE_ACCOUNT_EMAIL'];
 final String? userServiceKey = Platform.environment['CLOUDFLARE_USER_SERVICE_KEY'];
 
-Cloudflare cloudflare = Cloudflare(accountId: '', token: '');
+Cloudflare cloudflare = Cloudflare(accountId: 'test', token: 'test');
 
 Future<void> init() async {
 

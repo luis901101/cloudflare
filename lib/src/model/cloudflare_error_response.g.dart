@@ -1,13 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'error_response.dart';
+part of 'cloudflare_error_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ErrorResponse _$ErrorResponseFromJson(Map<String, dynamic> json) =>
-    ErrorResponse(
+CloudflareErrorResponse _$CloudflareErrorResponseFromJson(
+        Map<String, dynamic> json) =>
+    CloudflareErrorResponse(
       errors: (json['errors'] as List<dynamic>?)
           ?.map((e) => ErrorInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -16,7 +17,8 @@ ErrorResponse _$ErrorResponseFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$ErrorResponseToJson(ErrorResponse instance) =>
+Map<String, dynamic> _$CloudflareErrorResponseToJson(
+        CloudflareErrorResponse instance) =>
     <String, dynamic>{
       'errors': instance.errors,
       'messages': instance.messages,

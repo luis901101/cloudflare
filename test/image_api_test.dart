@@ -2,8 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/base_api/c_response.dart';
-import 'package:cloudflare/src/model/data_transmit.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -14,7 +12,7 @@ void main() async {
   await init();
 
   group('Retrieve image tests', () {
-    late final CResponse<List<CloudflareImage>?> responseList;
+    late final CloudflareHTTPResponse<List<CloudflareImage>?> responseList;
     String? imageId;
     setUpAll(() async {
       responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
