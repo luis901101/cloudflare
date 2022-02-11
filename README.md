@@ -148,4 +148,4 @@ List<CloudflareHTTPResponse<CloudflareImage?>> responseFromPaths = await cloudfl
 List<CloudflareHTTPResponse<CloudflareImage?>> responseFromBytes = await cloudflare.imageAPI.uploadMultiple(contentFromBytes: contentFromBytes);
 ```
 -------------
-### For mor examples of how to use this SDK check the example project and the unit tests
+### For mor examples of how to use this SDK check the example project and unit tests
