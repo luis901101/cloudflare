@@ -98,9 +98,20 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   String get baseUrl => _baseUrl ?? (_baseUrl = variants.isNotEmpty ? variants[0] : '');
 
   @override
+  bool operator ==(Object other) {
+    if(other is! CloudflareImage) return false;
+    return id == other.id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
   Map<String, dynamic> toJson() => _$CloudflareImageToJson(this);
   @override
   CloudflareImage? fromJsonMap(Map<String, dynamic>? json) => json != null ? CloudflareImage.fromJson(json) : null;
   factory CloudflareImage.fromJson(Map<String, dynamic> json) =>
       _$CloudflareImageFromJson(json);
+
+
 }
