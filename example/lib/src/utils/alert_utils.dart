@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 typedef ReviewCallback<T> = Function(T rate);
 
@@ -14,7 +12,7 @@ class AlertUtils {
     showModalBottomSheet(
         context: context,
         clipBehavior: Clip.hardEdge,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         builder: (context) {
@@ -24,12 +22,12 @@ class AlertUtils {
                 children: <Widget>[
                   InkWell(
                     child: Container(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Row(
                         children: <Widget>[
                           Icon(Icons.camera, color: Colors.grey.shade800),
-                          VerticalDivider(),
-                          Expanded(
+                          const VerticalDivider(),
+                          const Expanded(
                             child: Text(
                               'Use camera',
                               style: TextStyle(
@@ -43,15 +41,15 @@ class AlertUtils {
                   ),
                   InkWell(
                     child: Container(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Row(
                         children: <Widget>[
                           Icon(
                             Icons.image,
                             color: Colors.grey.shade800,
                           ),
-                          VerticalDivider(),
-                          Expanded(
+                          const VerticalDivider(),
+                          const Expanded(
                             child: Text(
                               'Choose from gallery',
                               style: TextStyle(
@@ -66,9 +64,9 @@ class AlertUtils {
                   Visibility(
                     child: InkWell(
                       child: Container(
-                        padding: EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         child: Row(
-                          children: <Widget>[
+                          children: const <Widget>[
                             Icon(
                               Icons.delete,
                               color: Colors.red,

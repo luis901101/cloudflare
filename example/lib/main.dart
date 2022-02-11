@@ -1,12 +1,6 @@
-import 'dart:async';
-import 'dart:io';
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/src/app.dart';
-import 'package:cloudflare_example/src/utils/alert_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloudflare_example/src/utils/image_utils.dart';
-import 'package:image_picker/image_picker.dart';
 
 /// Make sure to put environment variables in your
 /// flutter run command or in your Additional run args in your selected

@@ -1,6 +1,5 @@
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/model/cloudflare_http_response.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
