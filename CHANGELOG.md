@@ -12,3 +12,7 @@ Types of changes
 ## 0.0.1+1
 ### Added
 - Initial version.
+
+## 0.0.1+2
+### Fixed
+- Readme description.

@@ -4,10 +4,10 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
 
 ## Available APIs
 
-| API | Available |  
-| ------ | ------ |  
-| Image | :white_check_mark: |  
-| Stream | :ballot_box_with_check: |  
+| API | Available |
+| ------ | ------ |
+| Image | :white_check_mark: |
+| Stream | :ballot_box_with_check: |
 
 ## Installation
 The first thing is to add **cloudflare** as a dependency of your project, for this you can use the command:
@@ -26,7 +26,7 @@ Finally you just have to run:
 `dart pub get` **or** `flutter pub get` depending on the project type to download the dependency to your pub-cache
 
 ## How to use
-### Very simple, just build an instance of Cloudflare SDK like this:
+### **Very simple, just build an instance of Cloudflare SDK like this:**
 ```dart
 cloudflare = Cloudflare(  
   apiUrl: apiUrl,
@@ -49,7 +49,7 @@ cloudflare = Cloudflare(
 
 `userServiceKey`: A special Cloudflare API key good for a restricted set of endpoints. Always begins with "v1.0-", may vary in length.
 
-#### Authorization Important Note
+### **Authorization Important Note**
 For authorized requests to Cloudflare API you just need a `token` or `apiKey/accountEmail` or `userServiceKey` not all. Cloudflare's recommended authorization way is to use **`token`** authorization. So a valid Cloudflare instance could be:
 
 ```dart
@@ -148,4 +148,4 @@ List<CloudflareHTTPResponse<CloudflareImage?>> responseFromPaths = await cloudfl
 List<CloudflareHTTPResponse<CloudflareImage?>> responseFromBytes = await cloudflare.imageAPI.uploadMultiple(contentFromBytes: contentFromBytes);
 ```
 -------------
-### For mor examples of how to use this SDK check the example project and unit tests
+### **For more examples about how to use this package check the example project and unit tests**
