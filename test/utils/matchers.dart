@@ -1,10 +1,8 @@
-
 import 'package:cloudflare/cloudflare.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
 class GenericMatcher extends Matcher {
-
   bool Function(dynamic item, Map matchState)? onMatches;
   Description Function(Description description)? onDescribe;
 
@@ -29,10 +27,11 @@ class ResponseMatcher extends GenericMatcher {
 
   @override
   bool matches(response, Map matchState) {
-    if(response is! CloudflareHTTPResponse) return false;
-    if(!response.isSuccessful) {
+    if (response is! CloudflareHTTPResponse) return false;
+    if (!response.isSuccessful) {
       // fail('Unsuccessful response: ${response.error?.toString()}');
-      return printAndReturnOnFailure('Unsuccessful response: ${response.error?.toString()}');
+      return printAndReturnOnFailure(
+          'Unsuccessful response: ${response.error?.toString()}');
     }
     return true;
   }
@@ -44,7 +43,7 @@ class ImageMatcher extends ResponseMatcher {
   @override
   bool matches(response, Map matchState) {
     super.matches(response, matchState);
-    if(response is! CloudflareHTTPResponse<CloudflareImage>) return false;
+    if (response is! CloudflareHTTPResponse<CloudflareImage>) return false;
     return response.body != null && response.body!.variants.isNotEmpty;
   }
 }

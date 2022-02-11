@@ -1,4 +1,3 @@
-
 /// Callback for asynchronous token generation
 typedef TokenCallback = Future<String?> Function();
 
@@ -15,4 +14,5 @@ typedef TokenCallback = Future<String?> Function();
 /// 2.When receiving data:
 ///   [total] will be -1 if the size of the response body is not known in advance,
 ///   for example: response data is compressed with gzip or no content-length header.
-typedef GenericProgressCallback<T> = void Function(T? key, int count, int total);
+typedef GenericProgressCallback<T> = void Function(
+    T? key, int count, int total);

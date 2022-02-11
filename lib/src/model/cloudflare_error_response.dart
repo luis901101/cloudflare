@@ -7,16 +7,14 @@ part 'cloudflare_error_response.g.dart';
 /// It is a wrapper for error responses from network calls
 @JsonSerializable()
 class CloudflareErrorResponse extends Jsonable<CloudflareErrorResponse> {
-
   List<ErrorInfo> errors;
   List<String> messages;
 
   CloudflareErrorResponse({
     List<ErrorInfo>? errors,
     List<String>? messages,
-  }) : errors = errors ?? [],
-      messages = messages ?? []
-  ;
+  })  : errors = errors ?? [],
+        messages = messages ?? [];
 
   @override
   Map<String, dynamic> toJson() => _$CloudflareErrorResponseToJson(this);

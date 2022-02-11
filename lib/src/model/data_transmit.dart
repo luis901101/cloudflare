@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 class DataTransmit<T> {
-
   /// Data to transmit
   T data;
 

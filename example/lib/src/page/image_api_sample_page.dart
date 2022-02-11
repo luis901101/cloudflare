@@ -47,34 +47,35 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     super.initState();
   }
 
-  void onUploadSourceChanged(FileSource? value) => setState(() => fileSource = value!);
+  void onUploadSourceChanged(FileSource? value) =>
+      setState(() => fileSource = value!);
 
   Widget get uploadSourceView => Column(
-    children: [
-      const Text("File source"),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 150,
-            child: RadioListTile<FileSource>(
-                title: const Text("Path"),
-                value: FileSource.path,
-                groupValue: fileSource,
-                onChanged: onUploadSourceChanged),
-          ),
-          SizedBox(
-            width: 150,
-            child: RadioListTile<FileSource>(
-                title: const Text("Bytes"),
-                value: FileSource.bytes,
-                groupValue: fileSource,
-                onChanged: onUploadSourceChanged),
-          ),
+          const Text("File source"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 150,
+                child: RadioListTile<FileSource>(
+                    title: const Text("Path"),
+                    value: FileSource.path,
+                    groupValue: fileSource,
+                    onChanged: onUploadSourceChanged),
+              ),
+              SizedBox(
+                width: 150,
+                child: RadioListTile<FileSource>(
+                    title: const Text("Bytes"),
+                    value: FileSource.bytes,
+                    groupValue: fileSource,
+                    onChanged: onUploadSourceChanged),
+              ),
+            ],
+          )
         ],
-      )
-    ],
-  );
+      );
 
   Widget imageFromPathView(DataTransmitNotifier data) {
     return SizedBox(
@@ -91,7 +92,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
             key: ValueKey(data.dataTransmit.data),
             valueListenable: data.notifier,
             builder: (context, value, child) {
-              if(value == 0 && !loading) return const SizedBox();
+              if (value == 0 && !loading) return const SizedBox();
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -110,20 +111,23 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
   Widget imageFromUrlView(CloudflareImage image) {
     Widget imageView(String url) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.network(
-          url,
-          width: 100,
-          height: 100,
-        ),
-        Text(CloudflareImage.variantNameFromUrl(url)),
-      ],
-    );
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(
+              url,
+              width: 100,
+              height: 100,
+            ),
+            Text(CloudflareImage.variantNameFromUrl(url)),
+          ],
+        );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text('Variants', style: TextStyle(fontWeight: FontWeight.bold),),
+        const Text(
+          'Variants',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         ...image.variants.map((url) => imageView(url)).toList()
       ],
     );
@@ -139,10 +143,10 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
       return fromPath ? imageFromPathView(source) : imageFromUrlView(source);
     });
 
-    if(loading && !fromPath) {
-      imageViews.add(
-        const Center(child: CircularProgressIndicator(),)
-      );
+    if (loading && !fromPath) {
+      imageViews.add(const Center(
+        child: CircularProgressIndicator(),
+      ));
     }
     return Wrap(
       alignment: WrapAlignment.center,
@@ -178,16 +182,16 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                   onPressed: loading || dataImages.isEmpty
                       ? null
                       : () {
-                    dataImages = [];
-                    setState(() {});
-                  },
+                          dataImages = [];
+                          setState(() {});
+                        },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                            (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
-                              ? null
-                              : Colors.deepPurple;
-                        }),
+                        (Set<MaterialState> states) {
+                      return states.contains(MaterialState.disabled)
+                          ? null
+                          : Colors.deepPurple;
+                    }),
                   ),
                   child: const Text(
                     'Clear list',
@@ -227,16 +231,16 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                   onPressed: loading || cloudflareImages.isEmpty
                       ? null
                       : () {
-                    cloudflareImages = [];
-                    setState(() {});
-                  },
+                          cloudflareImages = [];
+                          setState(() {});
+                        },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                            (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
-                              ? null
-                              : Colors.purple;
-                        }),
+                        (Set<MaterialState> states) {
+                      return states.contains(MaterialState.disabled)
+                          ? null
+                          : Colors.purple;
+                    }),
                   ),
                   child: const Text(
                     'Clear list',
@@ -257,21 +261,22 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: loading ||
-                              (dataImages.isEmpty && cloudflareImages.isEmpty)
+                                  (dataImages.isEmpty &&
+                                      cloudflareImages.isEmpty)
                               ? null
                               : () {
-                            dataImages = [];
-                            cloudflareImages = [];
-                            setState(() {});
-                          },
+                                  dataImages = [];
+                                  cloudflareImages = [];
+                                  setState(() {});
+                                },
                           style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
+                                MaterialStateProperty.resolveWith<Color?>(
                                     (Set<MaterialState> states) {
-                                  return states.contains(MaterialState.disabled)
-                                      ? null
-                                      : Colors.deepOrange;
-                                }),
+                              return states.contains(MaterialState.disabled)
+                                  ? null
+                                  : Colors.deepOrange;
+                            }),
                           ),
                           child: const Text(
                             'Clear all',
@@ -307,12 +312,12 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                               : () => onClick(deleteUploadedImages),
                           style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
+                                MaterialStateProperty.resolveWith<Color?>(
                                     (Set<MaterialState> states) {
-                                  return states.contains(MaterialState.disabled)
-                                      ? null
-                                      : Colors.red.shade600;
-                                }),
+                              return states.contains(MaterialState.disabled)
+                                  ? null
+                                  : Colors.red.shade600;
+                            }),
                           ),
                           child: const Text(
                             'Delete uploaded images',
@@ -337,10 +342,11 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   }
 
   onNewImages(List<String> filePaths) {
-    if(filePaths.isNotEmpty) {
+    if (filePaths.isNotEmpty) {
       for (final path in filePaths) {
         if (path.isNotEmpty) {
-          dataImages.add(DataTransmitNotifier(dataTransmit: DataTransmit<String>(data: path)));
+          dataImages.add(DataTransmitNotifier(
+              dataTransmit: DataTransmit<String>(data: path)));
         }
       }
       setState(() {});
@@ -353,21 +359,25 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
   Future<void> doMultipleUpload() async {
     try {
-
       List<DataTransmit<String>>? contentFromPaths;
       List<DataTransmit<List<int>>>? contentFromBytes;
 
       switch (fileSource) {
         case FileSource.path:
-          contentFromPaths = dataImages.map((data) => data.dataTransmit).toList();
+          contentFromPaths =
+              dataImages.map((data) => data.dataTransmit).toList();
           break;
         case FileSource.bytes:
-          contentFromBytes = await Future.wait(dataImages.map((data) async => DataTransmit<List<int>>(data: await getFileBytes(data.dataTransmit.data), progressCallback: data.dataTransmit.progressCallback)));
+          contentFromBytes = await Future.wait(dataImages.map((data) async =>
+              DataTransmit<List<int>>(
+                  data: await getFileBytes(data.dataTransmit.data),
+                  progressCallback: data.dataTransmit.progressCallback)));
           break;
         default:
       }
 
-      List<CloudflareHTTPResponse<CloudflareImage?>> responses = await cloudflare.imageAPI.uploadMultiple(
+      List<CloudflareHTTPResponse<CloudflareImage?>> responses =
+          await cloudflare.imageAPI.uploadMultiple(
         contentFromPaths: contentFromPaths,
         contentFromBytes: contentFromBytes,
       );
@@ -376,8 +386,10 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         if (response.isSuccessful && response.body != null) {
           cloudflareImages.add(response.body!);
         } else {
-          if(response.error is CloudflareErrorResponse && (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
-            errorMessage = (response.error as CloudflareErrorResponse).messages.first;
+          if (response.error is CloudflareErrorResponse &&
+              (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
+            errorMessage =
+                (response.error as CloudflareErrorResponse).messages.first;
           } else {
             errorMessage = response.error?.toString();
           }
@@ -397,27 +409,32 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   }
 
   Future<void> doMultipleDelete() async {
-
-    List<CloudflareHTTPResponse> responses = await cloudflare.imageAPI.deleteMultiple(images: cloudflareImages,);
+    List<CloudflareHTTPResponse> responses =
+        await cloudflare.imageAPI.deleteMultiple(
+      images: cloudflareImages,
+    );
 
     errorMessage = null;
     List<CloudflareImage> imagesCouldNotDelete = [];
-    for (int i = 0; i < responses.length; ++i ) {
+    for (int i = 0; i < responses.length; ++i) {
       final response = responses[i];
       if (!response.isSuccessful) {
         imagesCouldNotDelete.add(cloudflareImages[i]);
-        if(response.error is CloudflareErrorResponse && (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
-          errorMessage = (response.error as CloudflareErrorResponse).messages.first;
+        if (response.error is CloudflareErrorResponse &&
+            (response.error as CloudflareErrorResponse).messages.isNotEmpty) {
+          errorMessage =
+              (response.error as CloudflareErrorResponse).messages.first;
         } else {
           errorMessage = response.error?.toString();
         }
       }
     }
 
-    if(imagesCouldNotDelete.isNotEmpty) {
+    if (imagesCouldNotDelete.isNotEmpty) {
       errorMessage = 'Not all images could be deleted: $errorMessage';
     }
-    cloudflareImages.removeWhere((image) => !imagesCouldNotDelete.contains(image));
+    cloudflareImages
+        .removeWhere((image) => !imagesCouldNotDelete.contains(image));
     setState(() {});
   }
 
@@ -464,7 +481,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
   Future<List<String>> handleImagePickerResponse(Future getImageCall) async {
     Map<String, dynamic> resource =
-    await (getImageCall as FutureOr<Map<String, dynamic>>);
+        await (getImageCall as FutureOr<Map<String, dynamic>>);
     if (resource.isEmpty) return [];
     switch (resource['status']) {
       case 'SUCCESS':

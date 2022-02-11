@@ -5,14 +5,13 @@ import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 
-class ImageAPI
-    extends RestAPIService<ImageService, CloudflareImage, CloudflareErrorResponse> {
+class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
+    CloudflareErrorResponse> {
   ImageAPI({required RestAPI restAPI, required String accountId})
-    : super(
-      restAPI: restAPI,
-      service: ImageService(dio: restAPI.dio, accountId: accountId),
-      dataType: CloudflareImage()
-    );
+      : super(
+            restAPI: restAPI,
+            service: ImageService(dio: restAPI.dio, accountId: accountId),
+            dataType: CloudflareImage());
 
   /// An image up to 10 Megabytes can be upload.
   Future<CloudflareHTTPResponse<CloudflareImage?>> upload({
@@ -38,12 +37,12 @@ class ImageAPI
         'One of the content must be specified.');
 
     final CloudflareHTTPResponse<CloudflareImage?> response;
-    if(contentFromPath != null) {
+    if (contentFromPath != null) {
       contentFromFile = DataTransmit<File>(
           data: File(contentFromPath.data),
           progressCallback: contentFromPath.progressCallback);
     }
-    if(contentFromFile != null) {
+    if (contentFromFile != null) {
       response = await parseResponse(service.uploadFromFile(
         file: contentFromFile.data,
         requireSignedURLs: requireSignedURLs,
@@ -80,15 +79,14 @@ class ImageAPI
     Map<String, dynamic>? metadata,
   }) async {
     assert(
-    (contentFromFiles?.isNotEmpty ?? false) ||
-        (contentFromPaths?.isNotEmpty ?? false) ||
-        (contentFromBytes?.isNotEmpty ?? false),
-    'One of the contents must be specified.');
+        (contentFromFiles?.isNotEmpty ?? false) ||
+            (contentFromPaths?.isNotEmpty ?? false) ||
+            (contentFromBytes?.isNotEmpty ?? false),
+        'One of the contents must be specified.');
 
     List<CloudflareHTTPResponse<CloudflareImage?>> responses = [];
 
-
-    if(contentFromPaths?.isNotEmpty ?? false) {
+    if (contentFromPaths?.isNotEmpty ?? false) {
       contentFromFiles = [];
       for (final content in contentFromPaths!) {
         contentFromFiles.add(DataTransmit<File>(
@@ -96,7 +94,7 @@ class ImageAPI
             progressCallback: content.progressCallback));
       }
     }
-    if(contentFromFiles?.isNotEmpty ?? false) {
+    if (contentFromFiles?.isNotEmpty ?? false) {
       for (final content in contentFromFiles!) {
         final response = await upload(
           contentFromFile: content,
@@ -134,8 +132,8 @@ class ImageAPI
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
-    assert(id != null || image != null,
-    'One of id or image must not be empty.');
+    assert(
+        id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
     final response = await parseResponse(service.update(
       id: id!,
@@ -155,10 +153,8 @@ class ImageAPI
     /// Number of items per page, default value: 50
     int? size,
   }) async {
-    final response = await parseResponseAsList(service.getAll(
-      page: page,
-      size: size
-    ));
+    final response =
+        await parseResponseAsList(service.getAll(page: page, size: size));
 
     return response;
   }
@@ -168,10 +164,12 @@ class ImageAPI
     String? id,
     CloudflareImage? image,
   }) async {
-    assert(id != null || image != null,
-    'One of id or image must not be empty.');
+    assert(
+        id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
-    final response = await parseResponse(service.get(id: id!,));
+    final response = await parseResponse(service.get(
+      id: id!,
+    ));
     return response;
   }
 
@@ -182,14 +180,14 @@ class ImageAPI
     String? id,
     CloudflareImage? image,
   }) async {
-    assert(id != null || image != null,
-    'One of id or image must not be empty.');
+    assert(
+        id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
     final response = await genericParseResponse<List<int>>(
-      service.getBase(
-        id: id!,
-      ), parseCloudflareResponse: false
-    );
+        service.getBase(
+          id: id!,
+        ),
+        parseCloudflareResponse: false);
 
     return response;
   }
@@ -200,10 +198,14 @@ class ImageAPI
     String? id,
     CloudflareImage? image,
   }) async {
-    assert(id != null || image != null,
-    'One of id or image must not be empty.');
+    assert(
+        id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
-    final response = await getSaveResponse(service.delete(id: id!,), parseCloudflareResponse: false);
+    final response = await getSaveResponse(
+        service.delete(
+          id: id!,
+        ),
+        parseCloudflareResponse: false);
     return response;
   }
 
@@ -214,16 +216,19 @@ class ImageAPI
     List<CloudflareImage>? images,
   }) async {
     assert((ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
-    'One of ids or images must not be empty.');
+        'One of ids or images must not be empty.');
 
     ids ??= images?.map((image) => image.id).toList();
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
+      final response = await getSaveResponse(
+          service.delete(
+            id: id,
+          ),
+          parseCloudflareResponse: false);
       responses.add(response);
     }
     return responses;
   }
-
 }

@@ -7,8 +7,7 @@ part 'cloudflare_image.g.dart';
 /// API docs: https://api.cloudflare.com/#cloudflare-images-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/images/cloudflare-images
 @JsonSerializable(includeIfNull: false)
-class CloudflareImage extends Jsonable<CloudflareImage>{
-
+class CloudflareImage extends Jsonable<CloudflareImage> {
   static const imageDeliveryUrl = 'https://imagedelivery.net';
 
   /// Image unique identifier
@@ -27,7 +26,6 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   /// read only
   String? filename;
 
-
   /// User modifiable key-value store.
   /// Can be used for keeping references to another system of record for
   /// managing images. Metadata must not exceed 1024 bytes
@@ -35,7 +33,7 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   /// {
   ///   "meta": "metaID"
   /// }
-  Map<String, dynamic>?  meta;
+  Map<String, dynamic>? meta;
 
   /// Indicates whether the image can be a accessed only using it's UID.
   /// If set to true, a signed token needs to be generated with a signing key
@@ -75,19 +73,17 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
     bool? requireSignedURLs,
     List<String>? variants,
     DateTime? uploaded,
-  }) :
-    id = id ?? '',
-    requireSignedURLs = requireSignedURLs ?? false,
-    variants = variants ?? [],
-    uploaded = uploaded ?? DateTime.now()
-  ;
+  })  : id = id ?? '',
+        requireSignedURLs = requireSignedURLs ?? false,
+        variants = variants ?? [],
+        uploaded = uploaded ?? DateTime.now();
 
   static Map<String, String> _dataFromUrl(String url) {
     final split = url.replaceAll('$imageDeliveryUrl/', '').split('/');
     String? imageDeliveryId = split.isNotEmpty ? split[0] : null,
         imageId = split.length > 1 ? split[1] : null,
         variantName = split.length > 2 ? split[2] : null;
-    if(!url.startsWith(imageDeliveryUrl) ||
+    if (!url.startsWith(imageDeliveryUrl) ||
         imageDeliveryId == null ||
         imageId == null ||
         variantName == null) {
@@ -113,11 +109,12 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
     return data['variantName']!;
   }
 
-  String get firstVaiant => _firstVaiant ?? (_firstVaiant = variants.isNotEmpty ? variants[0] : '');
+  String get firstVaiant =>
+      _firstVaiant ?? (_firstVaiant = variants.isNotEmpty ? variants[0] : '');
 
   @override
   bool operator ==(Object other) {
-    if(other is! CloudflareImage) return false;
+    if (other is! CloudflareImage) return false;
     return id == other.id;
   }
 
@@ -127,9 +124,8 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   @override
   Map<String, dynamic> toJson() => _$CloudflareImageToJson(this);
   @override
-  CloudflareImage? fromJsonMap(Map<String, dynamic>? json) => json != null ? CloudflareImage.fromJson(json) : null;
+  CloudflareImage? fromJsonMap(Map<String, dynamic>? json) =>
+      json != null ? CloudflareImage.fromJson(json) : null;
   factory CloudflareImage.fromJson(Map<String, dynamic> json) =>
       _$CloudflareImageFromJson(json);
-
-
 }

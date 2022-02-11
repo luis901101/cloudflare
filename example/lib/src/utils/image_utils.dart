@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUtils {
-  static Future<String?>  _retrieveLostData() async {
-    if(!Platform.isAndroid) return null;
+  static Future<String?> _retrieveLostData() async {
+    if (!Platform.isAndroid) return null;
     final LostDataResponse response = await ImagePicker().retrieveLostData();
     return response.file?.path != null ? response.file!.path : null;
   }
@@ -18,12 +18,11 @@ class ImageUtils {
     CameraDevice cameraDevice = CameraDevice.rear,
     bool multiple = true,
   }) async {
-
     Map<String, dynamic> resource = {};
 
     XFile? pickedImage;
     List<XFile>? pickedImages;
-    try{
+    try {
       Future<void> pickMultipleFromGallery() async {
         pickedImages = await ImagePicker().pickMultiImage(
           maxWidth: 1920,
@@ -31,6 +30,7 @@ class ImageUtils {
           imageQuality: 100,
         );
       }
+
       Future<void> pickSingleFromGallery() async {
         pickedImage = await ImagePicker().pickImage(
           source: source,
@@ -39,8 +39,9 @@ class ImageUtils {
           maxHeight: 1080,
           imageQuality: 100,
         );
-        if(pickedImage != null) pickedImages = [pickedImage!];
+        if (pickedImage != null) pickedImages = [pickedImage!];
       }
+
       Future<void> pickFromCamera() async {
         pickedImage = await ImagePicker().pickImage(
           source: source,
@@ -49,11 +50,12 @@ class ImageUtils {
           maxHeight: 1080,
           imageQuality: 100,
         );
-        if(pickedImage != null) pickedImages = [pickedImage!];
+        if (pickedImage != null) pickedImages = [pickedImage!];
       }
-      switch(source) {
+
+      switch (source) {
         case ImageSource.gallery:
-          if(multiple) {
+          if (multiple) {
             await pickMultipleFromGallery();
           } else {
             await pickSingleFromGallery();
@@ -67,12 +69,12 @@ class ImageUtils {
       List<String> filePaths = [];
       String? path;
       pickedImages?.forEach((item) => filePaths.add(item.path));
-      if(filePaths.isEmpty) {
+      if (filePaths.isEmpty) {
         path = await _retrieveLostData();
-        if(path != null) filePaths.add(path);
+        if (path != null) filePaths.add(path);
       }
       resource = {'status': 'SUCCESS', 'data': filePaths};
-    }on PlatformException catch(e){
+    } on PlatformException catch (e) {
       resource = {
         'status': 'ERROR',
         'data': [],
@@ -83,14 +85,14 @@ class ImageUtils {
       switch (e.code) {
         case cameraAccessDenied:
           resource['message'] =
-          'Camera permission denied. You have to grant permission from system settings';
+              'Camera permission denied. You have to grant permission from system settings';
           break;
         case galleryAccessDenied:
           resource['message'] =
-          'Gellery permission denied. You have to grant permission from system settings';
+              'Gellery permission denied. You have to grant permission from system settings';
           break;
       }
-    }catch(e){
+    } catch (e) {
       resource = {
         'status': 'ERROR',
         'data': [],
@@ -101,13 +103,17 @@ class ImageUtils {
     return resource;
   }
 
-  static Future<Map<String, dynamic>> pickImageFromGallery({bool multiple = true}) async =>
+  static Future<Map<String, dynamic>> pickImageFromGallery(
+          {bool multiple = true}) async =>
       await _pickImageFrom(source: ImageSource.gallery, multiple: multiple);
 
-  static Future<Map<String, dynamic>> takePhoto({CameraDevice cameraDevice = CameraDevice.rear}) async =>
-      await _pickImageFrom(source: ImageSource.camera, cameraDevice: cameraDevice);
+  static Future<Map<String, dynamic>> takePhoto(
+          {CameraDevice cameraDevice = CameraDevice.rear}) async =>
+      await _pickImageFrom(
+          source: ImageSource.camera, cameraDevice: cameraDevice);
 
-  static showPermissionExplanation({required BuildContext context, String? message}) {
+  static showPermissionExplanation(
+      {required BuildContext context, String? message}) {
     showDialog(
         context: context,
         builder: (innerContext) => AlertDialog(
@@ -115,7 +121,8 @@ class ImageUtils {
               content: Text(message!),
               actions: [
                 ElevatedButton(
-                    onPressed: () => Navigator.pop(context), child: const Text('OK'))
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'))
               ],
             ));
   }

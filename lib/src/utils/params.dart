@@ -1,4 +1,3 @@
-
 class Params {
   static const String id = 'id';
   static const String resultInfo = 'result_info';

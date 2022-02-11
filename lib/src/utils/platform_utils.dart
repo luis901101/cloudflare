@@ -1,8 +1,6 @@
-
 import 'dart:io';
 
 class PlatformUtils {
-
   /// Workaround to know if dart code is running on web
   static bool get isWeb {
     try {

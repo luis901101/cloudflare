@@ -32,14 +32,14 @@ abstract class Jsonable<T extends Object> {
           String? json, T? Function(Map<String, dynamic>? json) fromJsonMap) =>
       (json?.isNotEmpty ?? true) ? fromJsonMap.call(jsonDecode(json!)) : null;
 
-  static List<T>? fromJsonStringListGeneric<T>(
-          String? jsonStringList, T? Function(Map<String, dynamic> json) fromJsonMap) =>
-        (jsonStringList?.isNotEmpty ?? true)
+  static List<T>? fromJsonStringListGeneric<T>(String? jsonStringList,
+          T? Function(Map<String, dynamic> json) fromJsonMap) =>
+      (jsonStringList?.isNotEmpty ?? true)
           ? fromJsonListGeneric(jsonDecode(jsonStringList!), fromJsonMap)
           : null;
 
-  static List<T>? fromJsonListGeneric<T>(
-      List<dynamic>? jsonList, T? Function(Map<String, dynamic> json) fromJsonMap) {
+  static List<T>? fromJsonListGeneric<T>(List<dynamic>? jsonList,
+      T? Function(Map<String, dynamic> json) fromJsonMap) {
     if (jsonList == null) return null;
     if (jsonList.isEmpty) return [];
     List<T> list = jsonList.map((dynamic json) {

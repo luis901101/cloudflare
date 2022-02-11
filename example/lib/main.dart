@@ -18,12 +18,18 @@ import 'package:flutter/material.dart';
 /// --dart-define=CLOUDFLARE_ACCOUNT_EMAIL=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 /// --dart-define=CLOUDFLARE_USER_SERVICE_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 ///
-const String apiUrl = String.fromEnvironment('CLOUDFLARE_API_URL', defaultValue: 'https://api.cloudflare.com/client/v4');
-const String accountId = String.fromEnvironment('CLOUDFLARE_ACCOUNT_ID', defaultValue: '');
-const String token = String.fromEnvironment('CLOUDFLARE_TOKEN', defaultValue: '');
-const String apiKey = String.fromEnvironment('CLOUDFLARE_API_KEY', defaultValue: '');
-const String accountEmail = String.fromEnvironment('CLOUDFLARE_ACCOUNT_EMAIL', defaultValue: '');
-const String userServiceKey = String.fromEnvironment('CLOUDFLARE_USER_SERVICE_KEY', defaultValue: '');
+const String apiUrl = String.fromEnvironment('CLOUDFLARE_API_URL',
+    defaultValue: 'https://api.cloudflare.com/client/v4');
+const String accountId =
+    String.fromEnvironment('CLOUDFLARE_ACCOUNT_ID', defaultValue: '');
+const String token =
+    String.fromEnvironment('CLOUDFLARE_TOKEN', defaultValue: '');
+const String apiKey =
+    String.fromEnvironment('CLOUDFLARE_API_KEY', defaultValue: '');
+const String accountEmail =
+    String.fromEnvironment('CLOUDFLARE_ACCOUNT_EMAIL', defaultValue: '');
+const String userServiceKey =
+    String.fromEnvironment('CLOUDFLARE_USER_SERVICE_KEY', defaultValue: '');
 
 late Cloudflare cloudflare;
 String? cloudflareInitMessage;

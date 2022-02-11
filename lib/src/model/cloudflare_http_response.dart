@@ -31,7 +31,8 @@ class CloudflareHTTPResponse<BodyType> {
 
   final dynamic extraData;
 
-  const CloudflareHTTPResponse(this.base, this.body, {this.error, this.extraData});
+  const CloudflareHTTPResponse(this.base, this.body,
+      {this.error, this.extraData});
 
   /// Makes a copy of this Response, replacing original values with the given ones.
   /// This method can also alter the type of the response body.
