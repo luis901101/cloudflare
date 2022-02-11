@@ -66,7 +66,7 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
   /// read only
   DateTime uploaded;
 
-  String? _baseUrl;
+  String? _firstVaiant;
 
   CloudflareImage({
     String? id,
@@ -82,20 +82,38 @@ class CloudflareImage extends Jsonable<CloudflareImage>{
     uploaded = uploaded ?? DateTime.now()
   ;
 
-  factory CloudflareImage.fromUrl(String url) {
+  static Map<String, String> _dataFromUrl(String url) {
     final split = url.replaceAll('$imageDeliveryUrl/', '').split('/');
     String? imageDeliveryId = split.isNotEmpty ? split[0] : null,
-        imageId = split.length > 1 ? split[1] : null;
-    if(!url.startsWith(imageDeliveryUrl) || imageDeliveryId == null || imageId == null) {
+        imageId = split.length > 1 ? split[1] : null,
+        variantName = split.length > 2 ? split[2] : null;
+    if(!url.startsWith(imageDeliveryUrl) ||
+        imageDeliveryId == null ||
+        imageId == null ||
+        variantName == null) {
       throw Exception('Invalid CloudflareImage from url');
     }
+    return {
+      'imageDeliveryId': imageDeliveryId,
+      'imageId': imageId,
+      'variantName': variantName,
+    };
+  }
+
+  factory CloudflareImage.fromUrl(String url) {
+    final data = _dataFromUrl(url);
     return CloudflareImage(
-      id: imageDeliveryId,
+      id: data['imageId'],
       variants: [url],
     );
   }
 
-  String get baseUrl => _baseUrl ?? (_baseUrl = variants.isNotEmpty ? variants[0] : '');
+  static String variantNameFromUrl(String url) {
+    final data = _dataFromUrl(url);
+    return data['variantName']!;
+  }
+
+  String get firstVaiant => _firstVaiant ?? (_firstVaiant = variants.isNotEmpty ? variants[0] : '');
 
   @override
   bool operator ==(Object other) {

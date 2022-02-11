@@ -20,11 +20,22 @@ enum FileSource {
   bytes,
 }
 
+class DataTransmitNotifier {
+  final DataTransmit<String> dataTransmit;
+  final notifier = ValueNotifier<double>(0);
+
+  DataTransmitNotifier({required this.dataTransmit}) {
+    dataTransmit.progressCallback ??= (count, total) {
+      notifier.value = count.toDouble() / total.toDouble();
+    };
+  }
+}
+
 class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   static const int loadImage = 1;
   static const int uploadImages = 2;
   static const int deleteUploadedImages = 3;
-  List<String> pathImages = [];
+  List<DataTransmitNotifier> dataImages = [];
   List<CloudflareImage> cloudflareImages = [];
   bool loading = false;
   String? errorMessage;
@@ -64,26 +75,63 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     ],
   );
 
-  Widget imageFromPathView(String path) {
-    return Image.file(
-      File(path),
+  Widget imageFromPathView(DataTransmitNotifier data) {
+    return SizedBox(
       width: 100,
-      height: 100,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.file(
+            File(data.dataTransmit.data),
+            width: 100,
+            height: 100,
+          ),
+          ValueListenableBuilder<double>(
+            key: ValueKey(data.dataTransmit.data),
+            valueListenable: data.notifier,
+            builder: (context, value, child) {
+              if(value == 0 && !loading) return const SizedBox();
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LinearProgressIndicator(
+                    value: value,
+                  ),
+                  Text('${(value * 100).toInt()} %'),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget imageFromUrlView(CloudflareImage image) {
-    return Image.network(
-      image.baseUrl,
-      width: 100,
-      height: 100,
+    Widget imageView(String url) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.network(
+          url,
+          width: 100,
+          height: 100,
+        ),
+        Text(CloudflareImage.variantNameFromUrl(url)),
+      ],
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('Variants', style: TextStyle(fontWeight: FontWeight.bold),),
+        ...image.variants.map((url) => imageView(url)).toList()
+      ],
     );
   }
 
   Widget imageGalleryView({
     bool fromPath = true,
   }) {
-    List imagesSource = fromPath ? pathImages : cloudflareImages;
+    List imagesSource = fromPath ? dataImages : cloudflareImages;
 
     final imageViews = List.generate(imagesSource.length, (index) {
       final source = imagesSource[index];
@@ -95,7 +143,6 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         const Center(child: CircularProgressIndicator(),)
       );
     }
-
     return Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -127,10 +174,10 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                 ),
                 imageGalleryView(fromPath: true),
                 ElevatedButton(
-                  onPressed: loading || pathImages.isEmpty
+                  onPressed: loading || dataImages.isEmpty
                       ? null
                       : () {
-                    pathImages = [];
+                    dataImages = [];
                     setState(() {});
                   },
                   style: ButtonStyle(
@@ -209,10 +256,10 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: loading ||
-                              (pathImages.isEmpty && cloudflareImages.isEmpty)
+                              (dataImages.isEmpty && cloudflareImages.isEmpty)
                               ? null
                               : () {
-                            pathImages = [];
+                            dataImages = [];
                             cloudflareImages = [];
                             setState(() {});
                           },
@@ -236,7 +283,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                       ),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: loading || pathImages.isEmpty
+                          onPressed: loading || dataImages.isEmpty
                               ? null
                               : () => onClick(uploadImages),
                           child: const Text(
@@ -292,7 +339,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     if(filePaths.isNotEmpty) {
       for (final path in filePaths) {
         if (path.isNotEmpty) {
-          pathImages.add(path);
+          dataImages.add(DataTransmitNotifier(dataTransmit: DataTransmit<String>(data: path)));
         }
       }
       setState(() {});
@@ -311,10 +358,10 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
       switch (fileSource) {
         case FileSource.path:
-          contentFromPaths = pathImages.map((path) => DataTransmit<String>(data: path)).toList();
+          contentFromPaths = dataImages.map((data) => data.dataTransmit).toList();
           break;
         case FileSource.bytes:
-          contentFromBytes = await Future.wait(pathImages.map((path) async => DataTransmit<List<int>>(data: await getFileBytes(path))));
+          contentFromBytes = await Future.wait(dataImages.map((data) async => DataTransmit<List<int>>(data: await getFileBytes(data.dataTransmit.data), progressCallback: data.dataTransmit.progressCallback)));
           break;
         default:
       }
