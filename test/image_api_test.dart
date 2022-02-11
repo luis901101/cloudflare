@@ -222,13 +222,13 @@ void main() async {
     final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
     if(responseList.body?.isEmpty ?? true) fail('There are no uploaded images to test multi delete.');
 
-    List<String> ids = [];
+    List<CloudflareImage> images = [];
     for (int i = 0, length = min(3, responseList.body!.length); i < length; ++i) {
-      ids.add(responseList.body![i].id);
+      images.add(responseList.body![i]);
     }
 
     final responses = await cloudflare.imageAPI.deleteMultiple(
-      ids: ids,
+      images: images,
     );
     for (final response in responses) {
       expect(response, ResponseMatcher());

@@ -124,7 +124,8 @@ class ImageAPI
   /// Update image access control. On access control change,
   /// all copies of the image are purged from Cache.
   Future<CResponse<CloudflareImage?>> update({
-    required String id,
+    String? id,
+    CloudflareImage? image,
 
     /// Indicates whether the image can be accessed only using it's UID.
     /// If set to true, a signed token needs to be generated with a signing key
@@ -136,8 +137,11 @@ class ImageAPI
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
+    assert(id != null || image != null,
+    'One of id or image must not be empty.');
+    id ??= image?.id;
     final response = await parseResponse(service.update(
-      id: id,
+      id: id!,
       requireSignedURLs: requireSignedURLs,
       metadata: metadata,
     ));
@@ -164,12 +168,13 @@ class ImageAPI
 
   /// Fetch details of a single image.
   Future<CResponse<CloudflareImage?>> get({
-    required String id,
+    String? id,
+    CloudflareImage? image,
   }) async {
-    final response = await parseResponse(service.get(
-      id: id,
-    ));
-
+    assert(id != null || image != null,
+    'One of id or image must not be empty.');
+    id ??= image?.id;
+    final response = await parseResponse(service.get(id: id!,));
     return response;
   }
 
@@ -177,11 +182,15 @@ class ImageAPI
   /// file. For larger images it can be a near-lossless version of the original.
   /// Note: the response is <image blob data>
   Future<CResponse<List<int>?>> getBase({
-    required String id,
+    String? id,
+    CloudflareImage? image,
   }) async {
+    assert(id != null || image != null,
+    'One of id or image must not be empty.');
+    id ??= image?.id;
     final response = await genericParseResponse<List<int>>(
       service.getBase(
-        id: id,
+        id: id!,
       ), parseCloudflareResponse: false
     );
 
@@ -191,19 +200,29 @@ class ImageAPI
   /// Delete an image on Cloudflare Images. On success, all copies of the image
   /// are deleted and purged from Cache.
   Future<CResponse> delete({
-    required String id,
+    String? id,
+    CloudflareImage? image,
   }) async {
-    final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
+    assert(id != null || image != null,
+    'One of id or image must not be empty.');
+    id ??= image?.id;
+    final response = await getSaveResponse(service.delete(id: id!,), parseCloudflareResponse: false);
     return response;
   }
 
   /// Delete a list of images on Cloudflare Images. On success, all copies of the images
   /// are deleted and purged from Cache.
   Future<List<CResponse>> deleteMultiple({
-    required List<String> ids,
+    List<String>? ids,
+    List<CloudflareImage>? images,
   }) async {
+    assert((ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
+    'One of ids or images must not be empty.');
+
+    ids ??= images?.map((image) => image.id).toList();
+
     List<CResponse> responses = [];
-    for (final id in ids) {
+    for (final id in ids!) {
       final response = await getSaveResponse(service.delete(id: id,), parseCloudflareResponse: false);
       responses.add(response);
     }
