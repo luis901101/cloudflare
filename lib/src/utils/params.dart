@@ -1,5 +1,6 @@
 class Params {
   static const String id = 'id';
+  static const String uid = 'uid';
   static const String resultInfo = 'result_info';
   static const String page = 'page';
   static const String perPage = 'per_page';
