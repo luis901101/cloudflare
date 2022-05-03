@@ -237,8 +237,9 @@ void main() async {
 
   test('Delete multiple images', () async {
     final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
-    if (responseList.body?.isEmpty ?? true)
+    if (responseList.body?.isEmpty ?? true) {
       fail('There are no uploaded images to test multi delete.');
+    }
 
     List<CloudflareImage> images = [];
     for (int i = 0, length = min(3, responseList.body!.length);

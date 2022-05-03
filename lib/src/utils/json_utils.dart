@@ -4,7 +4,7 @@ class JsonUtils {
   static Map<String, dynamic>? jsonableToJson(Jsonable? value) =>
       value?.toJson();
   static Jsonable<T>? jsonableFromJson<T extends Object>(
-      Map<String, dynamic>? json) {}
+      Map<String, dynamic>? json) => null;
 
   static String? toJsonString(dynamic value) => value?.toString();
   static String? doubleToJsonString2Digits(double? value) => value?.toStringAsFixed(

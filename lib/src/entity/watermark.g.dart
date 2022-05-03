@@ -14,8 +14,9 @@ Watermark _$WatermarkFromJson(Map<String, dynamic> json) => Watermark(
       created: json['created'] == null
           ? null
           : DateTime.parse(json['created'] as String),
-      position:
-          $enumDecodeNullable(_$WatermarkPositionEnumMap, json['position']),
+      position: $enumDecodeNullable(
+          _$WatermarkPositionEnumMap, json['position'],
+          unknownValue: WatermarkPosition.upperRight),
       scale: (json['scale'] as num?)?.toDouble(),
       opacity: (json['opacity'] as num?)?.toDouble(),
       padding: (json['padding'] as num?)?.toDouble(),

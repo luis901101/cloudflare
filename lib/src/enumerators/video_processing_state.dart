@@ -5,4 +5,5 @@ enum VideoProcessingState {
   inprogress,
   ready,
   error,
+  unknown,
 }

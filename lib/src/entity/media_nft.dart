@@ -8,14 +8,20 @@ class MediaNFT extends Jsonable<MediaNFT> {
 
   /// ERC-721 compatible contract address
   ///
+  /// read only
+  ///
   /// min length: 42
   /// max length: 42
   ///
   /// e.g: "0x57f1887a8bf19b14fc0d912b9b2acc9af147ea85"
-  String? contract;
+  final String? contract;
 
   /// Token ID for the NFT
-  int? token;
+  ///
+  /// read only
+  ///
+  /// e.g: 5
+  final int? token;
 
   MediaNFT({
     this.contract,

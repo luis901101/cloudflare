@@ -12,19 +12,19 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
 
   /// Image unique identifier
   ///
-  /// e.g: "ZxR0pLaXRldlBtaFhhO2FiZGVnaA"
-  ///
   /// max length: 32
   /// read only
-  String id;
+  ///
+  /// e.g: "ZxR0pLaXRldlBtaFhhO2FiZGVnaA"
+  final String id;
 
   /// Image file name
   ///
-  /// e.g: "avatar.png"
-  ///
   /// max length: 32
   /// read only
-  String? filename;
+  ///
+  /// e.g: "avatar.png"
+  final String? filename;
 
   /// User modifiable key-value store.
   /// Can be used for keeping references to another system of record for
@@ -33,19 +33,21 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// {
   ///   "meta": "metaID"
   /// }
-  Map<String, dynamic>? meta;
+  Map? meta;
 
   /// Indicates whether the image can be a accessed only using it's UID.
   /// If set to true, a signed token needs to be generated with a signing key
   /// to view the image.
   ///
-  /// e.g: false
-  ///
   /// default value: false
   /// valid values: (true,false)
+  ///
+  /// e.g: false
   bool requireSignedURLs;
 
   /// List specifying available variants for an image.
+  ///
+  /// read only
   ///
   /// e.g:
   /// [
@@ -53,18 +55,17 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   ///   "https://imagedelivery.net/MTt4OTd0b0w5aj/ZxR0pLaXRldlBtaFhhO2FiZGVnaA/hero",
   ///   "https://imagedelivery.net/MTt4OTd0b0w5aj/ZxR0pLaXRldlBtaFhhO2FiZGVnaA/original"
   /// ]
-  ///
-  /// read only
-  List<String> variants;
+  final List<String> variants;
 
   /// When the media item was uploaded.
-  ///
-  /// e.g: "2014-01-02T02:20:00Z"
+  /// Using  ISO 8601 ZonedDateTime
   ///
   /// read only
-  DateTime uploaded;
+  ///
+  /// e.g: "2014-01-02T02:20:00Z"
+  final DateTime uploaded;
 
-  String? _firstVaiant;
+  @JsonKey(ignore: true) String? _firstVariant;
 
   CloudflareImage({
     String? id,
@@ -109,8 +110,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     return data['variantName']!;
   }
 
-  String get firstVaiant =>
-      _firstVaiant ?? (_firstVaiant = variants.isNotEmpty ? variants[0] : '');
+  String get firstVariant =>
+      _firstVariant ?? (_firstVariant = variants.isNotEmpty ? variants[0] : '');
 
   @override
   bool operator ==(Object other) {

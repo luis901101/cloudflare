@@ -5,13 +5,21 @@ part 'video_size.g.dart';
 
 @JsonSerializable()
 class VideoSize extends Jsonable<VideoSize> {
-  /// Width of the video in seconds. A value of -1 means the width is unknown.
+  /// Width of the video in pixels. A value of -1 means the width is unknown.
   /// Value becomes available after the upload, before the video is ready.
-  int width;
+  ///
+  /// read only
+  ///
+  /// e.g: 1920
+  final int width;
 
   /// Height of the video in pixels. A value of -1 means the height is unknown.
   /// Value becomes available after the upload, before the video is ready.
-  int height;
+  ///
+  /// read only
+  ///
+  /// e.g: 1080
+  final int height;
 
   VideoSize({
     int? width,

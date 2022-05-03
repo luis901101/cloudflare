@@ -7,7 +7,8 @@ part of 'video_status.dart';
 // **************************************************************************
 
 VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
-      state: $enumDecodeNullable(_$VideoProcessingStateEnumMap, json['state']),
+      state: $enumDecodeNullable(_$VideoProcessingStateEnumMap, json['state'],
+          unknownValue: VideoProcessingState.unknown),
       pctComplete: json['pctComplete'] as int?,
       errorReasonCode: json['errorReasonCode'] as String?,
       errorReasonText: json['errorReasonText'] as String?,
@@ -28,4 +29,5 @@ const _$VideoProcessingStateEnumMap = {
   VideoProcessingState.inprogress: 'inprogress',
   VideoProcessingState.ready: 'ready',
   VideoProcessingState.error: 'error',
+  VideoProcessingState.unknown: 'unknown',
 };

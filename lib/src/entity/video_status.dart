@@ -13,34 +13,44 @@ part 'video_status.g.dart';
 @JsonSerializable()
 class VideoStatus extends Jsonable<VideoStatus> {
   /// Specifies the processing status of the video.
-  VideoProcessingState state;
+  ///
+  /// read only
+  ///
+  /// e.g: "inprogress"
+  @JsonKey(unknownEnumValue: VideoProcessingState.unknown) final VideoProcessingState state;
 
   /// Indicates the percent upload completed of the entire upload in bytes.
   /// The value must be a non-negative integer.
   ///
+  /// read only
+  ///
   /// min value:0
   /// max value:100
-  int pctComplete;
+  final int pctComplete;
 
   /// Provides an error code on why this video failed to encode.
   /// Empty if the state is not in "error". This field should be preferred
   /// for programmatic use.
   ///
+  /// read only
+  ///
   /// e.g: "ERR_NON_VIDEO"
-  String? errorReasonCode;
+  final String? errorReasonCode;
 
   /// Provides a reason in English on why this video failed to encode.
   /// Empty if the state is not in "error".
   ///
+  /// read only
+  ///
   /// e.g: "The file was not recognized as a valid video file."
-  String? errorReasonText;
+  final String? errorReasonText;
 
   VideoStatus({
     VideoProcessingState? state,
     int? pctComplete,
     this.errorReasonCode,
     this.errorReasonText,
-  })  : state = state ?? VideoProcessingState.inprogress,
+  })  : state = state ?? VideoProcessingState.ready,
         pctComplete = pctComplete ?? 0;
 
   @override

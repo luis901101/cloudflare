@@ -2,7 +2,7 @@
 
 echo Running code generation
 echo ...
-dart pub run build_runner "$1" --delete-conflicting-outputs \
+flutter pub run build_runner build --delete-conflicting-outputs \
 --build-filter 'package:cloudflare/src/entity/*.dart' \
 --build-filter 'package:cloudflare/src/service/*.dart' \
 --build-filter 'package:cloudflare/src/model/*.dart' \

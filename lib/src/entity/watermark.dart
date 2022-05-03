@@ -10,26 +10,26 @@ part 'watermark.g.dart';
 class Watermark extends Jsonable<Watermark> {
 
   /// Watermark profile unique identifier.
-  @JsonKey(name: Params.uid) String id;
+  @JsonKey(name: Params.uid) final String id;
 
   /// The size of the image in bytes.
-  int size;
+  final int size;
 
   /// Width of the image in pixels.
-  int width;
+  final int width;
 
   /// Height of the image in pixels.
-  int height;
+  final int height;
 
   /// When the watermark profile was created.
-  DateTime created;
+  final DateTime created;
 
   /// Location of the image. Valid positions are: "upperRight", "upperLeft",
   /// "lowerLeft", "lowerRight", and "center".
   /// Note that "center" will ignore the "padding" parameter.
   ///
   /// default value: upperRight
-  WatermarkPosition position;
+  @JsonKey(unknownEnumValue: WatermarkPosition.upperRight) final WatermarkPosition position;
 
   /// The size of the image relative to the overall size of the video.
   /// This parameter will adapt to horizontal and vertical videos automatically.
@@ -39,7 +39,7 @@ class Watermark extends Jsonable<Watermark> {
   /// default value: 0.15
   /// min value: 0.0
   /// max value: 1.0
-  double scale;
+  final double scale;
 
   /// Translucency of the image. 0.0 means completely transparent, and 1.0 means
   /// completely opaque. Note that if the image is already semi-transparent,
@@ -48,7 +48,7 @@ class Watermark extends Jsonable<Watermark> {
   /// default value: 1.0
   /// min value: 0.0
   /// max value: 1.0
-  double opacity;
+  final double opacity;
 
   /// Whitespace between the adjacent edges (determined by position) of the
   /// video and the image. 0.0 means no padding, and 1.0 means padded full
@@ -57,15 +57,15 @@ class Watermark extends Jsonable<Watermark> {
   /// default value: 0.05
   /// min value: 0.0
   /// max value: 1.0
-  double padding;
+  final double padding;
 
   /// A short description for the profile.
-  String? name;
+  final String? name;
 
   /// The source URL to the image where it was downloaded from.
   /// If the watermark profile was created via direct upload,
   /// this field will be null.
-  String? downloadedFrom;
+  final String? downloadedFrom;
 
   Watermark({
     String? id,
