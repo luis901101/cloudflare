@@ -87,4 +87,8 @@ abstract class ImageService {
   Future<HttpResponse<CloudflareResponse?>> delete({
     @Path() required String id,
   });
+
+  @GET('/v1/stats')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> getStats();
 }

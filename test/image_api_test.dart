@@ -218,6 +218,12 @@ void main() async {
     }, timeout: Timeout(Duration(minutes: 2)));
   });
 
+  test('Get image usage statistics', () async {
+    final response = await cloudflare.imageAPI.getStats();
+    expect(response.isSuccessful, true);
+    print('Stats: ${response.body?.toJson()}');
+  });
+
   group('Retrieve image tests', () {
     late final CloudflareHTTPResponse<List<CloudflareImage>?> responseList;
     String? imageId;

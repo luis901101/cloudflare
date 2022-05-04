@@ -20,4 +20,5 @@ class Params {
   static const String requireSignedURLs = 'requireSignedURLs';
   static const String watermark = 'watermark';
   static const String uploadUrl = 'uploadURL';
+  static const String count = 'count';
 }

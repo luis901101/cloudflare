@@ -4,6 +4,7 @@ import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
+import 'package:cloudflare/src/entity/image_stats.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
@@ -420,5 +421,15 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       responses.add(response);
     }
     return responses;
+  }
+
+  /// Fetch details of Cloudflare Images usage statistics
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
+  Future<CloudflareHTTPResponse<ImageStats?>> getStats() async {
+    final response = await genericParseResponse(
+      service.getStats(), dataType: ImageStats(),
+    );
+    return response;
   }
 }
