@@ -14,4 +14,10 @@ class Params {
   static const String limit = 'limit';
   static const String asc = 'asc';
   static const String status = 'status';
+  static const String url = 'url';
+  static const String thumbnailTimestampPct = 'thumbnailTimestampPct';
+  static const String allowedOrigins = 'allowedOrigins';
+  static const String requireSignedURLs = 'requireSignedURLs';
+  static const String watermark = 'watermark';
+  static const String uploadUrl = 'uploadURL';
 }

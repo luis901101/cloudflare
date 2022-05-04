@@ -18,6 +18,7 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
       uploaded: json['uploaded'] == null
           ? null
           : DateTime.parse(json['uploaded'] as String),
+      draft: json['draft'] as bool?,
     );
 
 Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
@@ -36,5 +37,6 @@ Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
   val['requireSignedURLs'] = instance.requireSignedURLs;
   val['variants'] = instance.variants;
   val['uploaded'] = instance.uploaded.toIso8601String();
+  val['draft'] = instance.draft;
   return val;
 }

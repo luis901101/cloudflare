@@ -12,10 +12,10 @@ part 'image_service.g.dart';
 abstract class ImageService {
   factory ImageService({required Dio dio, required String accountId}) {
     return _ImageService(dio,
-        baseUrl: '${dio.options.baseUrl}/accounts/$accountId/images/v1');
+        baseUrl: '${dio.options.baseUrl}/accounts/$accountId/images');
   }
 
-  @POST('')
+  @POST('/v1')
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
@@ -25,7 +25,7 @@ abstract class ImageService {
     @SendProgress() ProgressCallback? onUploadProgress,
   });
 
-  @POST('')
+  @POST('/v1')
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes({
@@ -35,7 +35,17 @@ abstract class ImageService {
     @SendProgress() ProgressCallback? onUploadProgress,
   });
 
-  @PATCH('/{id}')
+  @POST('/v1')
+  @MultiPart()
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> uploadFromUrl({
+    @Part(name: Params.url) required String url,
+    @Part() bool? requireSignedURLs,
+    @Part() Map<String, dynamic>? metadata,
+    @SendProgress() ProgressCallback? onUploadProgress,
+  });
+
+  @PATCH('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> update({
     @Path() required String id,
@@ -43,27 +53,36 @@ abstract class ImageService {
     @Field() Map<String, dynamic>? metadata,
   });
 
-  @GET('')
+  @POST('/v2/direct_upload')
+  @MultiPart()
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> createDirectUpload({
+    @Part() bool? requireSignedURLs,
+    @Part() Map<String, dynamic>? metadata,
+    @Part() String? expiry,
+  });
+
+  @GET('/v1')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> getAll({
     @Query(Params.page) int? page,
     @Query(Params.perPage) int? size,
   });
 
-  @GET('/{id}')
+  @GET('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> get({
     @Path() required String id,
   });
 
-  @GET('/{id}/blob')
+  @GET('/v1/{id}/blob')
   @DioResponseType(ResponseType.bytes)
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse> getBase({
     @Path() required String id,
   });
 
-  @DELETE('/{id}')
+  @DELETE('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> delete({
     @Path() required String id,

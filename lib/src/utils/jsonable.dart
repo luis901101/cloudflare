@@ -3,6 +3,7 @@ import 'dart:convert';
 abstract class Jsonable<T extends Object> {
   static const int jsonParserError = 1000;
 
+  const Jsonable();
   ///
   /// This is just to suggest children to implement a named constructor to
   /// support creating objects fromJson(...) and fromJsonString(...) as easy as

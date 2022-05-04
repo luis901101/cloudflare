@@ -38,7 +38,7 @@ class _ImageService implements ImageService {
                 headers: _headers,
                 extra: _extra,
                 contentType: 'multipart/form-data')
-            .compose(_dio.options, '',
+            .compose(_dio.options, '/v1',
                 queryParameters: queryParameters,
                 data: _data,
                 onSendProgress: onUploadProgress)
@@ -75,7 +75,39 @@ class _ImageService implements ImageService {
                 headers: _headers,
                 extra: _extra,
                 contentType: 'multipart/form-data')
-            .compose(_dio.options, '',
+            .compose(_dio.options, '/v1',
+                queryParameters: queryParameters,
+                data: _data,
+                onSendProgress: onUploadProgress)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data == null
+        ? null
+        : CloudflareResponse.fromJson(_result.data!);
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<CloudflareResponse?>> uploadFromUrl(
+      {required url, requireSignedURLs, metadata, onUploadProgress}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.fields.add(MapEntry('url', url));
+    if (requireSignedURLs != null) {
+      _data.fields
+          .add(MapEntry('requireSignedURLs', requireSignedURLs.toString()));
+    }
+    _data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
+    final _result = await _dio.fetch<Map<String, dynamic>?>(
+        _setStreamType<HttpResponse<CloudflareResponse>>(Options(
+                method: 'POST',
+                headers: _headers,
+                extra: _extra,
+                contentType: 'multipart/form-data')
+            .compose(_dio.options, '/v1',
                 queryParameters: queryParameters,
                 data: _data,
                 onSendProgress: onUploadProgress)
@@ -102,9 +134,41 @@ class _ImageService implements ImageService {
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(
             Options(method: 'PATCH', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/${id}',
+                .compose(_dio.options, '/v1/${id}',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data == null
+        ? null
+        : CloudflareResponse.fromJson(_result.data!);
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<CloudflareResponse?>> createDirectUpload(
+      {requireSignedURLs, metadata, expiry}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    if (requireSignedURLs != null) {
+      _data.fields
+          .add(MapEntry('requireSignedURLs', requireSignedURLs.toString()));
+    }
+    _data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
+    if (expiry != null) {
+      _data.fields.add(MapEntry('expiry', expiry));
+    }
+    final _result = await _dio.fetch<Map<String, dynamic>?>(
+        _setStreamType<HttpResponse<CloudflareResponse>>(Options(
+                method: 'POST',
+                headers: _headers,
+                extra: _extra,
+                contentType: 'multipart/form-data')
+            .compose(_dio.options, '/v2/direct_upload',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -122,7 +186,7 @@ class _ImageService implements ImageService {
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(
             Options(method: 'GET', headers: _headers, extra: _extra)
-                .compose(_dio.options, '',
+                .compose(_dio.options, '/v1',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -141,7 +205,7 @@ class _ImageService implements ImageService {
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(
             Options(method: 'GET', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/${id}',
+                .compose(_dio.options, '/v1/${id}',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -163,7 +227,7 @@ class _ImageService implements ImageService {
                 headers: _headers,
                 extra: _extra,
                 responseType: ResponseType.bytes)
-            .compose(_dio.options, '/${id}/blob',
+            .compose(_dio.options, '/v1/${id}/blob',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data;
@@ -180,7 +244,7 @@ class _ImageService implements ImageService {
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(
             Options(method: 'DELETE', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/${id}',
+                .compose(_dio.options, '/v1/${id}',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null

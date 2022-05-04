@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -10,45 +11,14 @@ import 'utils/matchers.dart';
 void main() async {
   await init();
 
-  group('Retrieve image tests', () {
-    late final CloudflareHTTPResponse<List<CloudflareImage>?> responseList;
-    String? imageId;
-    setUpAll(() async {
-      responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
-    });
-
-    test('Get image list', () async {
-      expect(responseList, ResponseMatcher());
-      expect(responseList.body, isNotNull);
-      expect(responseList.body, isNotEmpty);
-      imageId = responseList.body![0].id;
-    });
-
-    test('Get image byId', () async {
-      if (imageId == null) {
-        // markTestSkipped('Get image byId skipped: No image available to get by Id');
-        fail('No image available to get by Id');
-      }
-      final response = await cloudflare.imageAPI.get(id: imageId!);
-      expect(response, ImageMatcher());
-    });
-
-    test('Get base image byId', () async {
-      if (imageId == null) {
-        fail('No base image available to get by Id');
-      }
-      final response = await cloudflare.imageAPI.getBase(id: imageId!);
-      expect(response, ResponseMatcher());
-      expect(response.body, isNotNull);
-    });
-  });
-
   group('Upload image tests', () {
     late final File imageFile, imageFile1, imageFile2;
+    late final String imageUrl;
     setUpAll(() async {
       imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
       imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? '');
       imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
+      imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
     });
 
     test('Simple upload image from file with progress update', () async {
@@ -63,6 +33,63 @@ void main() async {
               }));
       expect(response, ImageMatcher());
     }, timeout: Timeout(Duration(minutes: 2)));
+
+    test('Simple upload image from url with progress update', () async {
+      if (imageUrl.isEmpty) {
+        fail('No image url available to upload');
+      }
+      final response = await cloudflare.imageAPI.upload(
+          contentFromUrl: DataTransmit<String>(
+              data: imageUrl,
+              progressCallback: (count, total) {
+                print('Simple upload image from url progress: $count/$total');
+              }));
+      expect(response, ImageMatcher());
+    }, timeout: Timeout(Duration(minutes: 2)));
+
+    group('Image direct upload tests', () {
+      late final CloudflareHTTPResponse<DataUploadDraft?> response;
+      late final String? imageId;
+      late final String? uploadURL;
+
+      setUpAll(() async {
+        response = await cloudflare.imageAPI.createDirectUpload();
+        imageId = response.body?.id;
+        uploadURL = response.body?.uploadURL;
+      });
+
+      test('Create authenticated direct image upload URL', () async {
+        expect(response.isSuccessful, true);
+        expect(response.body?.id, isNotEmpty);
+        expect(response.body?.uploadURL, isNotEmpty);
+      }, timeout: Timeout(Duration(minutes: 2)));
+
+      test('Check created image draft status', () async {
+        if (imageId?.isEmpty ?? true) {
+          fail('No imageId available to check draft status');
+        }
+        final response = await cloudflare.imageAPI.get(id: imageId);
+        expect(response, ImageMatcher());
+        expect(response.body?.draft, true);
+      }, timeout: Timeout(Duration(minutes: 2)));
+
+      test('Doing image upload to direct upload URL', () async {
+        if (uploadURL?.isEmpty ?? true) {
+          fail('No uploadURL available to upload to');
+        }
+        final response = await cloudflare.imageAPI.directUpload(
+          uploadURL: uploadURL!,
+          contentFromFile: DataTransmit<File>(
+            data: imageFile,
+            progressCallback: (count, total) {
+              print('Image upload to direct upload URL from file progress: $count/$total');
+            })
+        );
+        expect(response, ImageMatcher());
+        expect(response.body?.id, imageId);
+        expect(response.body?.draft, false);
+      }, timeout: Timeout(Duration(minutes: 2)));
+    });
 
     test('Multiple upload image from file with progress update', () async {
       if (!imageFile.existsSync() ||
@@ -189,6 +216,39 @@ void main() async {
       expect(response.body!.requireSignedURLs, true);
       expect(response.body!.meta, metadata);
     }, timeout: Timeout(Duration(minutes: 2)));
+  });
+
+  group('Retrieve image tests', () {
+    late final CloudflareHTTPResponse<List<CloudflareImage>?> responseList;
+    String? imageId;
+    setUpAll(() async {
+      responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
+    });
+
+    test('Get image list', () async {
+      expect(responseList, ResponseMatcher());
+      expect(responseList.body, isNotNull);
+      expect(responseList.body, isNotEmpty);
+      imageId = responseList.body![0].id;
+    });
+
+    test('Get image byId', () async {
+      if (imageId == null) {
+        // markTestSkipped('Get image byId skipped: No image available to get by Id');
+        fail('No image available to get by Id');
+      }
+      final response = await cloudflare.imageAPI.get(id: imageId!);
+      expect(response, ImageMatcher());
+    });
+
+    test('Get base image byId', () async {
+      if (imageId == null) {
+        fail('No base image available to get by Id');
+      }
+      final response = await cloudflare.imageAPI.getBase(id: imageId!);
+      expect(response, ResponseMatcher());
+      expect(response.body, isNotNull);
+    });
   });
 
   group('Update/Delete image tests', () {

@@ -65,6 +65,12 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// e.g: "2014-01-02T02:20:00Z"
   final DateTime uploaded;
 
+  /// Whether this is a pending direct upload image or not
+  ///
+  /// Default value: false
+  /// e.g: false
+  final bool draft;
+
   @JsonKey(ignore: true) String? _firstVariant;
 
   CloudflareImage({
@@ -74,10 +80,12 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     bool? requireSignedURLs,
     List<String>? variants,
     DateTime? uploaded,
+    bool? draft,
   })  : id = id ?? '',
         requireSignedURLs = requireSignedURLs ?? false,
         variants = variants ?? [],
-        uploaded = uploaded ?? DateTime.now();
+        uploaded = uploaded ?? DateTime.now(),
+        draft = draft ?? false;
 
   static Map<String, String> _dataFromUrl(String url) {
     final split = url.replaceAll('$imageDeliveryUrl/', '').split('/');

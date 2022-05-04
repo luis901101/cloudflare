@@ -47,7 +47,7 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// e.g: "The file was not recognized as a valid video file."
   final String? errorReasonText;
 
-  VideoStatus({
+  const VideoStatus({
     MediaProcessingState? state,
     int? pctComplete,
     this.errorReasonCode,

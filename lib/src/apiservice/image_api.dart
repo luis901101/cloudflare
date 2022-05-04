@@ -1,9 +1,14 @@
-import 'dart:io';
+import 'dart:io' hide HttpResponse;
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
+import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/service/image_service.dart';
+import 'package:cloudflare/src/utils/date_time_utils.dart';
+import 'package:cloudflare/src/utils/params.dart';
+import 'package:dio/dio.dart';
+import 'package:retrofit/dio.dart';
 
 class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     CloudflareErrorResponse> {
@@ -14,31 +19,46 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
             dataType: CloudflareImage());
 
   /// An image up to 10 Megabytes can be upload.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-upload-an-image-using-a-single-http-request
   Future<CloudflareHTTPResponse<CloudflareImage?>> upload({
     /// Image file to upload
     DataTransmit<File>? contentFromFile,
+
+    /// Path to the image file to upload
     DataTransmit<String>? contentFromPath,
+
+    /// Image byte array representation to upload
     DataTransmit<List<int>>? contentFromBytes,
 
-    /// Indicates whether the image requires a signature token for the access
+    /// An url to fetch an image from origin and upload it.
+    ///
+    /// e.g: "https://example.com/some/path/to/image.jpeg"
+    DataTransmit<String>? contentFromUrl,
+
+    /// Indicates whether the image requires a signature token for the access.
+    ///
     /// default value: false
+    ///
     /// valid values: (true,false)
     bool? requireSignedURLs,
 
     /// User modifiable key-value store. Can use used for keeping references to
     /// another system of record for managing images.
-    /// "{\"meta\": \"metaID\"}"
+    ///
+    /// e.g: "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
     assert(
         contentFromFile != null ||
             contentFromPath != null ||
-            contentFromBytes != null,
+            contentFromBytes != null ||
+            contentFromUrl != null,
         'One of the content must be specified.');
 
     final CloudflareHTTPResponse<CloudflareImage?> response;
     if (contentFromPath != null) {
-      contentFromFile = DataTransmit<File>(
+      contentFromFile ??= DataTransmit<File>(
           data: File(contentFromPath.data),
           progressCallback: contentFromPath.progressCallback);
     }
@@ -49,15 +69,92 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         metadata: metadata,
         onUploadProgress: contentFromFile.progressCallback,
       ));
-    } else {
+    } else if (contentFromBytes != null){
       response = await parseResponse(service.uploadFromBytes(
-        bytes: contentFromBytes!.data,
+        bytes: contentFromBytes.data,
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
         onUploadProgress: contentFromBytes.progressCallback,
       ));
+    } else {
+      response = await parseResponse(service.uploadFromUrl(
+        url: contentFromUrl!.data,
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+        onUploadProgress: contentFromBytes!.progressCallback,
+      ));
     }
 
+    return response;
+  }
+
+  /// For image direct upload without API key or token.
+  /// This function is to be used specifically after an image directUpload
+  /// has been requested.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  Future<CloudflareHTTPResponse<CloudflareImage?>> directUpload({
+    /// Url to upload image without API key or token
+    required String uploadURL,
+
+    /// Image file to upload
+    DataTransmit<File>? contentFromFile,
+
+    /// Path to the image file to upload
+    DataTransmit<String>? contentFromPath,
+
+    /// Image byte array representation to upload
+    DataTransmit<List<int>>? contentFromBytes,
+  }) async {
+    assert(
+        contentFromFile != null ||
+            contentFromPath != null ||
+            contentFromBytes != null,
+        'One of the content must be specified.');
+
+    if (contentFromPath != null) {
+      contentFromFile ??= DataTransmit<File>(
+          data: File(contentFromPath.data),
+          progressCallback: contentFromPath.progressCallback);
+    }
+    final dio = restAPI.dio;
+    final formData = FormData();
+    ProgressCallback? progressCallback;
+    if (contentFromFile != null) {
+      final file = contentFromFile.data;
+      formData.files.add(MapEntry(
+        Params.file,
+        MultipartFile.fromFileSync(file.path, filename: file.path.split(Platform.pathSeparator).last)));
+      progressCallback = contentFromFile.progressCallback;
+    } else {
+      final bytes = contentFromBytes!.data;
+      formData.files.add(MapEntry(
+          Params.file,
+          MultipartFile.fromBytes(
+            bytes,
+            filename: null,
+          )));
+      progressCallback = contentFromBytes.progressCallback;
+    }
+
+    final rawResponse = await dio.fetch<Map<String, dynamic>?>(Options(
+      method: 'POST',
+      // headers: _headers,
+      responseType: ResponseType.json,
+      contentType: 'multipart/form-data',
+    ).compose(
+        BaseOptions(
+            baseUrl: uploadURL,
+            connectTimeout: restAPI.timeout?.inMilliseconds),
+        '',
+        data: formData,
+        onSendProgress: progressCallback));
+    final value = rawResponse.data == null
+        ? null
+        : CloudflareResponse.fromJson(rawResponse.data!);
+    final httpResponse = HttpResponse(value, rawResponse);
+
+    final response = await parseResponse(Future.value(httpResponse));
     return response;
   }
 
@@ -65,8 +162,15 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   Future<List<CloudflareHTTPResponse<CloudflareImage?>>> uploadMultiple({
     /// Image files to upload
     List<DataTransmit<File>>? contentFromFiles,
+
+    /// Paths to the image files to upload
     List<DataTransmit<String>>? contentFromPaths,
+
+    /// List of image byte array representations to upload
     List<DataTransmit<List<int>>>? contentFromBytes,
+
+    /// List of image urls to upload
+    List<DataTransmit<String>>? contentFromUrls,
 
     /// Indicates whether the image requires a signature token for the access
     /// default value: false
@@ -81,7 +185,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     assert(
         (contentFromFiles?.isNotEmpty ?? false) ||
             (contentFromPaths?.isNotEmpty ?? false) ||
-            (contentFromBytes?.isNotEmpty ?? false),
+            (contentFromBytes?.isNotEmpty ?? false) ||
+            (contentFromUrls?.isNotEmpty ?? false),
         'One of the contents must be specified.');
 
     List<CloudflareHTTPResponse<CloudflareImage?>> responses = [];
@@ -103,10 +208,19 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         );
         responses.add(response);
       }
-    } else {
+    } else if (contentFromBytes?.isNotEmpty ?? false){
       for (final content in contentFromBytes!) {
         final response = await upload(
           contentFromBytes: content,
+          requireSignedURLs: requireSignedURLs,
+          metadata: metadata,
+        );
+        responses.add(response);
+      }
+    } else {
+      for (final content in contentFromUrls!) {
+        final response = await upload(
+          contentFromUrl: content,
           requireSignedURLs: requireSignedURLs,
           metadata: metadata,
         );
@@ -118,18 +232,26 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Update image access control. On access control change,
   /// all copies of the image are purged from Cache.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-update-image
   Future<CloudflareHTTPResponse<CloudflareImage?>> update({
+    /// Image identifier
     String? id,
+
+    /// Image object
     CloudflareImage? image,
 
     /// Indicates whether the image can be accessed only using it's UID.
     /// If set to true, a signed token needs to be generated with a signing key
     /// to view the image. Returns a new UID on a change. No-op if not specified
+    ///
+    /// e.g: true
     bool? requireSignedURLs,
 
     /// User modifiable key-value store. Can use used for keeping references to
     /// another system of record for managing images. No-op if not specified.
-    /// "{\"meta\": \"metaID\"}"
+    ///
+    /// e.g: "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
     assert(
@@ -144,13 +266,63 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     return response;
   }
 
+  /// Direct uploads allow users to upload images without API keys. A common
+  /// place to use direct uploads is on web apps, client side applications, or
+  /// on mobile devices where users upload content directly to Cloudflare
+  /// Images. Method creates a draft record for a future image and returns
+  /// upload URL and image identifier that can be used later to verify if image
+  /// itself has been uploaded or not with the draft: true property in the
+  /// image response.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  Future<CloudflareHTTPResponse<DataUploadDraft?>> createDirectUpload({
+    /// Indicates whether the image requires a signature token for the access
+    ///
+    /// Default value: false
+    /// e.g: true
+    bool? requireSignedURLs,
+
+    /// User modifiable key-value store. Can use used for keeping references to
+    /// another system of record for managing images.
+    ///
+    /// e.g: "{\"meta\": \"metaID\"}"
+    Map<String, dynamic>? metadata,
+
+    /// The date after upload will not be accepted.
+    ///
+    /// Min value: Now + 2 minutes.
+    /// Max value: Now + 6 hours.
+    /// Default value: Now + 30 minutes.
+    /// e.g: "2021-01-02T02:20:00Z"
+    DateTime? expiry,
+  }) async {
+    final response = await genericParseResponse(
+      service.createDirectUpload(
+        requireSignedURLs: requireSignedURLs,
+        metadata: metadata,
+        expiry: expiry?.toJson(),
+      ),
+      dataType: DataUploadDraft(),
+    );
+    return response;
+  }
+
   /// Up to 100 images can be listed with one request, use optional parameters
   /// to get a specific range of images.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-list-images
   Future<CloudflareHTTPResponse<List<CloudflareImage>?>> getAll({
-    /// Page number of paginated results, default value: 1
+    /// Page number of paginated results.
+    ///
+    /// Min value: 1
+    /// Default value: 1
     int? page,
 
-    /// Number of items per page, default value: 50
+    /// Number of items per page.
+    ///
+    /// Min value: 10
+    /// Max value: 100
+    /// Default value: 50
     int? size,
   }) async {
     final response =
@@ -160,8 +332,13 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }
 
   /// Fetch details of a single image.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-image-details
   Future<CloudflareHTTPResponse<CloudflareImage?>> get({
+    /// Image identifier
     String? id,
+
+    /// Image object
     CloudflareImage? image,
   }) async {
     assert(
@@ -176,8 +353,13 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Fetch base image. For most images this will be the originally uploaded
   /// file. For larger images it can be a near-lossless version of the original.
   /// Note: the response is <image blob data>
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-base-image
   Future<CloudflareHTTPResponse<List<int>?>> getBase({
+    /// Image identifier
     String? id,
+
+    /// Image object
     CloudflareImage? image,
   }) async {
     assert(
@@ -194,12 +376,17 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Delete an image on Cloudflare Images. On success, all copies of the image
   /// are deleted and purged from Cache.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-delete-image
   Future<CloudflareHTTPResponse> delete({
+    /// Image identifier
     String? id,
+
+    /// Image object
     CloudflareImage? image,
   }) async {
     assert(
-        id != null || image != null, 'One of id or image must not be empty.');
+        id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
     final response = await getSaveResponse(
         service.delete(
@@ -212,7 +399,10 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Delete a list of images on Cloudflare Images. On success, all copies of the images
   /// are deleted and purged from Cache.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
+    /// List of image ids
     List<String>? ids,
+
+    /// List of image objects
     List<CloudflareImage>? images,
   }) async {
     assert((ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
