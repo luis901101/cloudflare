@@ -63,7 +63,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Uploads multiple images by repeatedly calling upload
   Future<List<CloudflareHTTPResponse<CloudflareImage?>>> uploadMultiple({
-    /// Image file to upload
+    /// Image files to upload
     List<DataTransmit<File>>? contentFromFiles,
     List<DataTransmit<String>>? contentFromPaths,
     List<DataTransmit<List<int>>>? contentFromBytes,

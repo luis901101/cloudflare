@@ -1,4 +1,4 @@
-enum VideoProcessingState {
+enum MediaProcessingState {
   pendingupload,
   downloading,
   queued,

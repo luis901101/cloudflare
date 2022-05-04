@@ -37,7 +37,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
       status: json['status'] == null
           ? null
           : VideoStatus.fromJson(json['status'] as Map<String, dynamic>),
-      duration: json['duration'] as int?,
+      duration: (json['duration'] as num?)?.toDouble(),
       uploadExpiry: json['uploadExpiry'] == null
           ? null
           : DateTime.parse(json['uploadExpiry'] as String),
@@ -71,7 +71,7 @@ Map<String, dynamic> _$CloudflareStreamVideoToJson(
   val['requireSignedURLs'] = instance.requireSignedURLs;
   writeNotNull('meta', instance.meta);
   val['allowedOrigins'] = instance.allowedOrigins;
-  val['maxDurationSeconds'] = instance.maxDurationSeconds;
+  writeNotNull('maxDurationSeconds', instance.maxDurationSeconds);
   val['created'] = instance.created.toIso8601String();
   val['preview'] = instance.preview;
   val['modified'] = instance.modified.toIso8601String();
@@ -80,7 +80,7 @@ Map<String, dynamic> _$CloudflareStreamVideoToJson(
   val['uid'] = instance.id;
   val['status'] = instance.status;
   val['duration'] = instance.duration;
-  val['uploadExpiry'] = instance.uploadExpiry.toIso8601String();
+  writeNotNull('uploadExpiry', instance.uploadExpiry?.toIso8601String());
   val['thumbnailTimestampPct'] = instance.thumbnailTimestampPct;
   writeNotNull('playback', instance.playback);
   writeNotNull('nft', instance.nft);

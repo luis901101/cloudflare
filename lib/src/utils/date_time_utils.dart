@@ -1,4 +1,4 @@
 extension DateTimeUtils on DateTime {
-  String toJson() => toIso8601String();
+  String toJson() => toUtc().toIso8601String();
   static DateTime fromJson(dynamic json) => DateTime.parse(json);
 }

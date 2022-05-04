@@ -2,22 +2,35 @@
 
 library cloudflare;
 
+//Imports
 import 'dart:io';
-
 import 'package:cloudflare/src/apiservice/image_api.dart';
+import 'package:cloudflare/src/apiservice/stream_api.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/utils/callbacks.dart';
 
+//Exports
 export 'package:cloudflare/src/apiservice/image_api.dart';
-
-export 'package:cloudflare/src/model/cloudflare_http_response.dart';
+export 'package:cloudflare/src/apiservice/stream_api.dart';
 
 export 'package:cloudflare/src/entity/cloudflare_image.dart';
 export 'package:cloudflare/src/entity/cloudflare_response.dart';
+export 'package:cloudflare/src/entity/cloudflare_stream_video.dart';
+export 'package:cloudflare/src/entity/media_nft.dart';
+export 'package:cloudflare/src/entity/video_playback_info.dart';
+export 'package:cloudflare/src/entity/video_size.dart';
+export 'package:cloudflare/src/entity/video_status.dart';
+export 'package:cloudflare/src/entity/watermark.dart';
 
+export 'package:cloudflare/src/enumerators/media_processing_state.dart';
+export 'package:cloudflare/src/enumerators/watermark_position.dart';
+
+export 'package:cloudflare/src/model/cloudflare_error_response.dart';
+export 'package:cloudflare/src/model/cloudflare_http_response.dart';
+export 'package:cloudflare/src/model/cloudflare_images_error_codes.dart';
+export 'package:cloudflare/src/model/cloudflare_stream_videos_error_codes.dart';
 export 'package:cloudflare/src/model/data_transmit.dart';
 export 'package:cloudflare/src/model/error_info.dart';
-export 'package:cloudflare/src/model/cloudflare_error_response.dart';
 export 'package:cloudflare/src/model/pagination.dart';
 
 export 'package:cloudflare/src/utils/callbacks.dart';
@@ -71,6 +84,7 @@ class Cloudflare {
 
   /// Image API
   late final ImageAPI imageAPI;
+  late final StreamAPI streamAPI;
   bool _initialized = false;
 
   Cloudflare({
@@ -116,6 +130,7 @@ class Cloudflare {
     );
 
     imageAPI = ImageAPI(restAPI: restAPI, accountId: accountId);
+    streamAPI = StreamAPI(restAPI: restAPI, accountId: accountId);
     _initialized = true;
   }
 }

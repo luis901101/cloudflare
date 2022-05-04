@@ -7,27 +7,27 @@ part of 'video_status.dart';
 // **************************************************************************
 
 VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
-      state: $enumDecodeNullable(_$VideoProcessingStateEnumMap, json['state'],
-          unknownValue: VideoProcessingState.unknown),
-      pctComplete: json['pctComplete'] as int?,
+      state: $enumDecodeNullable(_$MediaProcessingStateEnumMap, json['state'],
+          unknownValue: MediaProcessingState.unknown),
+      pctComplete: JsonUtils.intReadValue(json, 'pctComplete') as int?,
       errorReasonCode: json['errorReasonCode'] as String?,
       errorReasonText: json['errorReasonText'] as String?,
     );
 
 Map<String, dynamic> _$VideoStatusToJson(VideoStatus instance) =>
     <String, dynamic>{
-      'state': _$VideoProcessingStateEnumMap[instance.state],
+      'state': _$MediaProcessingStateEnumMap[instance.state],
       'pctComplete': instance.pctComplete,
       'errorReasonCode': instance.errorReasonCode,
       'errorReasonText': instance.errorReasonText,
     };
 
-const _$VideoProcessingStateEnumMap = {
-  VideoProcessingState.pendingupload: 'pendingupload',
-  VideoProcessingState.downloading: 'downloading',
-  VideoProcessingState.queued: 'queued',
-  VideoProcessingState.inprogress: 'inprogress',
-  VideoProcessingState.ready: 'ready',
-  VideoProcessingState.error: 'error',
-  VideoProcessingState.unknown: 'unknown',
+const _$MediaProcessingStateEnumMap = {
+  MediaProcessingState.pendingupload: 'pendingupload',
+  MediaProcessingState.downloading: 'downloading',
+  MediaProcessingState.queued: 'queued',
+  MediaProcessingState.inprogress: 'inprogress',
+  MediaProcessingState.ready: 'ready',
+  MediaProcessingState.error: 'error',
+  MediaProcessingState.unknown: 'unknown',
 };

@@ -1,5 +1,5 @@
 name: cloudflare
-description: This is a flutter package for Cloudflare media API.
+description: This is a dart package for Cloudflare media API to allow easy Image and Streaming api management.
 version: 0.1.0+3
 homepage: https://github.com/luis901101/cloudflare
 

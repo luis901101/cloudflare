@@ -74,7 +74,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   ///
   /// e.g: 300
   /// default value: -1
-  int maxDurationSeconds;
+  int? maxDurationSeconds;
 
   /// When the media item was created.
   /// Using  ISO 8601 ZonedDateTime
@@ -147,12 +147,12 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   /// read only
   ///
   /// e.g: 300
-  final int duration;
+  final double duration;
 
   /// Date at which the video upload URL is no longer valid for direct user uploads.
   ///
   /// e.g: "2014-01-02T02:20:00Z"
-  DateTime uploadExpiry;
+  DateTime? uploadExpiry;
 
   /// Timestamp location of thumbnail image calculated as a percentage value of
   /// the video's duration. To convert from a second-wise timestamp to a
@@ -210,7 +210,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     bool? requireSignedURLs,
     this.meta,
     List<String>? allowedOrigins,
-    int? maxDurationSeconds,
+    this.maxDurationSeconds,
     DateTime? created,
     String? preview,
     DateTime? modified,
@@ -218,8 +218,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     String? thumbnail,
     String? id,
     VideoStatus? status,
-    int? duration,
-    DateTime? uploadExpiry,
+    double? duration,
+    this.uploadExpiry,
     double? thumbnailTimestampPct,
     this.playback,
     this.nft,
@@ -230,7 +230,6 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     size = size ?? 0,
     requireSignedURLs = requireSignedURLs ?? false,
     allowedOrigins = allowedOrigins ?? [],
-    maxDurationSeconds = maxDurationSeconds ?? -1,
     created = created ?? DateTime.now(),
     preview = preview ?? '',
     modified = modified ?? DateTime.now(),
@@ -238,8 +237,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     thumbnail = thumbnail ?? '',
     id = id ?? '',
     status = status ?? VideoStatus(),
-    duration = duration ?? 0,
-    uploadExpiry = uploadExpiry ?? DateTime.now(),
+    duration = duration ?? -1,
     thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
     readyToStream = readyToStream ?? false
   ;

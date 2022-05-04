@@ -47,3 +47,15 @@ class ImageMatcher extends ResponseMatcher {
     return response.body != null && response.body!.variants.isNotEmpty;
   }
 }
+
+class StreamVideoMatcher extends ResponseMatcher {
+  StreamVideoMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    super.matches(response, matchState);
+    if (response is! CloudflareHTTPResponse<CloudflareStreamVideo>) return false;
+    return response.body != null && response.body!.thumbnail.isNotEmpty &&
+        response.body!.preview.isNotEmpty;
+  }
+}

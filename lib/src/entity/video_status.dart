@@ -1,4 +1,5 @@
-import 'package:cloudflare/src/enumerators/video_processing_state.dart';
+import 'package:cloudflare/src/enumerators/media_processing_state.dart';
+import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -17,7 +18,7 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// read only
   ///
   /// e.g: "inprogress"
-  @JsonKey(unknownEnumValue: VideoProcessingState.unknown) final VideoProcessingState state;
+  @JsonKey(unknownEnumValue: MediaProcessingState.unknown) final MediaProcessingState state;
 
   /// Indicates the percent upload completed of the entire upload in bytes.
   /// The value must be a non-negative integer.
@@ -26,7 +27,8 @@ class VideoStatus extends Jsonable<VideoStatus> {
   ///
   /// min value:0
   /// max value:100
-  final int pctComplete;
+  /// Fixme: This property is officially documented as an integer however actual response is a String with a double representation
+  @JsonKey(readValue: JsonUtils.intReadValue) final int pctComplete;
 
   /// Provides an error code on why this video failed to encode.
   /// Empty if the state is not in "error". This field should be preferred
@@ -46,12 +48,12 @@ class VideoStatus extends Jsonable<VideoStatus> {
   final String? errorReasonText;
 
   VideoStatus({
-    VideoProcessingState? state,
+    MediaProcessingState? state,
     int? pctComplete,
     this.errorReasonCode,
     this.errorReasonText,
-  })  : state = state ?? VideoProcessingState.ready,
-        pctComplete = pctComplete ?? 0;
+  })  : state = state ?? MediaProcessingState.ready,
+        pctComplete = pctComplete ?? 100;
 
   @override
   Map<String, dynamic> toJson() => _$VideoStatusToJson(this);

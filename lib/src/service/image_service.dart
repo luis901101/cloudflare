@@ -19,7 +19,7 @@ abstract class ImageService {
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
-    @Part(name: 'file') required File file,
+    @Part(name: Params.file) required File file,
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
@@ -29,7 +29,7 @@ abstract class ImageService {
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes({
-    @Part(name: 'file') required List<int> bytes,
+    @Part(name: Params.file) required List<int> bytes,
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
