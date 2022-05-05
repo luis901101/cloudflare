@@ -4,8 +4,6 @@ import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' hide Headers;
-import 'dart:convert'; //used by generated code with jsonEncode(...)
-import 'package:cloudflare/src/utils/date_time_utils.dart'; //used by generated code with date.toJson()
 
 part 'stream_service.g.dart';
 
@@ -16,13 +14,11 @@ abstract class StreamService {
         baseUrl: '${dio.options.baseUrl}/accounts/$accountId/stream');
   }
 
-  // @POST('')
-  // @MultiPart()
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
-  //   @Part(name: Params.file) required File file,
-  //   @SendProgress() ProgressCallback? onUploadProgress,
-  // });
+  @POST('/copy')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
+    @Body() required Map<String, dynamic> data,
+  });
 
   @POST('')
   @MultiPart()
@@ -51,8 +47,8 @@ abstract class StreamService {
   @GET('')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> getAll({
-    @Query(Params.after) DateTime? after,
-    @Query(Params.before) DateTime? before,
+    @Query(Params.after) String? after,
+    @Query(Params.before) String? before,
     @Query(Params.includeCounts) bool? includeCounts,
     @Query(Params.search) String? search,
     @Query(Params.limit) int? limit,
@@ -66,6 +62,11 @@ abstract class StreamService {
     @Path() required String id,
   });
 
+  @DELETE('/{id}')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> delete({
+    @Path() required String id,
+  });
 
 
 
@@ -92,10 +93,5 @@ abstract class StreamService {
   // Future<HttpResponse> getBase({
   //   @Path() required String id,
   // });
-  //
-  // @DELETE('/{id}')
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> delete({
-  //   @Path() required String id,
-  // });
+
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:test/test.dart';
@@ -12,10 +11,12 @@ void main() async {
 
   group('Stream video tests', () {
     late final File videoFile, videoFile1, videoFile2;
+    late final String videoUrl;
     setUpAll(() async {
       videoFile = File(Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? '');
       videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? '');
       videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? '');
+      videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
     });
 
     test('Simple stream video from file with progress update', () async {
@@ -28,6 +29,14 @@ void main() async {
               progressCallback: (count, total) {
                 print('Simple stream video from file progress: $count/$total');
               }));
+      expect(response, StreamVideoMatcher());
+    }, timeout: Timeout(Duration(minutes: 2)));
+
+    test('Simple stream video from url with progress update', () async {
+      if (videoUrl.isEmpty) {
+        fail('No video url available to stream');
+      }
+      final response = await cloudflare.streamAPI.stream(url: videoUrl);
       expect(response, StreamVideoMatcher());
     }, timeout: Timeout(Duration(minutes: 2)));
 
