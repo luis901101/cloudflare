@@ -82,7 +82,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         url: contentFromUrl!.data,
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
-        onUploadProgress: contentFromBytes!.progressCallback,
+        onUploadProgress: contentFromUrl.progressCallback,
       ));
     }
 
@@ -123,19 +123,19 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     ProgressCallback? progressCallback;
     if (contentFromFile != null) {
       final file = contentFromFile.data;
+      progressCallback = contentFromFile.progressCallback;
       formData.files.add(MapEntry(
         Params.file,
         MultipartFile.fromFileSync(file.path, filename: file.path.split(Platform.pathSeparator).last)));
-      progressCallback = contentFromFile.progressCallback;
     } else {
       final bytes = contentFromBytes!.data;
+      progressCallback = contentFromBytes.progressCallback;
       formData.files.add(MapEntry(
           Params.file,
           MultipartFile.fromBytes(
             bytes,
             filename: null,
           )));
-      progressCallback = contentFromBytes.progressCallback;
     }
 
     final rawResponse = await dio.fetch<Map<String, dynamic>?>(Options(

@@ -27,7 +27,9 @@ class ResponseMatcher extends GenericMatcher {
 
   @override
   bool matches(response, Map matchState) {
-    if (response is! CloudflareHTTPResponse) return false;
+    if (response is! CloudflareHTTPResponse) {
+      return false;
+    }
     if (!response.isSuccessful) {
       // fail('Unsuccessful response: ${response.error?.toString()}');
       return printAndReturnOnFailure(

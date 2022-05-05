@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -8,19 +7,21 @@ import 'package:test/test.dart';
 import 'base_tests.dart';
 import 'utils/matchers.dart';
 
+/// ImageAPI tests on each Cloudflare Image API endpoint.
+/// These tests ensures that every uploaded test image gets deleted.
 void main() async {
   await init();
+  final File imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? ''),
+      imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
+      imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
+  final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
+  Set<String> imageIds = {};
+
+  void addId(String? id) {
+    if(id != null) imageIds.add(id);
+  }
 
   group('Upload image tests', () {
-    late final File imageFile, imageFile1, imageFile2;
-    late final String imageUrl;
-    setUpAll(() async {
-      imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
-      imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? '');
-      imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
-      imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
-    });
-
     test('Simple upload image from file with progress update', () async {
       if (!imageFile.existsSync()) {
         fail('No image file available to upload');
@@ -29,9 +30,44 @@ void main() async {
           contentFromFile: DataTransmit<File>(
               data: imageFile,
               progressCallback: (count, total) {
-                print('Simple upload image from file progress: $count/$total');
+                final split = imageFile.path.split(Platform.pathSeparator);
+                String? filename = split.isNotEmpty ? split.last : null;
+                print('Simple upload image: $filename from file progress: $count/$total');
               }));
       expect(response, ImageMatcher());
+      addId(response.body?.id);
+    }, timeout: Timeout(Duration(minutes: 2)));
+
+    test('Simple upload image from path with progress update', () async {
+      if (!imageFile.existsSync()) {
+        fail('No image path available to upload');
+      }
+      final response = await cloudflare.imageAPI.upload(
+          contentFromPath: DataTransmit<String>(
+              data: imageFile.path,
+              progressCallback: (count, total) {
+                final split = imageFile.path.split(Platform.pathSeparator);
+                String? filename = split.isNotEmpty ? split.last : null;
+                print('Simple upload image: $filename from path progress: $count/$total');
+              }));
+      expect(response, ImageMatcher());
+      addId(response.body?.id);
+    }, timeout: Timeout(Duration(minutes: 2)));
+
+    test('Simple upload image from bytes with progress update', () async {
+      if (!imageFile.existsSync()) {
+        fail('No image bytes available to upload');
+      }
+      final response = await cloudflare.imageAPI.upload(
+          contentFromBytes: DataTransmit<List<int>>(
+              data: imageFile.readAsBytesSync(),
+              progressCallback: (count, total) {
+                final split = imageFile.path.split(Platform.pathSeparator);
+                String? filename = split.isNotEmpty ? split.last : null;
+                print('Simple upload image: $filename from bytes progress: $count/$total');
+              }));
+      expect(response, ImageMatcher());
+      addId(response.body?.id);
     }, timeout: Timeout(Duration(minutes: 2)));
 
     test('Simple upload image from url with progress update', () async {
@@ -42,54 +78,11 @@ void main() async {
           contentFromUrl: DataTransmit<String>(
               data: imageUrl,
               progressCallback: (count, total) {
-                print('Simple upload image from url progress: $count/$total');
+                print('Simple upload image from url: $imageUrl progress: $count/$total');
               }));
       expect(response, ImageMatcher());
+      addId(response.body?.id);
     }, timeout: Timeout(Duration(minutes: 2)));
-
-    group('Image direct upload tests', () {
-      late final CloudflareHTTPResponse<DataUploadDraft?> response;
-      late final String? imageId;
-      late final String? uploadURL;
-
-      setUpAll(() async {
-        response = await cloudflare.imageAPI.createDirectUpload();
-        imageId = response.body?.id;
-        uploadURL = response.body?.uploadURL;
-      });
-
-      test('Create authenticated direct image upload URL', () async {
-        expect(response.isSuccessful, true);
-        expect(response.body?.id, isNotEmpty);
-        expect(response.body?.uploadURL, isNotEmpty);
-      }, timeout: Timeout(Duration(minutes: 2)));
-
-      test('Check created image draft status', () async {
-        if (imageId?.isEmpty ?? true) {
-          fail('No imageId available to check draft status');
-        }
-        final response = await cloudflare.imageAPI.get(id: imageId);
-        expect(response, ImageMatcher());
-        expect(response.body?.draft, true);
-      }, timeout: Timeout(Duration(minutes: 2)));
-
-      test('Doing image upload to direct upload URL', () async {
-        if (uploadURL?.isEmpty ?? true) {
-          fail('No uploadURL available to upload to');
-        }
-        final response = await cloudflare.imageAPI.directUpload(
-          uploadURL: uploadURL!,
-          contentFromFile: DataTransmit<File>(
-            data: imageFile,
-            progressCallback: (count, total) {
-              print('Image upload to direct upload URL from file progress: $count/$total');
-            })
-        );
-        expect(response, ImageMatcher());
-        expect(response.body?.id, imageId);
-        expect(response.body?.draft, false);
-      }, timeout: Timeout(Duration(minutes: 2)));
-    });
 
     test('Multiple upload image from file with progress update', () async {
       if (!imageFile.existsSync() ||
@@ -115,20 +108,8 @@ void main() async {
       );
       for (final response in responses) {
         expect(response, ImageMatcher());
+        addId(response.body?.id);
       }
-    }, timeout: Timeout(Duration(minutes: 2)));
-
-    test('Simple upload image from path with progress update', () async {
-      if (!imageFile.existsSync()) {
-        fail('No image file available to upload');
-      }
-      final response = await cloudflare.imageAPI.upload(
-          contentFromPath: DataTransmit<String>(
-              data: imageFile.path,
-              progressCallback: (count, total) {
-                print('Simple upload image from path progress: $count/$total');
-              }));
-      expect(response, ImageMatcher());
     }, timeout: Timeout(Duration(minutes: 2)));
 
     test('Multiple upload image from path with progress update', () async {
@@ -155,21 +136,8 @@ void main() async {
       );
       for (final response in responses) {
         expect(response, ImageMatcher());
+        addId(response.body?.id);
       }
-    }, timeout: Timeout(Duration(minutes: 2)));
-
-    test('Simple upload image from bytes with progress update', () async {
-      if (!imageFile.existsSync()) {
-        fail('No image file available to upload');
-      }
-      final response = await cloudflare.imageAPI.upload(
-          contentFromBytes: DataTransmit<List<int>>(
-              data: imageFile.readAsBytesSync(),
-              progressCallback: (count, total) {
-                print('Simple upload image from bytes progress: $count/$total');
-              }));
-      expect(response, ImageMatcher());
-      print(response.body?.toString());
     }, timeout: Timeout(Duration(minutes: 2)));
 
     test('Multiple upload image from bytes with progress update', () async {
@@ -196,6 +164,31 @@ void main() async {
       );
       for (final response in responses) {
         expect(response, ImageMatcher());
+        addId(response.body?.id);
+      }
+    }, timeout: Timeout(Duration(minutes: 2)));
+
+    test('Multiple upload image from url with progress update', () async {
+      if (imageUrl.isEmpty) {
+        fail(
+            'imageUrl is required for multiple upload test. Check if you set imageUrl in the env vars.');
+      }
+      final urls = [imageUrl, imageUrl, imageUrl];
+      List<DataTransmit<String>> contents = [];
+      for (final url in urls) {
+        contents.add(DataTransmit<String>(
+            data: url,
+            progressCallback: (count, total) {
+              print(
+                  'Multiple upload image from url: $url progress: $count/$total');
+            }));
+      }
+      final responses = await cloudflare.imageAPI.uploadMultiple(
+        contentFromUrls: contents,
+      );
+      for (final response in responses) {
+        expect(response, ImageMatcher());
+        addId(response.body?.id);
       }
     }, timeout: Timeout(Duration(minutes: 2)));
 
@@ -215,12 +208,58 @@ void main() async {
       expect(response, ImageMatcher());
       expect(response.body!.requireSignedURLs, true);
       expect(response.body!.meta, metadata);
+      addId(response.body?.id);
     }, timeout: Timeout(Duration(minutes: 2)));
+
+    group('Image direct upload tests', () {
+      late final CloudflareHTTPResponse<DataUploadDraft?> response;
+      late final String? imageId;
+      late final String? uploadURL;
+
+      setUpAll(() async {
+        response = await cloudflare.imageAPI.createDirectUpload();
+        imageId = response.body?.id;
+        uploadURL = response.body?.uploadURL;
+      });
+
+      test('Create authenticated direct image upload URL', () async {
+        expect(response, ResponseMatcher());
+        expect(response.body?.id, isNotEmpty);
+        expect(response.body?.uploadURL, isNotEmpty);
+      }, timeout: Timeout(Duration(minutes: 2)));
+
+      test('Check created image draft status', () async {
+        if (imageId?.isEmpty ?? true) {
+          fail('No imageId available to check draft status');
+        }
+        final response = await cloudflare.imageAPI.get(id: imageId);
+        expect(response, ImageMatcher());
+        expect(response.body?.draft, true);
+      }, timeout: Timeout(Duration(minutes: 2)));
+
+      test('Doing image upload to direct upload URL', () async {
+        if (uploadURL?.isEmpty ?? true) {
+          fail('No uploadURL available to upload to');
+        }
+        final response = await cloudflare.imageAPI.directUpload(
+          uploadURL: uploadURL!,
+          contentFromFile: DataTransmit<File>(
+            data: imageFile,
+            progressCallback: (count, total) {
+              print('Image upload to direct upload URL from file progress: $count/$total');
+            })
+        );
+        expect(response, ImageMatcher());
+        addId(response.body?.id);
+        expect(response.body?.id, imageId);
+        expect(response.body?.draft, false);
+      }, timeout: Timeout(Duration(minutes: 2)));
+    });
   });
 
   test('Get image usage statistics', () async {
     final response = await cloudflare.imageAPI.getStats();
-    expect(response.isSuccessful, true);
+    expect(response, ResponseMatcher());
     print('Stats: ${response.body?.toJson()}');
   });
 
@@ -257,21 +296,20 @@ void main() async {
     });
   });
 
-  group('Update/Delete image tests', () {
-    late final File imageFile;
+  group('Update image tests', () {
     String? imageId;
     final metadata = {
       'system_id': "image-test-system-id'",
       'description': 'This is an image test',
     };
     setUpAll(() async {
-      imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '');
       final response = await cloudflare.imageAPI.upload(
         contentFromFile: DataTransmit<File>(data: imageFile),
-        // requireSignedURLs: true,
+        requireSignedURLs: true,
         metadata: metadata,
       );
       imageId = response.body?.id;
+      addId(imageId);
     });
 
     test('Update image', () async {
@@ -282,43 +320,47 @@ void main() async {
       metadata['description'] = '${metadata['description']}-updated';
       final response = await cloudflare.imageAPI.update(
         id: imageId!,
-        // requireSignedURLs: false,
+        requireSignedURLs: false,
         metadata: metadata,
       );
       expect(response, ImageMatcher());
-      // expect(response.body!.requireSignedURLs, false);
+      imageIds.remove(imageId);//After image updated the imageId changes
+      addId(response.body?.id);
+      expect(response.body!.requireSignedURLs, false);
       expect(response.body!.meta, metadata);
-    });
-
-    test('Delete image', () async {
-      if (imageId == null) {
-        fail('No image available to delete');
-      }
-      final response = await cloudflare.imageAPI.delete(
-        id: imageId!,
-      );
-      expect(response, ResponseMatcher());
     });
   });
 
+  test('Delete image test', () async {
+    final imageId = imageIds.isNotEmpty ? imageIds.first : null;
+    if (imageId == null) {
+      fail('No image available to delete');
+    }
+    final response = await cloudflare.imageAPI.delete(
+      id: imageId,
+    );
+    expect(response, ResponseMatcher());
+    imageIds.remove(imageId);
+  });
+  
   test('Delete multiple images', () async {
-    final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
-    if (responseList.body?.isEmpty ?? true) {
+    /// This code below is not part of the tests and should remain commented, be careful.
+    // final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
+    // if(responseList.isSuccessful && (responseList.body?.isNotEmpty ?? false)) {
+    //   imageIds = responseList.body!.map((e) => e.id).toSet();
+    // }
+
+    if (imageIds.isEmpty) {
       fail('There are no uploaded images to test multi delete.');
     }
 
-    List<CloudflareImage> images = [];
-    for (int i = 0, length = min(3, responseList.body!.length);
-        i < length;
-        ++i) {
-      images.add(responseList.body![i]);
-    }
-
     final responses = await cloudflare.imageAPI.deleteMultiple(
-      images: images,
+      ids: imageIds.toList(),
     );
+    int deleted = responses.where((response) => response.isSuccessful).length;
+    print('Deleted: $deleted of ${imageIds.length}');
     for (final response in responses) {
       expect(response, ResponseMatcher());
     }
-  });
+  }, timeout: Timeout(Duration(minutes: 10)));
 }
