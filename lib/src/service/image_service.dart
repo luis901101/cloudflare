@@ -29,7 +29,7 @@ abstract class ImageService {
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes({
-    @Part(name: Params.file) required List<int> bytes,
+    @Part(name: Params.file, fileName: 'image-from-bytes') required List<int> bytes,
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
@@ -84,7 +84,7 @@ abstract class ImageService {
 
   @DELETE('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> delete({
+  Future<HttpResponse> delete({
     @Path() required String id,
   });
 

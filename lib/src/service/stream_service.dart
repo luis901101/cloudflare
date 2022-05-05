@@ -18,6 +18,7 @@ abstract class StreamService {
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
     @Body() required Map<String, dynamic> data,
+    @SendProgress() ProgressCallback? onUploadProgress,
   });
 
   @POST('')
@@ -32,7 +33,7 @@ abstract class StreamService {
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> streamFromBytes({
-    @Part(name: Params.file) required List<int> bytes,
+    @Part(name: Params.file, fileName: 'video-from-bytes') required List<int> bytes,
     @SendProgress() ProgressCallback? onUploadProgress,
   });
 
@@ -64,7 +65,7 @@ abstract class StreamService {
 
   @DELETE('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> delete({
+  Future<HttpResponse> delete({
     @Path() required String id,
   });
 

@@ -19,6 +19,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// A video up to 200 MegaBytes can be uploaded using a single
   /// HTTP POST (multipart/form-data) request.
   /// For larger file sizes, please upload using the TUS protocol.
+  ///
+  /// Official documentation:
+  /// https://api.cloudflare.com/#stream-videos-upload-a-video-using-a-single-http-request
+  /// https://api.cloudflare.com/#stream-videos-upload-a-video-from-a-url
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> stream({
     /// Video file to stream
     DataTransmit<File>? contentFromFile,
@@ -35,7 +39,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// of the file.
     ///
     /// e.g: "https://example.com/myvideo.mp4"
-    String? url,
+    DataTransmit<String>? contentFromUrl,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -73,7 +77,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     bool? requireSignedURLs,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
-    /// A Watermark pointing to an existing watermark profile
+    /// A Watermark object with the id of an existing watermark profile
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
   }) async {
@@ -82,7 +86,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         contentFromFile != null ||
             contentFromPath != null ||
             contentFromBytes != null ||
-            url != null,
+            contentFromUrl != null,
         'One of the content must be specified.');
 
     final CloudflareHTTPResponse<CloudflareStreamVideo?> response;
@@ -104,12 +108,13 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     } else {
       response = await parseResponse(service.streamFromUrl(
         data: {
-          Params.url: url,
+          Params.url: contentFromUrl!.data,
           if(thumbnailTimestampPct != null) Params.thumbnailTimestampPct: thumbnailTimestampPct,
           if(allowedOrigins?.isNotEmpty ?? false) Params.allowedOrigins: allowedOrigins,
           if(requireSignedURLs != null) Params.requireSignedURLs: requireSignedURLs,
           if(watermark != null) Params.watermark: watermark.toJson(),
         },
+        onUploadProgress: contentFromUrl.progressCallback,
       ));
     }
     return response;
@@ -132,7 +137,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// of the file.
     ///
     /// e.g: "https://example.com/myvideo.mp4"
-    List<String>? urls,
+    List<DataTransmit<String>>? contentFromUrls,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -179,7 +184,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         (contentFromFiles?.isNotEmpty ?? false) ||
             (contentFromPaths?.isNotEmpty ?? false) ||
             (contentFromBytes?.isNotEmpty ?? false) ||
-            (urls?.isNotEmpty ?? false),
+            (contentFromUrls?.isNotEmpty ?? false),
         'One of the contents must be specified.');
 
     List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responses = [];
@@ -207,9 +212,9 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         responses.add(response);
       }
     } else {
-      for (final url in urls!) {
+      for (final contentFromUrl in contentFromUrls!) {
         final response = await stream(
-          url: url,
+          contentFromUrl: contentFromUrl,
           thumbnailTimestampPct: thumbnailTimestampPct,
           allowedOrigins: allowedOrigins,
           requireSignedURLs: requireSignedURLs,
@@ -227,6 +232,8 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// uses a cursor pattern to list more than 1000 videos. In order to list all
   /// videos, make multiple requests to the API using the created date-time of
   /// the last item in the previous request as the before or after parameter.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#stream-videos-list-videos
   Future<CloudflareHTTPResponse<List<CloudflareStreamVideo>?>> getAll({
     /// Show videos created after this date-time
     /// Using  ISO 8601 ZonedDateTime
@@ -292,6 +299,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }
 
   /// Fetch details of a single video.
+  /// Official documentation: https://api.cloudflare.com/#stream-videos-video-details
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> get({
     String? id,
     CloudflareStreamVideo? video,
@@ -308,18 +316,18 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
   /// Delete a video on Cloudflare Stream. On success, all copies of the video
   /// are deleted.
+  /// Official documentation: https://api.cloudflare.com/#stream-videos-delete-video
   Future<CloudflareHTTPResponse> delete({
     String? id,
     CloudflareStreamVideo? video,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || video != null, 'One of id or video must not be null.');
     id ??= video?.id;
     final response = await getSaveResponse(
-        service.delete(
-          id: id!,
-        ),
-        parseCloudflareResponse: false);
+      service.delete(id: id!,),
+      parseCloudflareResponse: false);
     return response;
   }
 
@@ -337,11 +345,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await getSaveResponse(
-          service.delete(
-            id: id,
-          ),
-          parseCloudflareResponse: false);
+      final response = await delete(id: id,);
       responses.add(response);
     }
     return responses;

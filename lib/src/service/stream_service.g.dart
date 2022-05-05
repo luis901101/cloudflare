@@ -17,9 +17,10 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromUrl(
-      {required data}) async {
+      {required data, onUploadProgress}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(data);
@@ -27,7 +28,9 @@ class _StreamService implements StreamService {
         _setStreamType<HttpResponse<CloudflareResponse>>(
             Options(method: 'POST', headers: _headers, extra: _extra)
                 .compose(_dio.options, '/copy',
-                    queryParameters: queryParameters, data: _data)
+                    queryParameters: queryParameters,
+                    data: _data,
+                    onSendProgress: onUploadProgress)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
         ? null
@@ -78,7 +81,7 @@ class _StreamService implements StreamService {
         'file',
         MultipartFile.fromBytes(
           bytes,
-          filename: null,
+          filename: 'video-from-bytes',
         )));
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
@@ -147,20 +150,17 @@ class _StreamService implements StreamService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> delete({required id}) async {
+  Future<HttpResponse<dynamic>> delete({required id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    final _result = await _dio.fetch<Map<String, dynamic>?>(
-        _setStreamType<HttpResponse<CloudflareResponse>>(
-            Options(method: 'DELETE', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/${id}',
-                    queryParameters: queryParameters, data: _data)
-                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = _result.data == null
-        ? null
-        : CloudflareResponse.fromJson(_result.data!);
+    final _result = await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(
+        Options(method: 'DELETE', headers: _headers, extra: _extra)
+            .compose(_dio.options, '/${id}',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
   }

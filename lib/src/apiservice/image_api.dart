@@ -399,10 +399,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
     final response = await getSaveResponse(
-        service.delete(
-          id: id!,
-        ),
-        parseCloudflareResponse: false);
+      service.delete(id: id!,),
+      parseCloudflareResponse: false);
     return response;
   }
 
@@ -423,11 +421,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await getSaveResponse(
-          service.delete(
-            id: id,
-          ),
-          parseCloudflareResponse: false);
+      final response = await delete(id: id,);
       responses.add(response);
     }
     return responses;
