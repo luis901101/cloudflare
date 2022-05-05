@@ -17,6 +17,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       : super(
             restAPI: restAPI,
             service: ImageService(dio: restAPI.dio, accountId: accountId),
+            accountId: accountId,
             dataType: CloudflareImage());
 
   /// An image up to 10 Megabytes can be upload.
@@ -50,6 +51,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// e.g: "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         contentFromFile != null ||
             contentFromPath != null ||
@@ -183,6 +185,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         (contentFromFiles?.isNotEmpty ?? false) ||
             (contentFromPaths?.isNotEmpty ?? false) ||
@@ -255,6 +258,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// e.g: "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
@@ -297,6 +301,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// e.g: "2021-01-02T02:20:00Z"
     DateTime? expiry,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
       service.createDirectUpload(
         requireSignedURLs: requireSignedURLs,
@@ -326,6 +331,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Default value: 50
     int? size,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response =
         await parseResponseAsList(service.getAll(page: page, size: size));
 
@@ -342,6 +348,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image object
     CloudflareImage? image,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
@@ -363,6 +370,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image object
     CloudflareImage? image,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
@@ -386,6 +394,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image object
     CloudflareImage? image,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
@@ -406,6 +415,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// List of image objects
     List<CloudflareImage>? images,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert((ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
         'One of ids or images must not be empty.');
 
@@ -427,6 +437,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
   Future<CloudflareHTTPResponse<ImageStats?>> getStats() async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
       service.getStats(), dataType: ImageStats(),
     );

@@ -13,6 +13,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       : super(
             restAPI: restAPI,
             service: StreamService(dio: restAPI.dio, accountId: accountId),
+            accountId: accountId,
             dataType: CloudflareStreamVideo());
 
   /// A video up to 200 MegaBytes can be uploaded using a single
@@ -76,6 +77,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         contentFromFile != null ||
             contentFromPath != null ||
@@ -172,6 +174,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         (contentFromFiles?.isNotEmpty ?? false) ||
             (contentFromPaths?.isNotEmpty ?? false) ||
@@ -272,6 +275,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// ]
     List<MediaProcessingState>? status,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await parseResponseAsList(
       service.getAll(
         after: after?.toJson(),
@@ -292,6 +296,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     String? id,
     CloudflareStreamVideo? video,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
         id != null || video != null, 'One of id or video must not be empty.');
     id ??= video?.id;
@@ -324,6 +329,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     List<String>? ids,
     List<CloudflareStreamVideo>? videos,
   }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert((ids?.isNotEmpty ?? false) || (videos?.isNotEmpty ?? false),
         'One of ids or images must not be empty.');
 
@@ -368,26 +374,4 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   //
   //   return response;
   // }
-  //
-  //
-  //
-  // /// Fetch base video. For most images this will be the originally uploaded
-  // /// file. For larger images it can be a near-lossless version of the original.
-  // /// Note: the response is <video blob data>
-  // Future<CloudflareHTTPResponse<List<int>?>> getBase({
-  //   String? id,
-  //   CloudflareStreamVideo? video,
-  // }) async {
-  //   assert(
-  //       id != null || video != null, 'One of id or video must not be empty.');
-  //   id ??= video?.id;
-  //   final response = await genericParseResponse<List<int>>(
-  //       service.getBase(
-  //         id: id!,
-  //       ),
-  //       parseCloudflareResponse: false);
-  //
-  //   return response;
-  // }
-  //
 }

@@ -14,10 +14,14 @@ import 'dart:async';
 
 abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   static const authorizationKey = 'Authorization';
+  static const authorizedRequestAssertMessage = 'This endpoint requires an '
+      'authorized request, check the Cloudflare constructor you are using and '
+      'make sure you are using a valid `accountId` and `token`';
 
   static const Map<String, String> defaultHeaders = {};
 
   I service;
+  final String accountId;
   DataType? dataType;
   ErrorType? errorType;
   RestAPI restAPI;
@@ -25,9 +29,12 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   RestAPIService({
     required this.restAPI,
     required this.service,
+    required this.accountId,
     this.dataType,
     this.errorType,
   });
+
+  bool get isBasic => accountId.isEmpty;
 
   Future<CloudflareHTTPResponse> getSaveResponse<ContainerDataTypeGeneric>(
       Future futureResponse,

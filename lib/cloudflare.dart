@@ -87,6 +87,11 @@ class Cloudflare {
   late final StreamAPI streamAPI;
   bool _initialized = false;
 
+  /// Cloudflare brings you full access to different apis like ImageAPI and
+  /// StreamAPI.
+  ///
+  /// The `accountId` is required as well as on of (`token` or `tokenCallback`)
+  /// or (`apiKey` and `accountEmail`) or `userServiceKey`
   Cloudflare({
     String? apiUrl,
     required this.accountId,
@@ -104,10 +109,17 @@ class Cloudflare {
                     (accountEmail?.isNotEmpty ?? false)) ||
                 (userServiceKey?.isNotEmpty ?? false),
             '\n\nA token or tokenCallback must be specified, only one of both. '
-            '\nOtherwise an apiKey and accountEmmail must specified. '
-            '\nOtherwise a userServiceKey must specified.'),
+            '\nOtherwise an apiKey and accountEmail must be specified. '
+            '\nOtherwise a userServiceKey must be specified.'),
         apiUrl = apiUrl ?? 'https://api.cloudflare.com/client/v4',
         tokenCallback = tokenCallback ?? (() async => token);
+
+  /// Usi this constructor when you don't need to make authorized requests
+  /// to Cloudflare apis, like when you just need to do image or stream
+  /// direct upload to an `uploadURL`
+  factory Cloudflare.basic() {
+    return Cloudflare(accountId: '', tokenCallback: () async => '');
+  }
 
   bool get isInitialized => _initialized;
 
