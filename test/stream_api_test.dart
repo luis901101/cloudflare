@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -19,6 +20,25 @@ void main() async {
   void addId(String? id) {
     if(id != null) videoIds.add(id);
   }
+
+  test('Handling video from url tests', (){
+    final video1 = CloudflareStreamVideo.fromUrl('https://videodelivery.net/2dee576797b5448fb3fb32f09f6a607c/thumbnails/thumbnail.jpg');
+    final video2 = CloudflareStreamVideo.fromUrl('https://watch.videodelivery.net/2dee576797b5448fb3fb32f09f6a607c');
+    final video3 = CloudflareStreamVideo.fromUrl('https://videodelivery.net/2dee576797b5448fb3fb32f09f6a607c/manifest/video.m3u8');
+    final video4 = CloudflareStreamVideo.fromUrl('https://videodelivery.net/2dee576797b5448fb3fb32f09f6a607c/manifest/video.mdp');
+    final video5 = CloudflareStreamVideo.fromUrl('https://cloudflarestream.com/2dee576797b5448fb3fb32f09f6a607c/thumbnails/thumbnail.jpg');
+    final video6 = CloudflareStreamVideo.fromUrl('https://upload.videodelivery.net/2dee576797b5448fb3fb32f09f6a607c');
+    final video7 = CloudflareStreamVideo(id: 'c5n485g8q34hrxi2uehdjsnkd');
+    final video8 = CloudflareStreamVideo();
+    expect(video1.playback, isNotNull);
+    expect(video2.playback, isNotNull);
+    expect(video3.playback, isNotNull);
+    expect(video4.playback, isNotNull);
+    expect(video5.playback, isNotNull);
+    expect(video6.playback, isNotNull);
+    expect(video7.playback, isNotNull);
+    expect(video8.playback, isNull);
+  });
 
   group('Stream video tests', () {
     test('Simple stream video from file with progress update', () async {
@@ -204,50 +224,54 @@ void main() async {
       addId(response.body?.id);
     }, timeout: Timeout(Duration(minutes: 5)));
 
-    // group('Video direct stream tests', () {
-    //   late final CloudflareHTTPResponse<DataUploadDraft?> response;
-    //   late final String? videoId;
-    //   late final String? uploadURL;
-    //
-    //   setUpAll(() async {
-    //     // response = await cloudflare.streamAPI.createDirectUpload();
-    //     // videoId = response.body?.id;
-    //     // uploadURL = response.body?.uploadURL;
-    //   });
-    //
-    //   test('Create authenticated direct video stream URL', () async {
-    //     expect(response, ResponseMatcher());
-    //     expect(response.body?.id, isNotEmpty);
-    //     expect(response.body?.uploadURL, isNotEmpty);
-    //   }, timeout: Timeout(Duration(minutes: 5)));
-    //
-    //   test('Check created video draft status', () async {
-    //     if (videoId?.isEmpty ?? true) {
-    //       fail('No videoId available to check draft status');
-    //     }
-    //     final response = await cloudflare.streamAPI.get(id: videoId);
-    //     expect(response, StreamVideoMatcher());
-    //     expect(response.body?.draft, true);
-    //   }, timeout: Timeout(Duration(minutes: 5)));
-    //
-    //   test('Doing video stream to direct stream URL', () async {
-    //     if (uploadURL?.isEmpty ?? true) {
-    //       fail('No streamURL available to stream to');
-    //     }
-    //     final response = await cloudflare.streamAPI.directUpload(
-    //         streamURL: uploadURL!,
-    //         contentFromFile: DataTransmit<File>(
-    //             data: videoFile,
-    //             progressCallback: (count, total) {
-    //               print('Video stream to direct stream URL from file progress: $count/$total');
-    //             })
-    //     );
-    //     expect(response, StreamVideoMatcher());
-    //     addId(response.body?.id);
-    //     expect(response.body?.id, videoId);
-    //     expect(response.body?.draft, false);
-    //   }, timeout: Timeout(Duration(minutes: 5)));
-    // });
+    group('Video direct stream tests', () {
+      late final CloudflareHTTPResponse<DataUploadDraft?> response;
+      late final String? videoId;
+      late final String? uploadURL;
+
+      setUpAll(() async {
+        print('WARNIGN: Make sure to test with a video with less than 60 seconds duration');
+        response = await cloudflare.streamAPI.createDirectStreamUpload(maxDurationSeconds: 60);
+        videoId = response.body?.id;
+        uploadURL = response.body?.uploadURL;
+      });
+
+      test('Create authenticated direct stream video URL', () async {
+        expect(response, ResponseMatcher());
+        expect(response.body?.id, isNotEmpty);
+        expect(response.body?.uploadURL, isNotEmpty, reason: 'Just created vide stream uploadURL  can\'t be empty');
+      });
+
+      test('Check created video ready to stream status', () async {
+        if (videoId?.isEmpty ?? true) {
+          fail('No videoId available to check video status');
+        }
+        final response = await cloudflare.streamAPI.get(id: videoId);
+        expect(response, StreamVideoMatcher());
+        expect(response.body?.readyToStream, false, reason: 'Just created video stream can\'t be ready');
+      }, timeout: Timeout(Duration(minutes: 5)));
+
+      test('Doing video stream to direct stream URL', () async {
+        if (uploadURL?.isEmpty ?? true) {
+          fail('No streamURL available to stream to');
+        }
+        if (!videoFile.existsSync()) {
+          fail('No video file available to stream');
+        }
+        final response = await cloudflare.streamAPI.directStreamUpload(
+            uploadURL: uploadURL!,
+            contentFromFile: DataTransmit<File>(
+                data: videoFile,
+                progressCallback: (count, total) {
+                  print('Video stream to direct stream URL from file progress: $count/$total');
+                })
+        );
+        expect(response, StreamVideoMatcher());
+        addId(response.body?.id);
+        expect(response.body?.id, videoId, reason: 'Uploaded video id doesn\'t match created upload video');
+        expect(response.body?.readyToStream, true, reason: 'Video stream is not ready');
+      }, timeout: Timeout(Duration(minutes: 5)));
+    });
   });
 
   group('Retrieve video tests', () {

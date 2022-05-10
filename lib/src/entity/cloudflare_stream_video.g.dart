@@ -3,6 +3,176 @@
 part of 'cloudflare_stream_video.dart';
 
 // **************************************************************************
+// CopyWithGenerator
+// **************************************************************************
+
+abstract class _$CloudflareStreamVideoCWProxy {
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  ///
+  /// Usage
+  /// ```dart
+  /// CloudflareStreamVideo(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CloudflareStreamVideo call({
+    List<String>? allowedOrigins,
+    DateTime? created,
+    double? duration,
+    String? id,
+    VideoSize? input,
+    String? liveInput,
+    int? maxDurationSeconds,
+    Map<dynamic, dynamic>? meta,
+    DateTime? modified,
+    MediaNFT? nft,
+    VideoPlaybackInfo? playback,
+    String? preview,
+    bool? readyToStream,
+    bool? requireSignedURLs,
+    int? size,
+    VideoStatus? status,
+    String? thumbnail,
+    double? thumbnailTimestampPct,
+    DateTime? uploadExpiry,
+    DateTime? uploaded,
+    Watermark? watermark,
+  });
+}
+
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareStreamVideo.copyWith(...)`.
+class _$CloudflareStreamVideoCWProxyImpl
+    implements _$CloudflareStreamVideoCWProxy {
+  final CloudflareStreamVideo _value;
+
+  const _$CloudflareStreamVideoCWProxyImpl(this._value);
+
+  @override
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  ///
+  /// Usage
+  /// ```dart
+  /// CloudflareStreamVideo(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CloudflareStreamVideo call({
+    Object? allowedOrigins = const $CopyWithPlaceholder(),
+    Object? created = const $CopyWithPlaceholder(),
+    Object? duration = const $CopyWithPlaceholder(),
+    Object? id = const $CopyWithPlaceholder(),
+    Object? input = const $CopyWithPlaceholder(),
+    Object? liveInput = const $CopyWithPlaceholder(),
+    Object? maxDurationSeconds = const $CopyWithPlaceholder(),
+    Object? meta = const $CopyWithPlaceholder(),
+    Object? modified = const $CopyWithPlaceholder(),
+    Object? nft = const $CopyWithPlaceholder(),
+    Object? playback = const $CopyWithPlaceholder(),
+    Object? preview = const $CopyWithPlaceholder(),
+    Object? readyToStream = const $CopyWithPlaceholder(),
+    Object? requireSignedURLs = const $CopyWithPlaceholder(),
+    Object? size = const $CopyWithPlaceholder(),
+    Object? status = const $CopyWithPlaceholder(),
+    Object? thumbnail = const $CopyWithPlaceholder(),
+    Object? thumbnailTimestampPct = const $CopyWithPlaceholder(),
+    Object? uploadExpiry = const $CopyWithPlaceholder(),
+    Object? uploaded = const $CopyWithPlaceholder(),
+    Object? watermark = const $CopyWithPlaceholder(),
+  }) {
+    return CloudflareStreamVideo(
+      allowedOrigins: allowedOrigins == const $CopyWithPlaceholder()
+          ? _value.allowedOrigins
+          // ignore: cast_nullable_to_non_nullable
+          : allowedOrigins as List<String>?,
+      created: created == const $CopyWithPlaceholder()
+          ? _value.created
+          // ignore: cast_nullable_to_non_nullable
+          : created as DateTime?,
+      duration: duration == const $CopyWithPlaceholder()
+          ? _value.duration
+          // ignore: cast_nullable_to_non_nullable
+          : duration as double?,
+      id: id == const $CopyWithPlaceholder()
+          ? _value.id
+          // ignore: cast_nullable_to_non_nullable
+          : id as String?,
+      input: input == const $CopyWithPlaceholder()
+          ? _value.input
+          // ignore: cast_nullable_to_non_nullable
+          : input as VideoSize?,
+      liveInput: liveInput == const $CopyWithPlaceholder()
+          ? _value.liveInput
+          // ignore: cast_nullable_to_non_nullable
+          : liveInput as String?,
+      maxDurationSeconds: maxDurationSeconds == const $CopyWithPlaceholder()
+          ? _value.maxDurationSeconds
+          // ignore: cast_nullable_to_non_nullable
+          : maxDurationSeconds as int?,
+      meta: meta == const $CopyWithPlaceholder()
+          ? _value.meta
+          // ignore: cast_nullable_to_non_nullable
+          : meta as Map<dynamic, dynamic>?,
+      modified: modified == const $CopyWithPlaceholder()
+          ? _value.modified
+          // ignore: cast_nullable_to_non_nullable
+          : modified as DateTime?,
+      nft: nft == const $CopyWithPlaceholder()
+          ? _value.nft
+          // ignore: cast_nullable_to_non_nullable
+          : nft as MediaNFT?,
+      playback: playback == const $CopyWithPlaceholder()
+          ? _value.playback
+          // ignore: cast_nullable_to_non_nullable
+          : playback as VideoPlaybackInfo?,
+      preview: preview == const $CopyWithPlaceholder()
+          ? _value.preview
+          // ignore: cast_nullable_to_non_nullable
+          : preview as String?,
+      readyToStream: readyToStream == const $CopyWithPlaceholder()
+          ? _value.readyToStream
+          // ignore: cast_nullable_to_non_nullable
+          : readyToStream as bool?,
+      requireSignedURLs: requireSignedURLs == const $CopyWithPlaceholder()
+          ? _value.requireSignedURLs
+          // ignore: cast_nullable_to_non_nullable
+          : requireSignedURLs as bool?,
+      size: size == const $CopyWithPlaceholder()
+          ? _value.size
+          // ignore: cast_nullable_to_non_nullable
+          : size as int?,
+      status: status == const $CopyWithPlaceholder()
+          ? _value.status
+          // ignore: cast_nullable_to_non_nullable
+          : status as VideoStatus?,
+      thumbnail: thumbnail == const $CopyWithPlaceholder()
+          ? _value.thumbnail
+          // ignore: cast_nullable_to_non_nullable
+          : thumbnail as String?,
+      thumbnailTimestampPct:
+          thumbnailTimestampPct == const $CopyWithPlaceholder()
+              ? _value.thumbnailTimestampPct
+              // ignore: cast_nullable_to_non_nullable
+              : thumbnailTimestampPct as double?,
+      uploadExpiry: uploadExpiry == const $CopyWithPlaceholder()
+          ? _value.uploadExpiry
+          // ignore: cast_nullable_to_non_nullable
+          : uploadExpiry as DateTime?,
+      uploaded: uploaded == const $CopyWithPlaceholder()
+          ? _value.uploaded
+          // ignore: cast_nullable_to_non_nullable
+          : uploaded as DateTime?,
+      watermark: watermark == const $CopyWithPlaceholder()
+          ? _value.watermark
+          // ignore: cast_nullable_to_non_nullable
+          : watermark as Watermark?,
+    );
+  }
+}
+
+extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
+  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo>.name.copyWith(...)`.
+  _$CloudflareStreamVideoCWProxy get copyWith =>
+      _$CloudflareStreamVideoCWProxyImpl(this);
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

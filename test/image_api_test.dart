@@ -21,7 +21,25 @@ void main() async {
     if(id != null) imageIds.add(id);
   }
 
+  test('Handling image from url tests', (){
+    final image1 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/thumbnail');
+    final image2 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/public');
+    final image3 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/');
+    final image4 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
+    final image5 = CloudflareImage.fromUrl('https://upload.imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
+    final image6 = CloudflareImage(id: 'm3xgriuradsz3ed23', imageDeliveryId: '4m5x3gt2o5htuergn');
+    final image7 = CloudflareImage();
+    expect(image1.firstVariant, isNotEmpty);
+    expect(image2.firstVariant, isNotEmpty);
+    expect(image3.firstVariant, isNotEmpty);
+    expect(image4.firstVariant, isNotEmpty);
+    expect(image5.firstVariant, isNotEmpty);
+    expect(image6.firstVariant, isNotEmpty);
+    expect(image7.firstVariant, isEmpty);
+  });
+
   group('Upload image tests', () {
+
     test('Simple upload image from file with progress update', () async {
       if (!imageFile.existsSync()) {
         fail('No image file available to upload');
@@ -226,7 +244,7 @@ void main() async {
         expect(response, ResponseMatcher());
         expect(response.body?.id, isNotEmpty);
         expect(response.body?.uploadURL, isNotEmpty);
-      }, timeout: Timeout(Duration(minutes: 2)));
+      });
 
       test('Check created image draft status', () async {
         if (imageId?.isEmpty ?? true) {

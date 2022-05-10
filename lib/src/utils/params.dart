@@ -21,4 +21,11 @@ class Params {
   static const String watermark = 'watermark';
   static const String uploadUrl = 'uploadURL';
   static const String count = 'count';
+  static const String maxDurationSeconds = 'maxDurationSeconds';
+  static const String creator = 'creator';
+  static const String expiry = 'expiry';
+  static const String public = 'public';
+  static const String imageDeliveryId = 'imageDeliveryId';
+  static const String variantName = 'variantName';
+  static const String variants = 'variants';
 }

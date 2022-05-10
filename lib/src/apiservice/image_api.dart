@@ -92,7 +92,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }
 
   /// For image direct upload without API key or token.
-  /// This function is to be used specifically after an image directUpload
+  /// This function is to be used specifically after an image createDirectUpload
   /// has been requested.
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2

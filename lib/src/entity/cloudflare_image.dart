@@ -1,6 +1,7 @@
 import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_image.g.dart';
@@ -8,6 +9,7 @@ part 'cloudflare_image.g.dart';
 /// Official documentation here:
 /// API docs: https://api.cloudflare.com/#cloudflare-images-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/images/cloudflare-images
+@CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareImage extends Jsonable<CloudflareImage> {
   static const uploadImageDeliveryUrl = 'https://upload.imagedelivery.net';
@@ -111,7 +113,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     if (!(url.startsWith(uploadImageDeliveryUrl) || url.startsWith(imageDeliveryUrl)) ||
         imageDeliveryId == null ||
         imageId == null) {
-      throw Exception('Invalid CloudflareImage from url');
+      // throw Exception('Invalid CloudflareImage from url');
+      return {};
     }
     return {
       Params.id: imageId,

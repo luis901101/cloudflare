@@ -5,6 +5,7 @@ import 'package:cloudflare/src/entity/video_status.dart';
 import 'package:cloudflare/src/entity/watermark.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_stream_video.g.dart';
@@ -12,6 +13,7 @@ part 'cloudflare_stream_video.g.dart';
 /// Official documentation here:
 /// API docs: https://api.cloudflare.com/#stream-videos-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/stream
+@CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
 
@@ -259,17 +261,18 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         .replaceAll('$videoDeliveryUrl/', '')
         .replaceAll('$videoCloudflareUrl/', '')
         .split('/');
-    String? videoIdo = split.isNotEmpty ? split[0] : null;
+    String? videoId = split.isNotEmpty ? split[0] : null;
 
     if (!(url.startsWith(uploadVideoDeliveryUrl) ||
         url.startsWith(watchVideoDeliveryUrl) ||
         url.startsWith(videoDeliveryUrl) ||
         url.startsWith(videoCloudflareUrl)) ||
-        videoIdo == null) {
-      throw Exception('Invalid Cloudflare video from url');
+        videoId == null) {
+      // throw Exception('Invalid Cloudflare video from url');
+      return {};
     }
     return {
-      Params.id: videoIdo,
+      Params.id: videoId,
     };
   }
 
@@ -277,6 +280,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     final data = _dataFromVideoDeliveryUrl(url);
     return CloudflareStreamVideo(
       id: data[Params.id],
+      readyToStream: !url.startsWith(uploadVideoDeliveryUrl)
     );
   }
 

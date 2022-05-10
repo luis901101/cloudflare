@@ -102,12 +102,41 @@ class _StreamService implements StreamService {
   }
 
   @override
+  Future<HttpResponse<CloudflareResponse?>> createDirectUpload(
+      {required data}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(data);
+    final _result = await _dio.fetch<Map<String, dynamic>?>(
+        _setStreamType<HttpResponse<CloudflareResponse>>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/direct_upload',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data == null
+        ? null
+        : CloudflareResponse.fromJson(_result.data!);
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
   Future<HttpResponse<CloudflareResponse?>> getAll(
-      {after, before, includeCounts, search, limit, asc, status}) async {
+      {after,
+      before,
+      creator,
+      includeCounts,
+      search,
+      limit,
+      asc,
+      status}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'after': after,
       r'before': before,
+      r'creator': creator,
       r'include_counts': includeCounts,
       r'search': search,
       r'limit': limit,

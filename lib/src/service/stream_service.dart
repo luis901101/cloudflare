@@ -37,19 +37,18 @@ abstract class StreamService {
     @SendProgress() ProgressCallback? onUploadProgress,
   });
 
-  // @POST('')
-  // @MultiPart()
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> directUpload({
-  //   @Part(name: Params.file) required List<int> bytes,
-  //   @SendProgress() ProgressCallback? onUploadProgress,
-  // });
+  @POST('/direct_upload')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> createDirectUpload({
+    @Body() required Map<String, dynamic> data,
+  });
 
   @GET('')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> getAll({
     @Query(Params.after) String? after,
     @Query(Params.before) String? before,
+    @Query(Params.creator) String? creator,
     @Query(Params.includeCounts) bool? includeCounts,
     @Query(Params.search) String? search,
     @Query(Params.limit) int? limit,

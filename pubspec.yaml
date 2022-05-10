@@ -14,6 +14,7 @@ dependencies:
   http_parser: ^4.0.0
   meta: ^1.0.0
   collection: ^1.15.0
+  copy_with_extension: ^4.0.0
 
 dev_dependencies:
   lints: ^1.0.1
@@ -21,4 +22,5 @@ dev_dependencies:
   flutter_lints: ^1.0.4
   json_serializable: ^6.2.0
   retrofit_generator: ^4.0.1
+  copy_with_extension_gen: ^4.0.1
   build_runner: ^2.1.10 #flutter pub run build_runner build

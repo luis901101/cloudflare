@@ -1,11 +1,14 @@
-import 'dart:io';
+import 'dart:io' hide HttpResponse;
+import 'package:http/http.dart' as http;
+
+import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
-
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
+import 'package:dio/dio.dart';
 
 class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     CloudflareErrorResponse> {
@@ -109,15 +112,96 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       response = await parseResponse(service.streamFromUrl(
         data: {
           Params.url: contentFromUrl!.data,
-          if(thumbnailTimestampPct != null) Params.thumbnailTimestampPct: thumbnailTimestampPct,
-          if(allowedOrigins?.isNotEmpty ?? false) Params.allowedOrigins: allowedOrigins,
-          if(requireSignedURLs != null) Params.requireSignedURLs: requireSignedURLs,
-          if(watermark != null) Params.watermark: watermark.toJson(),
-        },
+          Params.thumbnailTimestampPct: thumbnailTimestampPct,
+          Params.allowedOrigins: allowedOrigins,
+          Params.requireSignedURLs: requireSignedURLs,
+          Params.watermark: watermark?.toJson(),
+        }..removeWhere((key, value) => value == null || (value is List && value.isEmpty)),
         onUploadProgress: contentFromUrl.progressCallback,
       ));
     }
     return response;
+  }
+
+  /// For video direct stream upload without API key or token.
+  /// This function is to be used specifically after a video
+  /// createDirectStreamUpload has been requested.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> directStreamUpload({
+    /// Url to stream upload video without API key or token
+    required String uploadURL,
+
+    /// Video file to upload
+    DataTransmit<File>? contentFromFile,
+
+    /// Path to the image file to upload
+    DataTransmit<String>? contentFromPath,
+
+    /// Image byte array representation to upload
+    DataTransmit<List<int>>? contentFromBytes,
+  }) async {
+    assert(
+    contentFromFile != null ||
+        contentFromPath != null ||
+        contentFromBytes != null,
+    'One of the content must be specified.');
+
+    if (contentFromPath != null) {
+      contentFromFile ??= DataTransmit<File>(
+          data: File(contentFromPath.data),
+          progressCallback: contentFromPath.progressCallback);
+    }
+    final dio = restAPI.dio;
+    final formData = FormData();
+    ProgressCallback? progressCallback;
+    if (contentFromFile != null) {
+      final file = contentFromFile.data;
+      progressCallback = contentFromFile.progressCallback;
+      formData.files.add(MapEntry(
+          Params.file,
+          MultipartFile.fromFileSync(file.path, filename: file.path.split(Platform.pathSeparator).last)));
+    } else {
+      final bytes = contentFromBytes!.data;
+      progressCallback = contentFromBytes.progressCallback;
+      formData.files.add(MapEntry(
+          Params.file,
+          MultipartFile.fromBytes(
+            bytes,
+            filename: null,
+          )));
+    }
+
+    final rawResponse = await dio.fetch(Options(
+      method: 'POST',
+      // headers: _headers,
+      // responseType: ResponseType.plain,
+      contentType: 'multipart/form-data',
+    ).compose(
+        BaseOptions(
+            baseUrl: uploadURL,
+            connectTimeout: restAPI.timeout?.inMilliseconds),
+        '',
+        data: formData,
+        onSendProgress: progressCallback));
+
+    Map<String, String> headers = {};
+    for (final key in rawResponse.headers.map.keys) {
+      final valueList = rawResponse.headers.map[key];
+      if(valueList?.isNotEmpty ?? false) {
+        headers[key] = valueList!.first.toString();
+      }
+    }
+
+    return CloudflareHTTPResponse<CloudflareStreamVideo?>(
+      http.Response(
+        rawResponse.data?.toString() ?? '',
+        rawResponse.statusCode ?? HttpStatus.badRequest,
+        headers: headers,
+        isRedirect: rawResponse.isRedirect ?? false,
+      ),
+      CloudflareStreamVideo.fromUrl(uploadURL).copyWith(readyToStream: true),
+    );
   }
 
   /// Stream multiple videos by repeatedly calling stream
@@ -175,7 +259,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     bool? requireSignedURLs,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
-    /// A Watermark pointing to an existing watermark profile
+    /// A Watermark object with the id of an existing watermark profile
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
   }) async {
@@ -226,6 +310,89 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return responses;
   }
 
+  /// Direct uploads allow users to upload videos without API keys. A common
+  /// place to use direct uploads is on web apps, client side applications,
+  /// or on mobile devices where users upload content directly to Stream.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#stream-videos-create-a-video-and-get-authenticated-direct-upload-url
+  Future<CloudflareHTTPResponse<DataUploadDraft?>> createDirectStreamUpload({
+    /// Direct uploads occupy minutes of videos on your Stream account until
+    /// they are expired. This value will be used to calculate the duration the
+    /// video will occupy before the video is uploaded. After upload, the
+    /// duration of the uploaded will be used instead. If a video longer than
+    /// this value is uploaded, the video will result in an error.
+    ///
+    /// Min value: 1 second
+    /// Max value: 21600 seconds which is 360 mins, 6 hours
+    /// e.g: 300 seconds which is 5 mins
+    required int maxDurationSeconds,
+
+    /// User-defined identifier of the media creator
+    ///
+    /// Max length: 64
+    /// e.g: "creator-id_abcde12345"
+    String? creator,
+
+    /// Timestamp location of thumbnail image calculated as a percentage value
+    /// of the video's duration. To convert from a second-wise timestamp to a
+    /// percentage, divide the desired timestamp by the total duration of the
+    /// video. If this value is not set, the default thumbnail image will be
+    /// from 0s of the video.
+    ///
+    /// Default value: 0
+    /// Min value:0
+    /// Max value:1
+    /// e.g: 0.529241
+    num? thumbnailTimestampPct,
+
+    /// List which origins should be allowed to display the video. Enter
+    /// allowed origin domains in an array and use * for wildcard subdomains.
+    /// Empty array will allow the video to be viewed on any origin.
+    ///
+    /// e.g:
+    /// [
+    ///   "example.com"
+    /// ]
+    List<String>? allowedOrigins,
+
+    /// Indicates whether the video can be a accessed only using it's UID. If
+    /// set to true, a signed token needs to be generated with a signing key to
+    /// view the video.
+    ///
+    /// Default value: false
+    /// e.g: true
+    bool? requireSignedURLs,
+
+    /// A Watermark object with the id of an existing watermark profile
+    /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
+    Watermark? watermark,
+
+    /// The date after upload will not be accepted.
+    ///
+    /// Min value: Now + 2 minutes.
+    /// Max value: Now + 6 hours.
+    /// Default value: Now + 30 minutes.
+    /// e.g: "2021-01-02T02:20:00Z"
+    DateTime? expiry,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    final response = await genericParseResponse(
+      service.createDirectUpload(
+        data: {
+          Params.maxDurationSeconds: maxDurationSeconds,
+          Params.creator: creator,
+          Params.thumbnailTimestampPct: thumbnailTimestampPct,
+          Params.allowedOrigins: allowedOrigins,
+          Params.requireSignedURLs: requireSignedURLs,
+          Params.watermark: watermark?.toJson(),
+          Params.expiry: expiry?.toJson(),
+        }..removeWhere((key, value) => value == null || (value is List && value.isEmpty)),
+      ),
+      dataType: DataUploadDraft(),
+    );
+    return response;
+  }
+
   /// Up to 1000 videos can be listed with one request, use optional parameters
   /// to get a specific range of videos.
   /// Please note that Cloudflare Stream does not use pagination, instead it
@@ -246,6 +413,12 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     ///
     /// e.g: "2014-01-02T02:20:00Z"
     DateTime? before,
+
+    /// Filter by user-defined identifier of the media creator
+    ///
+    /// Max length: 64
+    /// e.g: "creator-id_abcde12345"
+    String? creator,
 
     /// Include stats in the response about the number of videos in response
     /// range and total number of videos available
@@ -287,6 +460,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       service.getAll(
         after: after?.toJson(),
         before: before?.toJson(),
+        creator: creator,
         includeCounts: includeCounts,
         search: search,
         limit: limit,
