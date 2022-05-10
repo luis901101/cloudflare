@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/params.dart';
 
 class JsonUtils {
   static Map<String, dynamic>? jsonableToJson(Jsonable? value) =>
@@ -28,4 +29,7 @@ class JsonUtils {
     if(data is String) return jsonDecode(data);
     return data;
   }
+
+  static dynamic idReadValue(Map map, String key) =>
+      map[Params.id] ?? map[Params.uid];
 }
