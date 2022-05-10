@@ -57,6 +57,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
 Map<String, dynamic> _$CloudflareStreamVideoToJson(
     CloudflareStreamVideo instance) {
   final val = <String, dynamic>{
+    'uid': instance.id,
     'uploaded': instance.uploaded.toIso8601String(),
     'size': instance.size,
   };
@@ -77,7 +78,6 @@ Map<String, dynamic> _$CloudflareStreamVideoToJson(
   val['modified'] = instance.modified.toIso8601String();
   val['input'] = instance.input;
   val['thumbnail'] = instance.thumbnail;
-  val['uid'] = instance.id;
   val['status'] = instance.status;
   val['duration'] = instance.duration;
   writeNotNull('uploadExpiry', instance.uploadExpiry?.toIso8601String());

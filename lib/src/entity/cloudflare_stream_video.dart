@@ -15,6 +15,19 @@ part 'cloudflare_stream_video.g.dart';
 @JsonSerializable(includeIfNull: false)
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
 
+  static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
+  static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
+  static const videoDeliveryUrl = 'https://videodelivery.net';
+  static const videoCloudflareUrl = 'https://cloudflarestream.com';
+
+  /// Media item unique identifier
+  /// max length: 32
+  ///
+  /// read only
+  ///
+  /// e.g: "ea95132c15732412d22c1476fa83f27a"
+  @JsonKey(name: Params.uid) final String id;
+
   /// When the media item was uploaded.
   /// Using  ISO 8601 ZonedDateTime
   ///
@@ -113,14 +126,6 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   ///
   /// e.g: "https://videodelivery.net/ea95132c15732412d22c1476fa83f27a/thumbnails/thumbnail.jpg"
   final String thumbnail;
-
-  /// Media item unique identifier
-  /// max length: 32
-  ///
-  /// read only
-  ///
-  /// e.g: "ea95132c15732412d22c1476fa83f27a"
-  @JsonKey(name: Params.uid) final String id;
 
   /// Object specifying more fine-grained status for this video item.
   /// If "state" is "inprogress" or "error", "step" will be one of "encoding"
@@ -221,27 +226,59 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     double? duration,
     this.uploadExpiry,
     double? thumbnailTimestampPct,
-    this.playback,
+    VideoPlaybackInfo? playback,
     this.nft,
     bool? readyToStream,
     this.liveInput,
   }) :
+    id = id ??= '',
     uploaded = uploaded ?? DateTime.now(),
     size = size ?? 0,
     requireSignedURLs = requireSignedURLs ?? false,
     allowedOrigins = allowedOrigins ?? [],
     created = created ?? DateTime.now(),
-    preview = preview ?? '',
+    preview = preview ?? (id.isNotEmpty ? '$watchVideoDeliveryUrl/$id' : ''),
     modified = modified ?? DateTime.now(),
     input = input ?? VideoSize(),
-    thumbnail = thumbnail ?? '',
-    id = id ?? '',
+    thumbnail = thumbnail ?? (id.isNotEmpty ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.jpg' : ''),
     status = status ?? VideoStatus(),
     duration = duration ?? -1,
     thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
+    playback = playback ?? (id.isNotEmpty ? VideoPlaybackInfo(
+      hls: '$videoDeliveryUrl/$id/manifest/video.m3u8',
+      dash: '$videoDeliveryUrl/$id/manifest/video.mpd',
+    ) : null),
     readyToStream = readyToStream ?? false
   ;
 
+  bool get isReady => readyToStream;
+
+  static Map<String, dynamic> _dataFromVideoDeliveryUrl(String url) {
+    final split = url.replaceAll('$uploadVideoDeliveryUrl/', '')
+        .replaceAll('$watchVideoDeliveryUrl/', '')
+        .replaceAll('$videoDeliveryUrl/', '')
+        .replaceAll('$videoCloudflareUrl/', '')
+        .split('/');
+    String? videoIdo = split.isNotEmpty ? split[0] : null;
+
+    if (!(url.startsWith(uploadVideoDeliveryUrl) ||
+        url.startsWith(watchVideoDeliveryUrl) ||
+        url.startsWith(videoDeliveryUrl) ||
+        url.startsWith(videoCloudflareUrl)) ||
+        videoIdo == null) {
+      throw Exception('Invalid Cloudflare video from url');
+    }
+    return {
+      Params.id: videoIdo,
+    };
+  }
+
+  factory CloudflareStreamVideo.fromUrl(String url) {
+    final data = _dataFromVideoDeliveryUrl(url);
+    return CloudflareStreamVideo(
+      id: data[Params.id],
+    );
+  }
 
   @override
   bool operator ==(Object other) {
