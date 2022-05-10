@@ -1,3 +1,5 @@
+import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -9,16 +11,21 @@ part 'data_upload_draft.g.dart';
 class DataUploadDraft extends Jsonable<DataUploadDraft> {
 
   /// Resource id.
-  final String id;
+  @JsonKey(readValue: JsonUtils.idReadValue) final String id;
 
   /// Url to upload resource without API key or token
   final String uploadURL;
 
+  /// Only on video direct upload responses
+  final Watermark? watermark;
+
   const DataUploadDraft({
     String? id,
+    String? uid,
     String? uploadURL,
+    this.watermark,
   }) :
-    id = id ?? '',
+    id = id ?? uid ?? '',
     uploadURL = uploadURL ?? ''
   ;
 
