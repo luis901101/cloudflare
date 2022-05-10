@@ -9,6 +9,7 @@ part of 'cloudflare_image.dart';
 CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
     CloudflareImage(
       id: json['id'] as String?,
+      imageDeliveryId: json['imageDeliveryId'] as String?,
       filename: json['filename'] as String?,
       meta:
           JsonUtils.stringToMapReadValue(json, 'meta') as Map<String, dynamic>?,
@@ -33,6 +34,7 @@ Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
     }
   }
 
+  writeNotNull('imageDeliveryId', instance.imageDeliveryId);
   writeNotNull('filename', instance.filename);
   writeNotNull('meta', instance.meta);
   val['requireSignedURLs'] = instance.requireSignedURLs;

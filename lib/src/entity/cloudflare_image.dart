@@ -1,5 +1,6 @@
 import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:cloudflare/src/utils/params.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_image.g.dart';
@@ -9,6 +10,7 @@ part 'cloudflare_image.g.dart';
 /// Developer Cloudflare docs: https://developers.cloudflare.com/images/cloudflare-images
 @JsonSerializable(includeIfNull: false)
 class CloudflareImage extends Jsonable<CloudflareImage> {
+  static const uploadImageDeliveryUrl = 'https://upload.imagedelivery.net';
   static const imageDeliveryUrl = 'https://imagedelivery.net';
 
   /// Image unique identifier
@@ -18,6 +20,15 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   ///
   /// e.g: "ZxR0pLaXRldlBtaFhhO2FiZGVnaA"
   final String id;
+
+  /// Image unique identifier for cloudflare account image delivery, for
+  /// instance this is the structure of an image delivery url:
+  ///
+  /// https://imagedelivery.net/<image_delivery_id>/<image_id>/<variant_name>
+  /// https://imagedelivery.net/B45fsu4hrqe32jned3k2/<image_id>/<variant_name>
+  ///
+  /// e.g: "B45fsu4hrqe32jned3k2"
+  final String? imageDeliveryId;
 
   /// Image file name
   ///
@@ -76,51 +87,59 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
 
   CloudflareImage({
     String? id,
+    this.imageDeliveryId,
     this.filename,
     this.meta,
     bool? requireSignedURLs,
     List<String>? variants,
     DateTime? uploaded,
     bool? draft,
-  })  : id = id ?? '',
+  })  : id = id ??= '',
         requireSignedURLs = requireSignedURLs ?? false,
-        variants = variants ?? [],
+        variants = variants ?? (id.isNotEmpty && imageDeliveryId != null ? ['$imageDeliveryUrl/$imageDeliveryId/$id/${Params.public}'] : []),
         uploaded = uploaded ?? DateTime.now(),
         draft = draft ?? false;
 
-  static Map<String, String> _dataFromUrl(String url) {
-    final split = url.replaceAll('$imageDeliveryUrl/', '').split('/');
+  static Map<String, dynamic> _dataFromImageDeliveryUrl(String url) {
+    final split = url.replaceAll('$uploadImageDeliveryUrl/', '')
+        .replaceAll('$imageDeliveryUrl/', '')
+        .split('/');
     String? imageDeliveryId = split.isNotEmpty ? split[0] : null,
         imageId = split.length > 1 ? split[1] : null,
-        variantName = split.length > 2 ? split[2] : null;
-    if (!url.startsWith(imageDeliveryUrl) ||
+        variantName = split.length > 2 ? split[2] : Params.public;
+
+    if (!(url.startsWith(uploadImageDeliveryUrl) || url.startsWith(imageDeliveryUrl)) ||
         imageDeliveryId == null ||
-        imageId == null ||
-        variantName == null) {
+        imageId == null) {
       throw Exception('Invalid CloudflareImage from url');
     }
     return {
-      'imageDeliveryId': imageDeliveryId,
-      'imageId': imageId,
-      'variantName': variantName,
+      Params.id: imageId,
+      Params.imageDeliveryId: imageDeliveryId,
+      Params.variantName: variantName,
+      Params.variants: ['$imageDeliveryUrl/$imageDeliveryId/$imageId/$variantName']
     };
   }
 
   factory CloudflareImage.fromUrl(String url) {
-    final data = _dataFromUrl(url);
+    final data = _dataFromImageDeliveryUrl(url);
     return CloudflareImage(
-      id: data['imageId'],
-      variants: [url],
+      id: data[Params.id],
+      imageDeliveryId: data[Params.imageDeliveryId],
+      variants: data[Params.variants],
     );
   }
 
   static String variantNameFromUrl(String url) {
-    final data = _dataFromUrl(url);
-    return data['variantName']!;
+    final data = _dataFromImageDeliveryUrl(url);
+    return data[Params.variantName]!;
   }
 
   String get firstVariant =>
-      _firstVariant ?? (_firstVariant = variants.isNotEmpty ? variants[0] : '');
+      _firstVariant ??
+      (_firstVariant = variants.isNotEmpty ? variants.first : '');
+
+  bool get isReady => !draft;
 
   @override
   bool operator ==(Object other) {
