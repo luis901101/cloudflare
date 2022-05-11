@@ -8,6 +8,7 @@ import 'package:cloudflare/src/entity/image_stats.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
+import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/dio.dart';
 
@@ -60,11 +61,21 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         'One of the content must be specified.');
 
     final CloudflareHTTPResponse<CloudflareImage?> response;
+
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
           data: File(contentFromPath.data),
           progressCallback: contentFromPath.progressCallback);
     }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<List<int>>(
+          data: contentFromFile.data.readAsBytesSync(),
+          progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
     if (contentFromFile != null) {
       response = await parseResponse(service.uploadFromFile(
         file: contentFromFile.data,
@@ -120,6 +131,15 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
           data: File(contentFromPath.data),
           progressCallback: contentFromPath.progressCallback);
     }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<List<int>>(
+          data: contentFromFile.data.readAsBytesSync(),
+          progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
     final dio = restAPI.dio;
     final formData = FormData();
     ProgressCallback? progressCallback;

@@ -1,4 +1,5 @@
 import 'dart:io' hide HttpResponse;
+import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -93,11 +94,21 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         'One of the content must be specified.');
 
     final CloudflareHTTPResponse<CloudflareStreamVideo?> response;
+
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
+        data: File(contentFromPath.data),
+        progressCallback: contentFromPath.progressCallback);
     }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<List<int>>(
+        data: contentFromFile.data.readAsBytesSync(),
+        progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
     if (contentFromFile != null) {
       response = await parseResponse(service.streamFromFile(
         file: contentFromFile.data,
@@ -152,6 +163,15 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
           data: File(contentFromPath.data),
           progressCallback: contentFromPath.progressCallback);
     }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<List<int>>(
+          data: contentFromFile.data.readAsBytesSync(),
+          progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
     final dio = restAPI.dio;
     final formData = FormData();
     ProgressCallback? progressCallback;
