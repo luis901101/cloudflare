@@ -12,6 +12,7 @@ import 'package:cloudflare/src/utils/callbacks.dart';
 //Exports
 export 'package:cloudflare/src/apiservice/image_api.dart';
 export 'package:cloudflare/src/apiservice/stream_api.dart';
+export 'package:cloudflare/src/apiservice/tus_api.dart';
 
 export 'package:cloudflare/src/entity/cloudflare_image.dart';
 export 'package:cloudflare/src/entity/cloudflare_response.dart';

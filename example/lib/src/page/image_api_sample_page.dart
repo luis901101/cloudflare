@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/main.dart';
@@ -353,14 +354,14 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     }
   }
 
-  Future<List<int>> getFileBytes(String path) async {
+  Future<Uint8List> getFileBytes(String path) async {
     return await File(path).readAsBytes();
   }
 
   Future<void> doMultipleUpload() async {
     try {
       List<DataTransmit<String>>? contentFromPaths;
-      List<DataTransmit<List<int>>>? contentFromBytes;
+      List<DataTransmit<Uint8List>>? contentFromBytes;
 
       switch (fileSource) {
         case FileSource.path:
@@ -369,7 +370,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
           break;
         case FileSource.bytes:
           contentFromBytes = await Future.wait(dataImages.map((data) async =>
-              DataTransmit<List<int>>(
+              DataTransmit<Uint8List>(
                   data: await getFileBytes(data.dataTransmit.data),
                   progressCallback: data.dataTransmit.progressCallback)));
           break;

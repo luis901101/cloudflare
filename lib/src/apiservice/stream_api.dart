@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io' hide HttpResponse;
+import 'dart:typed_data';
 import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:cross_file/cross_file.dart' show XFile;
 
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
@@ -13,8 +16,10 @@ import 'package:dio/dio.dart';
 
 class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     CloudflareErrorResponse> {
-  StreamAPI({required RestAPI restAPI, required String accountId})
-      : super(
+  final String tusUploadUrl;
+  StreamAPI({required RestAPI restAPI, required String accountId}) :
+      tusUploadUrl = 'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
+      super(
             restAPI: restAPI,
             service: StreamService(dio: restAPI.dio, accountId: accountId),
             accountId: accountId,
@@ -134,6 +139,104 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return response;
   }
 
+  /// For videos larger than 200 MegaBytes TUS(https://tus.io) protocol is used
+  ///
+  /// Official documentation:
+  /// https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files
+  Future<TusAPI> tusStream({
+    /// Video file to stream
+    DataTransmit<File>? contentFromFile,
+
+    /// Path to the video file to stream
+    DataTransmit<String>? contentFromPath,
+
+    /// Video byte array representation to stream
+    DataTransmit<Uint8List>? contentFromBytes,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// Timestamp location of thumbnail image calculated as a percentage value
+    /// of the video's duration. To convert from a second-wise timestamp to a
+    /// percentage, divide the desired timestamp by the total duration of the
+    /// video. If this value is not set, the default thumbnail image will be
+    /// from 0s of the video.
+    ///
+    /// default value: 0
+    /// min value:0
+    /// max value:1
+    ///
+    /// e.g: 0.529241
+    double? thumbnailTimestampPct,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// List which origins should be allowed to display the video. Enter
+    /// allowed origin domains in an array and use * for wildcard subdomains.
+    /// Empty array will allow the video to be viewed on any origin.
+    ///
+    /// e.g:
+    /// [
+    ///   "example.com"
+    /// ]
+    List<String>? allowedOrigins,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// Indicates whether the video can be a accessed only using it's UID.
+    /// If set to true, a signed token needs to be generated with a signing key
+    /// to view the video.
+    ///
+    /// default value: false
+    ///
+    /// e.g: true
+    bool? requireSignedURLs,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// A Watermark object with the id of an existing watermark profile
+    /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
+    Watermark? watermark,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert(
+        contentFromFile != null ||
+            contentFromPath != null ||
+            contentFromBytes != null,
+        'One of the content must be specified.');
+
+    if (contentFromPath != null) {
+      contentFromFile ??= DataTransmit<File>(
+          data: File(contentFromPath.data),
+          progressCallback: contentFromPath.progressCallback);
+    }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<Uint8List>(
+          data: contentFromFile.data.readAsBytesSync(),
+          progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
+    final ProgressCallback? progressCallback;
+    final XFile file;
+    if (contentFromFile != null) {
+      file = XFile(contentFromFile.data.path);
+      progressCallback = contentFromFile.progressCallback;
+    } else {
+      file = XFile.fromData(contentFromBytes!.data);
+      progressCallback = contentFromBytes.progressCallback;
+    }
+    final tusAPI = TusAPI(
+      uploadURL: tusUploadUrl,
+      file: file,
+      headers: restAPI.headers,
+      metadata: {
+        if(thumbnailTimestampPct != null) Params.thumbnailTimestampPct: thumbnailTimestampPct.toString(),
+        if(allowedOrigins?.isNotEmpty ?? false) Params.allowedOrigins: jsonEncode(allowedOrigins),
+        if(requireSignedURLs != null) Params.requireSignedURLs: requireSignedURLs.toString(),
+        if(watermark != null) Params.watermark: watermark.id,
+      }
+    );
+    return tusAPI;
+  }
+
   /// For video direct stream upload without API key or token.
   /// This function is to be used specifically after a video
   /// createDirectStreamUpload has been requested.
@@ -150,7 +253,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     DataTransmit<String>? contentFromPath,
 
     /// Image byte array representation to upload
-    DataTransmit<List<int>>? contentFromBytes,
+    DataTransmit<Uint8List>? contentFromBytes,
   }) async {
     assert(
     contentFromFile != null ||
@@ -166,7 +269,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
     /// Web support
     if(contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<List<int>>(
+      contentFromBytes ??= DataTransmit<Uint8List>(
           data: contentFromFile.data.readAsBytesSync(),
           progressCallback: contentFromFile.progressCallback);
       contentFromFile = null;
@@ -233,7 +336,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     List<DataTransmit<String>>? contentFromPaths,
 
     /// List of video byte array representations to stream
-    List<DataTransmit<List<int>>>? contentFromBytes,
+    List<DataTransmit<Uint8List>>? contentFromBytes,
 
     /// URL list to the videos. Server must be publicly routable and support
     /// HTTP HEAD requests and HTTP GET range requests. Server should respond

@@ -1,4 +1,5 @@
 import 'dart:io' hide HttpResponse;
+import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
@@ -32,7 +33,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     DataTransmit<String>? contentFromPath,
 
     /// Image byte array representation to upload
-    DataTransmit<List<int>>? contentFromBytes,
+    DataTransmit<Uint8List>? contentFromBytes,
 
     /// An url to fetch an image from origin and upload it.
     ///
@@ -70,7 +71,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     /// Web support
     if(contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<List<int>>(
+      contentFromBytes ??= DataTransmit<Uint8List>(
           data: contentFromFile.data.readAsBytesSync(),
           progressCallback: contentFromFile.progressCallback);
       contentFromFile = null;
@@ -118,7 +119,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     DataTransmit<String>? contentFromPath,
 
     /// Image byte array representation to upload
-    DataTransmit<List<int>>? contentFromBytes,
+    DataTransmit<Uint8List>? contentFromBytes,
   }) async {
     assert(
         contentFromFile != null ||
@@ -134,7 +135,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     /// Web support
     if(contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<List<int>>(
+      contentFromBytes ??= DataTransmit<Uint8List>(
           data: contentFromFile.data.readAsBytesSync(),
           progressCallback: contentFromFile.progressCallback);
       contentFromFile = null;
@@ -190,7 +191,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     List<DataTransmit<String>>? contentFromPaths,
 
     /// List of image byte array representations to upload
-    List<DataTransmit<List<int>>>? contentFromBytes,
+    List<DataTransmit<Uint8List>>? contentFromBytes,
 
     /// List of image urls to upload
     List<DataTransmit<String>>? contentFromUrls,
@@ -383,7 +384,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Note: the response is <image blob data>
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-base-image
-  Future<CloudflareHTTPResponse<List<int>?>> getBase({
+  Future<CloudflareHTTPResponse<Uint8List?>> getBase({
     /// Image identifier
     String? id,
 
@@ -394,7 +395,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     assert(
         id != null || image != null, 'One of id or image must not be empty.');
     id ??= image?.id;
-    final response = await genericParseResponse<List<int>>(
+    final response = await genericParseResponse<Uint8List>(
         service.getBase(
           id: id!,
         ),

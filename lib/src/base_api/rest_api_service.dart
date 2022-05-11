@@ -17,6 +17,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   static const authorizedRequestAssertMessage = 'This endpoint requires an '
       'authorized request, check the Cloudflare constructor you are using and '
       'make sure you are using a valid `accountId` and `token`';
+  static String bearer(String token) => 'Bearer $token';
 
   static const Map<String, String> defaultHeaders = {};
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -78,7 +79,7 @@ void main() async {
         fail('No video bytes available to stream');
       }
       final response = await cloudflare.streamAPI.stream(
-          contentFromBytes: DataTransmit<List<int>>(
+          contentFromBytes: DataTransmit<Uint8List>(
               data: videoFile.readAsBytesSync(),
               progressCallback: (count, total) {
                 final split = videoFile.path.split(Platform.pathSeparator);
@@ -167,9 +168,9 @@ void main() async {
             'videoFile and videoFile1 and videoFile2 are required for multiple stream test. Check if you set each video file for each env var.');
       }
       final files = [videoFile, videoFile1, videoFile2];
-      List<DataTransmit<List<int>>> contents = [];
+      List<DataTransmit<Uint8List>> contents = [];
       for (final file in files) {
-        contents.add(DataTransmit<List<int>>(
+        contents.add(DataTransmit<Uint8List>(
             data: file.readAsBytesSync(),
             progressCallback: (count, total) {
               final split = file.path.split(Platform.pathSeparator);
@@ -263,7 +264,7 @@ void main() async {
             contentFromFile: DataTransmit<File>(
                 data: videoFile,
                 progressCallback: (count, total) {
-                  print('Video stream to direct stream URL from file progress: $count/$total');
+                  print('Video stream to direct stream URL from file: $videoFile progress: $count/$total');
                 })
         );
         expect(response, StreamVideoMatcher());
@@ -272,6 +273,29 @@ void main() async {
         expect(response.body?.readyToStream, true, reason: 'Video stream is not ready');
       }, timeout: Timeout(Duration(minutes: 5)));
     });
+  });
+
+    group('TUS protocol stream upload tests', () {
+      test('Doing authenticated TUS stream upload', () async {
+        if (!videoFile.existsSync()) {
+          fail('No video file available to stream');
+        }
+        final tusAPI = await cloudflare.streamAPI.tusStream(
+          contentFromFile: DataTransmit(data: videoFile),
+        );
+        num completeProgress = 0;
+        onProgress(progress) {
+          completeProgress = progress;
+          print('TUS authenticated video stream from file: $videoFile progress: $progress');
+        }
+        final testProgressCallback = expectAsyncUntil1(onProgress, () => completeProgress == 100);
+        tusAPI.upload(
+          onProgress: testProgressCallback,
+          onComplete: () {
+            print('TUS authenticated video stream completed');
+          }
+        );
+      }, timeout: Timeout(Duration(minutes: 1)));
   });
 
   group('Retrieve video tests', () {

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -77,7 +78,7 @@ void main() async {
         fail('No image bytes available to upload');
       }
       final response = await cloudflare.imageAPI.upload(
-          contentFromBytes: DataTransmit<List<int>>(
+          contentFromBytes: DataTransmit<Uint8List>(
               data: imageFile.readAsBytesSync(),
               progressCallback: (count, total) {
                 final split = imageFile.path.split(Platform.pathSeparator);
@@ -166,9 +167,9 @@ void main() async {
             'imageFile and imageFile1 and imageFile2 are required for multiple upload test. Check if you set each image file for each env var.');
       }
       final files = [imageFile, imageFile1, imageFile2];
-      List<DataTransmit<List<int>>> contents = [];
+      List<DataTransmit<Uint8List>> contents = [];
       for (final file in files) {
-        contents.add(DataTransmit<List<int>>(
+        contents.add(DataTransmit<Uint8List>(
             data: file.readAsBytesSync(),
             progressCallback: (count, total) {
               final split = file.path.split(Platform.pathSeparator);

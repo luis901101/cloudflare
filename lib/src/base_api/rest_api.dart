@@ -24,6 +24,8 @@ class RestAPI {
     _initDio();
   }
 
+  String? get authorizationHeader => headers?[HttpHeaders.authorizationHeader];
+
   void _initDio() {
     dispose();
 
