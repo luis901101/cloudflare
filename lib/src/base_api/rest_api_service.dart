@@ -4,6 +4,7 @@ import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/model/cloudflare_error_response.dart';
 import 'package:cloudflare/src/model/pagination.dart';
+import 'package:cloudflare/src/utils/map_utils.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:cloudflare/src/model/cloudflare_http_response.dart';
@@ -14,6 +15,9 @@ import 'dart:async';
 
 abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   static const authorizationKey = 'Authorization';
+  static const tusResumableKey = 'Tus-Resumable';
+  static const uploadLengthKey = 'Upload-Length';
+  static const uploadMetadataKey = 'Upload-Metadata';
   static const authorizedRequestAssertMessage = 'This endpoint requires an '
       'authorized request, check the Cloudflare constructor you are using and '
       'make sure you are using a valid `accountId` and `token`';
@@ -66,8 +70,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
           http.Response(
             '',
             response.response.statusCode ?? HttpStatus.notFound,
-            headers: response.response.headers.map
-                .map((key, value) => MapEntry(key, value.join('; '))),
+            headers: MapUtils.parseHeaders(response.response.headers) ?? {},
             isRedirect: response.response.isRedirect ?? false,
             request: http.Request(
               response.response.requestOptions.method,
@@ -85,9 +88,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
             http.Response(
               '',
               error.response?.statusCode ?? HttpStatus.notFound,
-              headers: error.response?.headers.map
-                      .map((key, value) => MapEntry(key, value.join('; '))) ??
-                  {},
+              headers: MapUtils.parseHeaders(error.response?.headers) ?? {},
               isRedirect: error.response?.isRedirect ?? false,
               request: http.Request(
                 error.response?.requestOptions.method ?? HttpMethod.GET,

@@ -124,9 +124,9 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     };
   }
 
-  factory CloudflareImage.fromUrl(String url) {
+  static CloudflareImage? fromUrl(String url) {
     final data = _dataFromImageDeliveryUrl(url);
-    return CloudflareImage(
+    return data.isEmpty ? null : CloudflareImage(
       id: data[Params.id],
       imageDeliveryId: data[Params.imageDeliveryId],
       variants: data[Params.variants],

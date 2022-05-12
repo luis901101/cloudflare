@@ -109,8 +109,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
   Future<CloudflareHTTPResponse<CloudflareImage?>> directUpload({
-    /// Url to upload image without API key or token
-    required String uploadURL,
+    /// Information on where to upload the image without an API key or token
+    required DataUploadDraft dataUploadDraft,
 
     /// Image file to upload
     DataTransmit<File>? contentFromFile,
@@ -168,7 +168,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       contentType: 'multipart/form-data',
     ).compose(
         BaseOptions(
-            baseUrl: uploadURL,
+            baseUrl: dataUploadDraft.uploadURL,
             connectTimeout: restAPI.timeout?.inMilliseconds),
         '',
         data: formData,

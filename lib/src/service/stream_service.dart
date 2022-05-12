@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' hide Headers;
@@ -43,6 +43,15 @@ abstract class StreamService {
     @Body() required Map<String, dynamic> data,
   });
 
+  @POST('?direct_user=true')
+  @Headers({
+    RestAPIService.tusResumableKey: TusAPI.tusVersion,
+  })
+  Future<HttpResponse> createTusDirectUpload({
+    @Header(RestAPIService.uploadLengthKey) required int size,
+    @Header(RestAPIService.uploadMetadataKey) String? metadata,
+  });
+
   @GET('')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> getAll({
@@ -67,31 +76,4 @@ abstract class StreamService {
   Future<HttpResponse> delete({
     @Path() required String id,
   });
-
-
-
-
-
-
-
-
-
-  //
-  // @PATCH('/{id}')
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> update({
-  //   @Path() required String id,
-  //   @Field() bool? requireSignedURLs,
-  //   @Field() Map<String, dynamic>? metadata,
-  // });
-  //
-  //
-  //
-  // @GET('/{id}/blob')
-  // @DioResponseType(ResponseType.bytes)
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse> getBase({
-  //   @Path() required String id,
-  // });
-
 }

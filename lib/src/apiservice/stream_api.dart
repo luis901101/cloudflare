@@ -1,18 +1,17 @@
-import 'dart:convert';
 import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
-import 'package:cloudflare/src/utils/platform_utils.dart';
-import 'package:http/http.dart' as http;
-import 'package:cross_file/cross_file.dart' show XFile;
 
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
-import 'package:cloudflare/src/utils/date_time_utils.dart';
-import 'package:cloudflare/src/utils/params.dart';
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
+import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
+import 'package:cloudflare/src/utils/date_time_utils.dart';
+import 'package:cloudflare/src/utils/params.dart';
+import 'package:cloudflare/src/utils/platform_utils.dart';
+import 'package:cross_file/cross_file.dart' show XFile;
 import 'package:dio/dio.dart';
+import 'package:retrofit/dio.dart';
 
 class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     CloudflareErrorResponse> {
@@ -139,7 +138,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return response;
   }
 
-  /// For videos larger than 200 MegaBytes TUS(https://tus.io) protocol is used
+  /// For videos larger than 200 MegaBytes tus(https://tus.io) protocol is used
   ///
   /// Official documentation:
   /// https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files
@@ -152,6 +151,9 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
     /// Video byte array representation to stream
     DataTransmit<Uint8List>? contentFromBytes,
+
+    /// The name of the video in the dashboard.
+    String? name,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -224,14 +226,15 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       progressCallback = contentFromBytes.progressCallback;
     }
     final tusAPI = TusAPI(
-      uploadURL: tusUploadUrl,
+      dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
       file: file,
       headers: restAPI.headers,
       metadata: {
-        if(thumbnailTimestampPct != null) Params.thumbnailTimestampPct: thumbnailTimestampPct.toString(),
-        if(allowedOrigins?.isNotEmpty ?? false) Params.allowedOrigins: jsonEncode(allowedOrigins),
-        if(requireSignedURLs != null) Params.requireSignedURLs: requireSignedURLs.toString(),
-        if(watermark != null) Params.watermark: watermark.id,
+        Params.name: name,
+        Params.thumbnailTimestampPct: thumbnailTimestampPct,
+        Params.allowedOrigins: allowedOrigins,
+        Params.requireSignedURLs: requireSignedURLs,
+        Params.watermark: watermark?.id,
       }
     );
     return tusAPI;
@@ -243,8 +246,8 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> directStreamUpload({
-    /// Url to stream upload video without API key or token
-    required String uploadURL,
+    /// Information on where to stream upload the video without an API key or token
+    required DataUploadDraft dataUploadDraft,
 
     /// Video file to upload
     DataTransmit<File>? contentFromFile,
@@ -302,29 +305,135 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       contentType: 'multipart/form-data',
     ).compose(
         BaseOptions(
-            baseUrl: uploadURL,
-            connectTimeout: restAPI.timeout?.inMilliseconds),
+          baseUrl: dataUploadDraft.uploadURL,
+          connectTimeout: restAPI.timeout?.inMilliseconds),
         '',
         data: formData,
         onSendProgress: progressCallback));
-
-    Map<String, String> headers = {};
-    for (final key in rawResponse.headers.map.keys) {
-      final valueList = rawResponse.headers.map[key];
-      if(valueList?.isNotEmpty ?? false) {
-        headers[key] = valueList!.first.toString();
-      }
-    }
+    final rawHttpResponse = HttpResponse(rawResponse.data, rawResponse);
+    final rawCloudflareResponse = await getSaveResponse(
+        Future.value(rawHttpResponse),
+        parseCloudflareResponse: false);
 
     return CloudflareHTTPResponse<CloudflareStreamVideo?>(
-      http.Response(
-        rawResponse.data?.toString() ?? '',
-        rawResponse.statusCode ?? HttpStatus.badRequest,
-        headers: headers,
-        isRedirect: rawResponse.isRedirect ?? false,
-      ),
-      CloudflareStreamVideo.fromUrl(uploadURL).copyWith(readyToStream: true),
+      rawCloudflareResponse.base,
+        CloudflareStreamVideo(
+          id: dataUploadDraft.id,
+          readyToStream: true,
+          watermark: dataUploadDraft.watermark
+        ),
+        error: rawCloudflareResponse.error,
+      extraData: rawCloudflareResponse.extraData
     );
+  }
+
+  /// For larger than 200 MegaBytes video direct stream upload using
+  /// tus(https://tus.io) protocol without API key or token.
+  /// This function is to be used specifically after a video
+  /// [createTusDirectStreamUpload] has been requested.
+  Future<TusAPI> tusDirectStreamUpload({
+    /// Information on where to stream upload the video without an API key or token
+    required DataUploadDraft dataUploadDraft,
+
+    /// Video file to stream
+    DataTransmit<File>? contentFromFile,
+
+    /// Path to the video file to stream
+    DataTransmit<String>? contentFromPath,
+
+    /// Video byte array representation to stream
+    DataTransmit<Uint8List>? contentFromBytes,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// Timestamp location of thumbnail image calculated as a percentage value
+    /// of the video's duration. To convert from a second-wise timestamp to a
+    /// percentage, divide the desired timestamp by the total duration of the
+    /// video. If this value is not set, the default thumbnail image will be
+    /// from 0s of the video.
+    ///
+    /// default value: 0
+    /// min value:0
+    /// max value:1
+    ///
+    /// e.g: 0.529241
+    double? thumbnailTimestampPct,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// List which origins should be allowed to display the video. Enter
+    /// allowed origin domains in an array and use * for wildcard subdomains.
+    /// Empty array will allow the video to be viewed on any origin.
+    ///
+    /// e.g:
+    /// [
+    ///   "example.com"
+    /// ]
+    List<String>? allowedOrigins,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// Indicates whether the video can be a accessed only using it's UID.
+    /// If set to true, a signed token needs to be generated with a signing key
+    /// to view the video.
+    ///
+    /// default value: false
+    ///
+    /// e.g: true
+    bool? requireSignedURLs,
+
+    /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
+    /// A Watermark object with the id of an existing watermark profile
+    /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
+    Watermark? watermark,
+
+    /// The size in bytes of the portions of the file that will be uploaded in
+    /// chunks.
+    ///
+    /// Min value: 5242880 bytes which is 5 MB
+    /// Max value: 209715200 bytes which is 200 MB
+    /// e.g: For reliable connections you can use 52428800 bytes which is 50 MB
+    int? chunkSize,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert(
+    contentFromFile != null ||
+        contentFromPath != null ||
+        contentFromBytes != null,
+    'One of the content must be specified.');
+
+    if (contentFromPath != null) {
+      contentFromFile ??= DataTransmit<File>(
+          data: File(contentFromPath.data),
+          progressCallback: contentFromPath.progressCallback);
+    }
+
+    /// Web support
+    if(contentFromFile != null && PlatformUtils.isWeb) {
+      contentFromBytes ??= DataTransmit<Uint8List>(
+          data: contentFromFile.data.readAsBytesSync(),
+          progressCallback: contentFromFile.progressCallback);
+      contentFromFile = null;
+    }
+
+    final ProgressCallback? progressCallback;
+    final XFile file;
+    if (contentFromFile != null) {
+      file = XFile(contentFromFile.data.path);
+      progressCallback = contentFromFile.progressCallback;
+    } else {
+      file = XFile.fromData(contentFromBytes!.data);
+      progressCallback = contentFromBytes.progressCallback;
+    }
+    final tusAPI = TusAPI(
+      dataUploadDraft: dataUploadDraft,
+      file: file,
+      chunkSize: chunkSize,
+      metadata: {
+        Params.thumbnailTimestampPct: thumbnailTimestampPct,
+        Params.allowedOrigins: allowedOrigins,
+        Params.requireSignedURLs: requireSignedURLs,
+        Params.watermark: watermark?.id,
+      }
+    );
+    return tusAPI;
   }
 
   /// Stream multiple videos by repeatedly calling stream
@@ -516,6 +625,115 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return response;
   }
 
+  /// Direct upload using tus(https://tus.io) protocol
+  /// Direct uploads allow users to upload videos without API keys. A common
+  /// place to use direct uploads is on web apps, client side applications,
+  /// or on mobile devices where users upload content directly to Stream.
+  ///
+  /// IMPORTANT: when using tus protocol for direct stream upload it's not
+  /// required to set a [maxDurationSeconds] because Cloudflare will reserve a
+  /// loose amount o minutes for the video to be uploaded, for instance 240
+  /// minutes will be reserved from you available storage.
+  ///
+  /// Official documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb
+  Future<CloudflareHTTPResponse<DataUploadDraft?>> createTusDirectStreamUpload({
+    /// The size of the file to upload in bytes
+    required int size,
+
+    /// The name of the video in the dashboard.
+    String? name,
+
+    /// Direct uploads occupy minutes of videos on your Stream account until
+    /// they are expired. This value will be used to calculate the duration the
+    /// video will occupy before the video is uploaded. After upload, the
+    /// duration of the uploaded will be used instead. If a video longer than
+    /// this value is uploaded, the video will result in an error.
+    ///
+    /// Min value: 1 second
+    /// Max value: 21600 seconds which is 360 mins, 6 hours
+    /// e.g: 300 seconds which is 5 mins
+    int? maxDurationSeconds,
+
+    /// User-defined identifier of the media creator
+    ///
+    /// Max length: 64
+    /// e.g: "creator-id_abcde12345"
+    String? creator,
+
+    /// Timestamp location of thumbnail image calculated as a percentage value
+    /// of the video's duration. To convert from a second-wise timestamp to a
+    /// percentage, divide the desired timestamp by the total duration of the
+    /// video. If this value is not set, the default thumbnail image will be
+    /// from 0s of the video.
+    ///
+    /// Default value: 0
+    /// Min value:0
+    /// Max value:1
+    /// e.g: 0.529241
+    num? thumbnailTimestampPct,
+
+    /// List which origins should be allowed to display the video. Enter
+    /// allowed origin domains in an array and use * for wildcard subdomains.
+    /// Empty array will allow the video to be viewed on any origin.
+    ///
+    /// e.g:
+    /// [
+    ///   "example.com"
+    /// ]
+    List<String>? allowedOrigins,
+
+    /// Indicates whether the video can be a accessed only using it's UID. If
+    /// set to true, a signed token needs to be generated with a signing key to
+    /// view the video.
+    ///
+    /// Default value: false
+    /// e.g: true
+    bool? requireSignedURLs,
+
+    /// A Watermark object with the id of an existing watermark profile
+    /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
+    Watermark? watermark,
+
+    /// The date after upload will not be accepted.
+    ///
+    /// Min value: Now + 2 minutes.
+    /// Max value: Now + 6 hours.
+    /// Default value: Now + 30 minutes.
+    /// e.g: "2021-01-02T02:20:00Z"
+    DateTime? expiry,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+      final metadataMap = {
+        Params.name: name,
+        Params.maxDurationSeconds: maxDurationSeconds,
+        Params.creator: creator,
+        Params.thumbnailTimestampPct: thumbnailTimestampPct,
+        Params.allowedOrigins: allowedOrigins,
+        Params.requireSignedURLs: requireSignedURLs,
+        Params.watermark: watermark?.id,
+        Params.expiry: expiry?.toJson(),
+      };
+    final metadata = TusAPI.generateMetadata(metadataMap);
+    final rawResponse = await getSaveResponse(
+      service.createTusDirectUpload(
+        size: size,
+        metadata: metadata,
+      ),
+      parseCloudflareResponse: false
+    );
+    final id = rawResponse.headers[Params.streamMediaIdKC];
+    final uploadURL = rawResponse.headers[Params.location];
+    return CloudflareHTTPResponse<DataUploadDraft>(
+      rawResponse.base,
+      DataUploadDraft(
+        id: id,
+        uploadURL: uploadURL,
+      ),
+      error: rawResponse.error,
+      extraData: rawResponse.extraData,
+    );
+  }
+
   /// Up to 1000 videos can be listed with one request, use optional parameters
   /// to get a specific range of videos.
   /// Please note that Cloudflare Stream does not use pagination, instead it
@@ -647,32 +865,4 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     }
     return responses;
   }
-
-  // /// Update video access control. On access control change,
-  // /// all copies of the video are purged from Cache.
-  // Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> update({
-  //   String? id,
-  //   CloudflareStreamVideo? video,
-  //
-  //   /// Indicates whether the video can be accessed only using it's UID.
-  //   /// If set to true, a signed token needs to be generated with a signing key
-  //   /// to view the video. Returns a new UID on a change. No-op if not specified
-  //   bool? requireSignedURLs,
-  //
-  //   /// User modifiable key-value store. Can use used for keeping references to
-  //   /// another system of record for managing images. No-op if not specified.
-  //   /// "{\"meta\": \"metaID\"}"
-  //   Map<String, dynamic>? metadata,
-  // }) async {
-  //   assert(
-  //       id != null || video != null, 'One of id or video must not be empty.');
-  //   id ??= video?.id;
-  //   final response = await parseResponse(service.update(
-  //     id: id!,
-  //     requireSignedURLs: requireSignedURLs,
-  //     metadata: metadata,
-  //   ));
-  //
-  //   return response;
-  // }
 }

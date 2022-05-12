@@ -30,11 +30,11 @@ void main() async {
     final image5 = CloudflareImage.fromUrl('https://upload.imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
     final image6 = CloudflareImage(id: 'm3xgriuradsz3ed23', imageDeliveryId: '4m5x3gt2o5htuergn');
     final image7 = CloudflareImage();
-    expect(image1.firstVariant, isNotEmpty);
-    expect(image2.firstVariant, isNotEmpty);
-    expect(image3.firstVariant, isNotEmpty);
-    expect(image4.firstVariant, isNotEmpty);
-    expect(image5.firstVariant, isNotEmpty);
+    expect(image1?.firstVariant, isNotEmpty);
+    expect(image2?.firstVariant, isNotEmpty);
+    expect(image3?.firstVariant, isNotEmpty);
+    expect(image4?.firstVariant, isNotEmpty);
+    expect(image5?.firstVariant, isNotEmpty);
     expect(image6.firstVariant, isNotEmpty);
     expect(image7.firstVariant, isEmpty);
   });
@@ -232,36 +232,34 @@ void main() async {
 
     group('Image direct upload tests', () {
       late final CloudflareHTTPResponse<DataUploadDraft?> response;
-      late final String? imageId;
-      late final String? uploadURL;
+      late final DataUploadDraft? dataUploadDraft;
 
       setUpAll(() async {
         response = await cloudflare.imageAPI.createDirectUpload();
-        imageId = response.body?.id;
-        uploadURL = response.body?.uploadURL;
+        dataUploadDraft = response.body;
       });
 
       test('Create authenticated direct image upload URL', () async {
         expect(response, ResponseMatcher());
-        expect(response.body?.id, isNotEmpty);
-        expect(response.body?.uploadURL, isNotEmpty);
+        expect(dataUploadDraft?.id, isNotEmpty);
+        expect(dataUploadDraft?.uploadURL, isNotEmpty);
       });
 
       test('Check created image draft status', () async {
-        if (imageId?.isEmpty ?? true) {
+        if (dataUploadDraft?.id.isEmpty ?? true) {
           fail('No imageId available to check draft status');
         }
-        final response = await cloudflare.imageAPI.get(id: imageId);
+        final response = await cloudflare.imageAPI.get(id: dataUploadDraft?.id);
         expect(response, ImageMatcher());
         expect(response.body?.draft, true);
       }, timeout: Timeout(Duration(minutes: 2)));
 
       test('Doing image upload to direct upload URL', () async {
-        if (uploadURL?.isEmpty ?? true) {
+        if (dataUploadDraft?.uploadURL.isEmpty ?? true) {
           fail('No uploadURL available to upload to');
         }
         final response = await cloudflare.imageAPI.directUpload(
-          uploadURL: uploadURL!,
+          dataUploadDraft: dataUploadDraft!,
           contentFromFile: DataTransmit<File>(
             data: imageFile,
             progressCallback: (count, total) {
@@ -270,7 +268,7 @@ void main() async {
         );
         expect(response, ImageMatcher());
         addId(response.body?.id);
-        expect(response.body?.id, imageId);
+        expect(response.body?.id, dataUploadDraft?.id);
         expect(response.body?.draft, false);
       }, timeout: Timeout(Duration(minutes: 2)));
     });

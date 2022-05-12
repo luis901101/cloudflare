@@ -28,4 +28,7 @@ class Params {
   static const String imageDeliveryId = 'imageDeliveryId';
   static const String variantName = 'variantName';
   static const String variants = 'variants';
+  static const String streamMediaIdKC = 'stream-media-id'; //Kebab case
+  static const String location = 'location';
+  static const String name = 'name';
 }

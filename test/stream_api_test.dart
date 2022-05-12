@@ -31,12 +31,12 @@ void main() async {
     final video6 = CloudflareStreamVideo.fromUrl('https://upload.videodelivery.net/2dee576797b5448fb3fb32f09f6a607c');
     final video7 = CloudflareStreamVideo(id: 'c5n485g8q34hrxi2uehdjsnkd');
     final video8 = CloudflareStreamVideo();
-    expect(video1.playback, isNotNull);
-    expect(video2.playback, isNotNull);
-    expect(video3.playback, isNotNull);
-    expect(video4.playback, isNotNull);
-    expect(video5.playback, isNotNull);
-    expect(video6.playback, isNotNull);
+    expect(video1?.playback, isNotNull);
+    expect(video2?.playback, isNotNull);
+    expect(video3?.playback, isNotNull);
+    expect(video4?.playback, isNotNull);
+    expect(video5?.playback, isNotNull);
+    expect(video6?.playback, isNotNull);
     expect(video7.playback, isNotNull);
     expect(video8.playback, isNull);
   });
@@ -227,40 +227,38 @@ void main() async {
 
     group('Video direct stream tests', () {
       late final CloudflareHTTPResponse<DataUploadDraft?> response;
-      late final String? videoId;
-      late final String? uploadURL;
+      late final DataUploadDraft? dataUploadDraft;
 
       setUpAll(() async {
         print('WARNIGN: Make sure to test with a video with less than 60 seconds duration');
         response = await cloudflare.streamAPI.createDirectStreamUpload(maxDurationSeconds: 60);
-        videoId = response.body?.id;
-        uploadURL = response.body?.uploadURL;
+        dataUploadDraft = response.body;
       });
 
       test('Create authenticated direct stream video URL', () async {
         expect(response, ResponseMatcher());
-        expect(response.body?.id, isNotEmpty);
-        expect(response.body?.uploadURL, isNotEmpty, reason: 'Just created vide stream uploadURL  can\'t be empty');
+        expect(dataUploadDraft?.id, isNotEmpty);
+        expect(dataUploadDraft?.uploadURL, isNotEmpty, reason: 'Just created video stream uploadURL  can\'t be empty');
       });
 
       test('Check created video ready to stream status', () async {
-        if (videoId?.isEmpty ?? true) {
+        if (dataUploadDraft?.id.isEmpty ?? true) {
           fail('No videoId available to check video status');
         }
-        final response = await cloudflare.streamAPI.get(id: videoId);
+        final response = await cloudflare.streamAPI.get(id: dataUploadDraft?.id);
         expect(response, StreamVideoMatcher());
         expect(response.body?.readyToStream, false, reason: 'Just created video stream can\'t be ready');
-      }, timeout: Timeout(Duration(minutes: 5)));
+      }, timeout: Timeout(Duration(minutes: 1)));
 
       test('Doing video stream to direct stream URL', () async {
-        if (uploadURL?.isEmpty ?? true) {
+        if (dataUploadDraft?.uploadURL.isEmpty ?? true) {
           fail('No streamURL available to stream to');
         }
         if (!videoFile.existsSync()) {
           fail('No video file available to stream');
         }
         final response = await cloudflare.streamAPI.directStreamUpload(
-            uploadURL: uploadURL!,
+            dataUploadDraft: dataUploadDraft!,
             contentFromFile: DataTransmit<File>(
                 data: videoFile,
                 progressCallback: (count, total) {
@@ -269,33 +267,105 @@ void main() async {
         );
         expect(response, StreamVideoMatcher());
         addId(response.body?.id);
-        expect(response.body?.id, videoId, reason: 'Uploaded video id doesn\'t match created upload video');
+        expect(response.body?.id, dataUploadDraft?.id, reason: 'Uploaded video id doesn\'t match created upload video');
         expect(response.body?.readyToStream, true, reason: 'Video stream is not ready');
       }, timeout: Timeout(Duration(minutes: 5)));
     });
   });
 
-    group('TUS protocol stream upload tests', () {
-      test('Doing authenticated TUS stream upload', () async {
+    group('tus protocol stream upload tests', () {
+      DataUploadDraft? dataUploadDraft;
+
+      test('Doing authenticated stream upload using tus protocol', () async {
         if (!videoFile.existsSync()) {
           fail('No video file available to stream');
         }
         final tusAPI = await cloudflare.streamAPI.tusStream(
           contentFromFile: DataTransmit(data: videoFile),
+          name: 'test-video-upload-authenticated',
         );
-        num completeProgress = 0;
-        onProgress(progress) {
-          completeProgress = progress;
-          print('TUS authenticated video stream from file: $videoFile progress: $progress');
+        bool isComplete = false;
+        onProgress(count, total) {
+          if(isComplete) return;
+          print('tus authenticated video stream from file: $videoFile progress: $count/$total');
         }
-        final testProgressCallback = expectAsyncUntil1(onProgress, () => completeProgress == 100);
+        final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
         tusAPI.upload(
           onProgress: testProgressCallback,
-          onComplete: () {
-            print('TUS authenticated video stream completed');
+          onComplete: (cloudflareStreamVideo) {
+            addId(cloudflareStreamVideo?.id);
+            print('tus authenticated video stream completed videoId: ${cloudflareStreamVideo?.id}');
+            isComplete = true;
+            testProgressCallback(0, 0);
           }
         );
+      }, timeout: Timeout(Duration(minutes: 5)));
+
+      test('Create authenticated direct stream video URL using tus protocol', () async {
+        if (!videoFile.existsSync()) {
+          fail('No video file available to get its file size');
+        }
+        final fileSize = videoFile.lengthSync();
+        final response = await cloudflare.streamAPI.createTusDirectStreamUpload(
+          size: fileSize,
+          name: 'test-video-direct-upload',
+          // maxDurationSeconds: 60, //when using tus protocol [maxDurationSeconds] is not required because Cloudflare reserves a loose amount of minutes for the video to be uploaded
+        );
+        dataUploadDraft = response.body;
+        expect(response, ResponseMatcher());
+        expect(dataUploadDraft?.id, isNotEmpty);
+        expect(dataUploadDraft?.uploadURL, isNotEmpty, reason: 'Just created video stream uploadURL can\'t be empty');
       }, timeout: Timeout(Duration(minutes: 1)));
+
+      test('Check created video ready to stream status', () async {
+        if (dataUploadDraft?.id.isEmpty ?? true) {
+          fail('No videoId available to check video status');
+        }
+        final response = await cloudflare.streamAPI.get(id: dataUploadDraft?.id);
+        expect(response, StreamVideoMatcher());
+        expect(response.body?.readyToStream, false, reason: 'Just created video stream can\'t be ready');
+      }, timeout: Timeout(Duration(minutes: 1)));
+
+      test('Doing direct stream upload using tus protocol', () async {
+        if (dataUploadDraft?.uploadURL.isEmpty ?? true) {
+          fail('No streamURL available to stream to');
+        }
+        if (!videoFile.existsSync()) {
+          fail('No video file available to stream');
+        }
+        final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
+          dataUploadDraft: dataUploadDraft!,
+          contentFromFile: DataTransmit(data: videoFile),
+        );
+        bool isComplete = false;
+        onProgress(count, total) {
+          if(isComplete) return;
+          print('tus authenticated video stream from file: $videoFile progress: $count/$total');
+        }
+        final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
+        tusAPI.upload(
+          onProgress: testProgressCallback,
+          onComplete: (cloudflareStreamVideo) {
+            addId(cloudflareStreamVideo?.id);
+            print('tus authenticated video stream completed videoId: ${cloudflareStreamVideo?.id}');
+            isComplete = true;
+            testProgressCallback(0, 0);
+            expect(cloudflareStreamVideo, isNotNull, reason: 'CloudFlareStreamVideo must not be null after tus stream upload');
+            expect(cloudflareStreamVideo?.id, isNotEmpty, reason: 'CloudFlareStreamVideo id must not be empty after tus stream upload');
+          }
+        );
+
+        await Future.delayed(const Duration(seconds: 2), () {
+          print('Upload paused');
+          tusAPI.pause();
+        });
+
+        await Future.delayed(const Duration(seconds: 4), () {
+          print('Upload resumed');
+          tusAPI.resume();
+        });
+
+      }, timeout: Timeout(Duration(minutes: 5)));
   });
 
   group('Retrieve video tests', () {

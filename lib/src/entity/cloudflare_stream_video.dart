@@ -276,9 +276,9 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     };
   }
 
-  factory CloudflareStreamVideo.fromUrl(String url) {
+  static CloudflareStreamVideo? fromUrl(String url) {
     final data = _dataFromVideoDeliveryUrl(url);
-    return CloudflareStreamVideo(
+    return data.isEmpty ? null : CloudflareStreamVideo(
       id: data[Params.id],
       readyToStream: !url.startsWith(uploadVideoDeliveryUrl)
     );
