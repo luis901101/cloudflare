@@ -35,8 +35,9 @@ class DataTransmitNotifier {
 
 class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   static const int loadImage = 1;
-  static const int uploadImages = 2;
-  static const int deleteUploadedImages = 3;
+  static const int doAuthenticatedUpload = 2;
+  static const int doDirectUpload = 3;
+  static const int deleteUploadedData = 4;
   List<DataTransmitNotifier> dataImages = [];
   List<CloudflareImage> cloudflareImages = [];
   bool loading = false;
@@ -168,6 +169,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
       body: Center(
         child: Scrollbar(
           child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -257,49 +259,98 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: loading ||
-                                  (dataImages.isEmpty &&
-                                      cloudflareImages.isEmpty)
-                              ? null
-                              : () {
-                                  dataImages = [];
-                                  cloudflareImages = [];
-                                  setState(() {});
-                                },
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                                    (Set<MaterialState> states) {
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: loading ||
+                          (dataImages.isEmpty &&
+                              cloudflareImages.isEmpty)
+                          ? null
+                          : () {
+                        dataImages = [];
+                        cloudflareImages = [];
+                        setState(() {});
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                              return states.contains(MaterialState.disabled)
+                                  ? null
+                                  : Colors.blue;
+                            }),
+                      ),
+                      child: const Text(
+                        'Clear all',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: loading || dataImages.isEmpty
+                          ? null
+                          : () => onClick(doAuthenticatedUpload),
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(const EdgeInsets.all(8))
+                      ),
+                      child: Column(
+                        children: const [
+                          Text(
+                            'Authenticated upload',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Authenticated uploads are recommended only for server side, because it requires a token or api key to be able to upload image to Cloudflare. For uploading images from client side like mobile or web app consider "Direct upload"',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: loading || dataImages.isEmpty
+                          ? null
+                          : () => onClick(doDirectUpload),
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+                        backgroundColor:
+                        MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
                               return states.contains(MaterialState.disabled)
                                   ? null
                                   : Colors.deepOrange;
                             }),
-                          ),
-                          child: const Text(
-                            'Clear all',
+                      ),
+                      child: Column(
+                        children: const [
+                          Text(
+                            'Direct upload',
                             textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 16,
-                      ),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: loading || dataImages.isEmpty
-                              ? null
-                              : () => onClick(uploadImages),
-                          child: const Text(
-                            'Upload',
+                          SizedBox(height: 4),
+                          Text(
+                            'Direct uploads are recommended from client side like mobile or web app. This upload consist on client apps first requests the server for an upload url to upload to without token or api key authorization and then uploads the image to the upload url returned by server.',
                             textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 Padding(
@@ -310,7 +361,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                         child: ElevatedButton(
                           onPressed: loading || cloudflareImages.isEmpty
                               ? null
-                              : () => onClick(deleteUploadedImages),
+                              : () => onClick(deleteUploadedData),
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.resolveWith<Color?>(
@@ -329,6 +380,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                     ],
                   ),
                 ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom,),
               ],
             ),
           ),
@@ -342,7 +394,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     );
   }
 
-  onNewImages(List<String> filePaths) {
+  void onNewImages(List<String> filePaths) {
     if (filePaths.isNotEmpty) {
       for (final path in filePaths) {
         if (path.isNotEmpty) {
@@ -358,7 +410,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     return await File(path).readAsBytes();
   }
 
-  Future<void> doMultipleUpload() async {
+  Future<void> doMultipleAuthenticatedUpload() async {
     try {
       List<DataTransmit<String>>? contentFromPaths;
       List<DataTransmit<Uint8List>>? contentFromBytes;
@@ -404,9 +456,69 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     }
   }
 
-  Future<void> upload() async {
+  Future<void> doMultipleDirectUpload() async {
+    try {
+      List<DataTransmit> contents = [];
+
+      switch (fileSource) {
+        case FileSource.path:
+          contents =
+              dataImages.map((data) => data.dataTransmit).toList();
+          break;
+        case FileSource.bytes:
+          contents = await Future.wait(dataImages.map((data) async =>
+              DataTransmit<Uint8List>(
+                  data: await getFileBytes(data.dataTransmit.data),
+                  progressCallback: data.dataTransmit.progressCallback)));
+          break;
+        default:
+      }
+
+      for (final content in contents) {
+        DataTransmit<String>? contentFromPath;
+        DataTransmit<Uint8List>? contentFromBytes;
+        if(content.data is String) {
+          contentFromPath = content as DataTransmit<String>;
+        } else if(content.data is Uint8List) {
+          contentFromBytes = content as DataTransmit<Uint8List>;
+        }
+        final responseCreateDirectUpload = await cloudflare.imageAPI.createDirectUpload();
+        if(responseCreateDirectUpload.isSuccessful && responseCreateDirectUpload.body != null) {
+          final responseUpload = await cloudflare.imageAPI.directUpload(
+            dataUploadDraft: responseCreateDirectUpload.body!,
+            contentFromPath: contentFromPath,
+            contentFromBytes: contentFromBytes,
+          );
+          setState(() {});
+          if (responseUpload.isSuccessful && responseUpload.body != null) {
+            cloudflareImages.add(responseUpload.body!);
+          } else {
+            if (responseUpload.error is CloudflareErrorResponse &&
+                (responseUpload.error as CloudflareErrorResponse).messages.isNotEmpty) {
+              errorMessage =
+                  (responseUpload.error as CloudflareErrorResponse).messages.first;
+            } else {
+              errorMessage = responseUpload.error?.toString();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> authenticatedUpload() async {
     showLoading();
-    return doMultipleUpload();
+    return doMultipleAuthenticatedUpload();
+  }
+
+  Future<void> directUpload() async {
+    showLoading();
+    return doMultipleDirectUpload();
   }
 
   Future<void> doMultipleDelete() async {
@@ -440,7 +552,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   }
 
   Future<void> delete() async {
-    return doMultipleDelete();
+    showLoading();
+    await doMultipleDelete();
   }
 
   void onClick(int id) async {
@@ -460,10 +573,13 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
             },
           );
           break;
-        case uploadImages:
-          await upload();
+        case doAuthenticatedUpload:
+          await authenticatedUpload();
           break;
-        case deleteUploadedImages:
+        case doDirectUpload:
+          await directUpload();
+          break;
+        case deleteUploadedData:
           await delete();
           break;
       }
@@ -476,9 +592,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     }
   }
 
-  showLoading() => setState(() => loading = true);
+  void showLoading() => setState(() => loading = true);
 
-  hideLoading() => setState(() => loading = false);
+  void hideLoading() => setState(() => loading = false);
 
   Future<List<String>> handleImagePickerResponse(Future getImageCall) async {
     Map<String, dynamic> resource =
