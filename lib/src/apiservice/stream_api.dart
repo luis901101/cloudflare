@@ -2,6 +2,7 @@ import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/apiservice/tus/store.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -144,13 +145,13 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files
   Future<TusAPI> tusStream({
     /// Video file to stream
-    DataTransmit<File>? contentFromFile,
+    File? file,
 
     /// Path to the video file to stream
-    DataTransmit<String>? contentFromPath,
+    String? path,
 
     /// Video byte array representation to stream
-    DataTransmit<Uint8List>? contentFromBytes,
+    Uint8List? bytes,
 
     /// The name of the video in the dashboard.
     String? name,
@@ -194,40 +195,47 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// A Watermark object with the id of an existing watermark profile
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
+
+    /// The size in bytes of the portions of the file that will be uploaded in
+    /// chunks.
+    ///
+    /// Min value: 5242880 bytes which is 5 MB
+    /// Max value: 209715200 bytes which is 200 MB
+    /// e.g: For reliable connections you can use 52428800 bytes which is 50 MB
+    int? chunkSize,
+
+    /// Sets the storage to be used to allow resuming uploads
+    /// See [TusMemoryStore] or [TusPersistentStore]
+    ///
+    /// Default value: [TusMemoryStore]
+    TusStore? tusStore,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        contentFromFile != null ||
-            contentFromPath != null ||
-            contentFromBytes != null,
+        file != null ||
+            path != null ||
+            bytes != null,
         'One of the content must be specified.');
 
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
-    }
+    if (path != null) file ??= File(path);
 
     /// Web support
-    if(contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-          data: contentFromFile.data.readAsBytesSync(),
-          progressCallback: contentFromFile.progressCallback);
-      contentFromFile = null;
+    if(file != null && PlatformUtils.isWeb) {
+      bytes ??= file.readAsBytesSync();
+      file = null;
     }
 
-    final ProgressCallback? progressCallback;
-    final XFile file;
-    if (contentFromFile != null) {
-      file = XFile(contentFromFile.data.path);
-      progressCallback = contentFromFile.progressCallback;
+    final XFile xFile;
+    if (file != null) {
+      xFile = XFile(file.path);
     } else {
-      file = XFile.fromData(contentFromBytes!.data);
-      progressCallback = contentFromBytes.progressCallback;
+      xFile = XFile.fromData(bytes!);
     }
     final tusAPI = TusAPI(
       dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
-      file: file,
+      file: xFile,
+      store: tusStore,
+      chunkSize: chunkSize,
       headers: restAPI.headers,
       metadata: {
         Params.name: name,
@@ -235,7 +243,8 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         Params.allowedOrigins: allowedOrigins,
         Params.requireSignedURLs: requireSignedURLs,
         Params.watermark: watermark?.id,
-      }
+      },
+      timeout: restAPI.timeout
     );
     return tusAPI;
   }
@@ -336,13 +345,13 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     required DataUploadDraft dataUploadDraft,
 
     /// Video file to stream
-    DataTransmit<File>? contentFromFile,
+    File? file,
 
     /// Path to the video file to stream
-    DataTransmit<String>? contentFromPath,
+    String? path,
 
     /// Video byte array representation to stream
-    DataTransmit<Uint8List>? contentFromBytes,
+    Uint8List? bytes,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -391,47 +400,46 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// Max value: 209715200 bytes which is 200 MB
     /// e.g: For reliable connections you can use 52428800 bytes which is 50 MB
     int? chunkSize,
+
+    /// Sets the storage to be used to allow resuming uploads
+    /// See [TusMemoryStore] or [TusPersistentStore]
+    ///
+    /// Default value: [TusMemoryStore]
+    TusStore? tusStore,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-    contentFromFile != null ||
-        contentFromPath != null ||
-        contentFromBytes != null,
+    file != null ||
+        path != null ||
+        bytes != null,
     'One of the content must be specified.');
 
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
-    }
+    if (path != null) file ??= File(path);
 
     /// Web support
-    if(contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-          data: contentFromFile.data.readAsBytesSync(),
-          progressCallback: contentFromFile.progressCallback);
-      contentFromFile = null;
+    if(file != null && PlatformUtils.isWeb) {
+      bytes ??= file.readAsBytesSync();
+      file = null;
     }
 
-    final ProgressCallback? progressCallback;
-    final XFile file;
-    if (contentFromFile != null) {
-      file = XFile(contentFromFile.data.path);
-      progressCallback = contentFromFile.progressCallback;
+    final XFile xFile;
+    if (file != null) {
+      xFile = XFile(file.path);
     } else {
-      file = XFile.fromData(contentFromBytes!.data);
-      progressCallback = contentFromBytes.progressCallback;
+      xFile = XFile.fromData(bytes!);
     }
     final tusAPI = TusAPI(
       dataUploadDraft: dataUploadDraft,
-      file: file,
+      file: xFile,
+      store: tusStore,
       chunkSize: chunkSize,
       metadata: {
         Params.thumbnailTimestampPct: thumbnailTimestampPct,
         Params.allowedOrigins: allowedOrigins,
         Params.requireSignedURLs: requireSignedURLs,
         Params.watermark: watermark?.id,
-      }
+      },
+      timeout: restAPI.timeout,
     );
     return tusAPI;
   }

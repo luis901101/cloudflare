@@ -1,6 +1,7 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'data_upload_draft.g.dart';
@@ -21,13 +22,25 @@ class DataUploadDraft extends Jsonable<DataUploadDraft> {
 
   const DataUploadDraft({
     String? id,
-    String? uid,
+    @CopyWithField(immutable: true) String? uid,
     String? uploadURL,
     this.watermark,
   }) :
     id = id ?? uid ?? '',
     uploadURL = uploadURL ?? ''
   ;
+
+  DataUploadDraft copyWith({
+    String? id,
+    String? uploadURL,
+    Watermark? watermark,
+  }) {
+    return DataUploadDraft(
+      id: id ?? this.id,
+      uploadURL: uploadURL ?? this.uploadURL,
+      watermark: watermark ?? this.watermark,
+    );
+  }
 
   @override
   Map<String, dynamic> toJson() => _$DataUploadDraftToJson(this);

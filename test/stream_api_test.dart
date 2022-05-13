@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cloudflare/src/apiservice/tus/exceptions.dart';
+import 'package:cloudflare/src/apiservice/tus/store.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -10,11 +13,14 @@ import 'utils/matchers.dart';
 
 /// StreamAPI tests on each Cloudflare Stream API endpoint.
 /// These tests ensures that every streamed test video gets deleted.
+///
+// ignore_for_file: void_checks
 void main() async {
   await init();
   final File videoFile = File(Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? ''),
       videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
-      videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? '');
+      videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
+      videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
   final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
   Set<String> videoIds = {};
 
@@ -50,9 +56,7 @@ void main() async {
           contentFromFile: DataTransmit<File>(
               data: videoFile,
               progressCallback: (count, total) {
-                final split = videoFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple stream video: $filename from file progress: $count/$total');
+                print('Simple stream video: ${p.basename(videoFile.path)} from file progress: $count/$total');
               }));
       expect(response, StreamVideoMatcher());
       addId(response.body?.id);
@@ -66,9 +70,7 @@ void main() async {
           contentFromPath: DataTransmit<String>(
               data: videoFile.path,
               progressCallback: (count, total) {
-                final split = videoFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple stream video: $filename from path progress: $count/$total');
+                print('Simple stream video: ${p.basename(videoFile.path)} from path progress: $count/$total');
               }));
       expect(response, StreamVideoMatcher());
       addId(response.body?.id);
@@ -82,9 +84,7 @@ void main() async {
           contentFromBytes: DataTransmit<Uint8List>(
               data: videoFile.readAsBytesSync(),
               progressCallback: (count, total) {
-                final split = videoFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple stream video: $filename from bytes progress: $count/$total');
+                print('Simple stream video: ${p.basename(videoFile.path)} from bytes progress: $count/$total');
               }));
       expect(response, StreamVideoMatcher());
       addId(response.body?.id);
@@ -117,10 +117,8 @@ void main() async {
         contents.add(DataTransmit<File>(
             data: file,
             progressCallback: (count, total) {
-              final split = file.path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple stream video from file: $filename progress: $count/$total');
+                  'Multiple stream video from file: ${p.basename(file.path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.streamAPI.streamMultiple(
@@ -145,10 +143,8 @@ void main() async {
         contents.add(DataTransmit<String>(
             data: path,
             progressCallback: (count, total) {
-              final split = path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple stream video from path: $filename progress: $count/$total');
+                  'Multiple stream video from path: ${p.basename(path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.streamAPI.streamMultiple(
@@ -173,10 +169,8 @@ void main() async {
         contents.add(DataTransmit<Uint8List>(
             data: file.readAsBytesSync(),
             progressCallback: (count, total) {
-              final split = file.path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple stream video from bytes: $filename progress: $count/$total');
+                  'Multiple stream video from bytes: ${p.basename(file.path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.streamAPI.streamMultiple(
@@ -281,25 +275,37 @@ void main() async {
           fail('No video file available to stream');
         }
         final tusAPI = await cloudflare.streamAPI.tusStream(
-          contentFromFile: DataTransmit(data: videoFile),
+          file: videoFile,
           name: 'test-video-upload-authenticated',
+          tusStore: TusPersistentStore(''),
         );
         bool isComplete = false;
         onProgress(count, total) {
           if(isComplete) return;
-          print('tus authenticated video stream from file: $videoFile progress: $count/$total');
+          print('tus authenticated video stream from file: ${p.basename(videoFile.path)} progress: $count/$total');
         }
         final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
-        tusAPI.upload(
-          onProgress: testProgressCallback,
-          onComplete: (cloudflareStreamVideo) {
-            addId(cloudflareStreamVideo?.id);
-            print('tus authenticated video stream completed videoId: ${cloudflareStreamVideo?.id}');
-            isComplete = true;
-            testProgressCallback(0, 0);
-          }
-        );
-      }, timeout: Timeout(Duration(minutes: 5)));
+        try {
+          await tusAPI.upload(
+            onProgress: testProgressCallback,
+            onComplete: (cloudflareStreamVideo) {
+              addId(cloudflareStreamVideo?.id);
+              print('tus authenticated video stream completed videoId: ${cloudflareStreamVideo?.id}');
+              isComplete = true;
+              testProgressCallback(0, 0);
+            }
+          );
+        } on ProtocolException catch(e){
+          print('Response status code: ${e.response.statusCode}');
+          print('Response status reasonPhrase: ${e.response.reasonPhrase}');
+          print('Response body: ${e.response.body}');
+          print('Response headers: ${e.response.headers}');
+          rethrow;
+        } catch(e) {
+          print(e);
+          rethrow;
+        }
+      }, timeout: Timeout(Duration(minutes: 50)));
 
       test('Create authenticated direct stream video URL using tus protocol', () async {
         if (!videoFile.existsSync()) {
@@ -330,17 +336,17 @@ void main() async {
         if (dataUploadDraft?.uploadURL.isEmpty ?? true) {
           fail('No streamURL available to stream to');
         }
-        if (!videoFile.existsSync()) {
+        if (!videoFile3.existsSync()) {
           fail('No video file available to stream');
         }
         final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: dataUploadDraft!,
-          contentFromFile: DataTransmit(data: videoFile),
+          file: videoFile,
         );
         bool isComplete = false;
         onProgress(count, total) {
           if(isComplete) return;
-          print('tus authenticated video stream from file: $videoFile progress: $count/$total');
+          print('tus direct video stream from file: $videoFile progress: $count/$total');
         }
         final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
         tusAPI.upload(
@@ -352,6 +358,9 @@ void main() async {
             testProgressCallback(0, 0);
             expect(cloudflareStreamVideo, isNotNull, reason: 'CloudFlareStreamVideo must not be null after tus stream upload');
             expect(cloudflareStreamVideo?.id, isNotEmpty, reason: 'CloudFlareStreamVideo id must not be empty after tus stream upload');
+          },
+          onTimeoutCallback: () {
+            print('Request timeout');
           }
         );
 

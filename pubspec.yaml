@@ -12,7 +12,9 @@ dependencies:
   http: ^0.13.4
   dio: ^4.0.4
   http_parser: ^4.0.0
-  tus_client: ^1.0.0
+  cross_file: ^0.3.3
+  hive: ^2.1.0
+#  tus_client: ^1.0.0
 #  tus_client_file_store: #^1.0.0 Null safety version is not published but code is already migrated
 #    git:
 #      url: https://github.com/jjmutumi/tus_client_file_store.git

@@ -14,8 +14,7 @@ class PlatformUtils {
 
   static bool get isIOS {
     try {
-      Platform.isIOS;
-      return true;
+      return Platform.isIOS;
     } catch (e) {
       print(e);
     }
@@ -24,8 +23,7 @@ class PlatformUtils {
 
   static bool get isAndroid {
     try {
-      Platform.isAndroid;
-      return true;
+      return Platform.isAndroid;
     } catch (e) {
       print(e);
     }

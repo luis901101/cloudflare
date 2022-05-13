@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -49,9 +50,7 @@ void main() async {
           contentFromFile: DataTransmit<File>(
               data: imageFile,
               progressCallback: (count, total) {
-                final split = imageFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple upload image: $filename from file progress: $count/$total');
+                print('Simple upload image: ${p.basename(imageFile.path)} from file progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -65,9 +64,7 @@ void main() async {
           contentFromPath: DataTransmit<String>(
               data: imageFile.path,
               progressCallback: (count, total) {
-                final split = imageFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple upload image: $filename from path progress: $count/$total');
+                print('Simple upload image: ${p.basename(imageFile.path)} from path progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -81,9 +78,7 @@ void main() async {
           contentFromBytes: DataTransmit<Uint8List>(
               data: imageFile.readAsBytesSync(),
               progressCallback: (count, total) {
-                final split = imageFile.path.split(Platform.pathSeparator);
-                String? filename = split.isNotEmpty ? split.last : null;
-                print('Simple upload image: $filename from bytes progress: $count/$total');
+                print('Simple upload image: ${p.basename(imageFile.path)} from bytes progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -116,10 +111,8 @@ void main() async {
         contents.add(DataTransmit<File>(
             data: file,
             progressCallback: (count, total) {
-              final split = file.path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple upload image from file: $filename progress: $count/$total');
+                  'Multiple upload image from file: ${p.basename(file.path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.imageAPI.uploadMultiple(
@@ -144,10 +137,8 @@ void main() async {
         contents.add(DataTransmit<String>(
             data: path,
             progressCallback: (count, total) {
-              final split = path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple upload image from path: $filename progress: $count/$total');
+                  'Multiple upload image from path: ${p.basename(path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.imageAPI.uploadMultiple(
@@ -172,10 +163,8 @@ void main() async {
         contents.add(DataTransmit<Uint8List>(
             data: file.readAsBytesSync(),
             progressCallback: (count, total) {
-              final split = file.path.split(Platform.pathSeparator);
-              String? filename = split.isNotEmpty ? split.last : null;
               print(
-                  'Multiple upload image from bytes: $filename progress: $count/$total');
+                  'Multiple upload image from bytes: ${p.basename(file.path)} progress: $count/$total');
             }));
       }
       final responses = await cloudflare.imageAPI.uploadMultiple(
