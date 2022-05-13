@@ -3,8 +3,7 @@ import 'dart:convert' show base64, utf8;
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/apiservice/tus/client.dart';
-import 'package:cloudflare/src/apiservice/tus/store.dart';
+import 'package:tusc/tusc.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/utils/map_utils.dart';
 import 'package:cross_file/cross_file.dart' show XFile;
@@ -24,14 +23,11 @@ class TusAPI {
 
   DataUploadDraft _dataUploadDraft;
   late final TusClient _tusClient;
-  dio.ProgressCallback? _onProgress;
-  Function(CloudflareStreamVideo? cloudflareStreamVideo)? _onComplete;
-  Function()? _onTimeoutCallback;
 
   TusAPI({
     required DataUploadDraft dataUploadDraft,
     required XFile file,
-    TusStore? store,
+    TusCache? cache,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? metadata,
     int? chunkSize,
@@ -41,10 +37,10 @@ class TusAPI {
     _tusClient = TusClient(
       url: dataUploadDraft.uploadURL,
       file: file,
-      store: store ?? TusMemoryStore(),
+      cache: cache ?? TusMemoryCache(),
       headers: MapUtils.parseMapDynamicHeaders(headers),
       metadata: MapUtils.parseMapDynamicHeaders(metadata),
-      chunkSize: chunkSize ?? 5 * 1024 * 1024,
+      chunkSize: chunkSize ?? 5.MB,
       timeout: timeout,
     );
   }
@@ -62,19 +58,16 @@ class TusAPI {
   String get uploadMetadata => _tusClient.uploadMetadata;
 
   /// Check if possible to resume an already started upload
-  Future<bool> canResume() => _tusClient.resume();
+  Future<bool> canResume() => _tusClient.canResume();
 
   /// Start or resume an upload in chunks
   /// It throws [ProtocolException] on server error
-  Future<void> upload({
+  Future<void> startUpload({
     dio.ProgressCallback? onProgress,
     Function(CloudflareStreamVideo? cloudflareStreamVideo)? onComplete,
     Function()? onTimeoutCallback,
   }) {
-    _onProgress = onProgress;
-    _onComplete = onComplete;
-    _onTimeoutCallback = onTimeoutCallback;
-    return _tusClient.upload(
+    return _tusClient.startUpload(
       onProgress: (count, total, response) {
         onProgress?.call(count, total);
       },
@@ -91,17 +84,13 @@ class TusAPI {
           onComplete(cloudflareStreamVideo);
         }
       },
-      onTimeoutCallback: _onTimeoutCallback,
+      onTimeout: onTimeoutCallback,
     );
   }
 
   /// Pause the current upload
-  void pause() => _tusClient.pause();
+  Future? pauseUpload() => _tusClient.pauseUpload();
 
   /// Resume the current upload
-  void resume() => upload(
-    onProgress: _onProgress,
-    onComplete: _onComplete,
-    onTimeoutCallback: _onTimeoutCallback,
-  );
+  Future<void> resumeUpload() => _tusClient.resumeUpload();
 }

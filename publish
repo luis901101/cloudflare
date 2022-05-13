@@ -1,1 +1,1 @@
-flutter pub publish -v
+dart pub publish $1

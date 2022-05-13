@@ -4,29 +4,23 @@ version: 0.1.0+3
 homepage: https://github.com/luis901101/cloudflare
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
+  sdk: '>=2.14.0 <3.0.0'
 
 dependencies:
   json_annotation: ^4.5.0
   retrofit: ^3.0.0
   http: ^0.13.4
   dio: ^4.0.4
-  http_parser: ^4.0.0
   cross_file: ^0.3.3
-  hive: ^2.1.0
-#  tus_client: ^1.0.0
-#  tus_client_file_store: #^1.0.0 Null safety version is not published but code is already migrated
-#    git:
-#      url: https://github.com/jjmutumi/tus_client_file_store.git
-#      ref: cda2e0738b9532ada40b528c7dff54fb3e40563b
+  path: ^1.0.0
+  tusc: ^1.0.0
+#    path: ../tusc
   meta: ^1.0.0
-  collection: ^1.15.0
   copy_with_extension: ^4.0.0
 
 dev_dependencies:
   lints: ^1.0.1
   test: ^1.21.1
-  flutter_lints: ^1.0.4
   json_serializable: ^6.2.0
   retrofit_generator: ^4.0.1
   copy_with_extension_gen: ^4.0.1

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:cloudflare/src/apiservice/tus/exceptions.dart';
-import 'package:cloudflare/src/apiservice/tus/store.dart';
+import 'package:tusc/tusc.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
@@ -256,7 +255,7 @@ void main() async {
             contentFromFile: DataTransmit<File>(
                 data: videoFile,
                 progressCallback: (count, total) {
-                  print('Video stream to direct stream URL from file: $videoFile progress: $count/$total');
+                  print('Video stream to direct stream URL from file: ${p.basename(videoFile.path)} progress: $count/$total');
                 })
         );
         expect(response, StreamVideoMatcher());
@@ -277,7 +276,7 @@ void main() async {
         final tusAPI = await cloudflare.streamAPI.tusStream(
           file: videoFile,
           name: 'test-video-upload-authenticated',
-          tusStore: TusPersistentStore(''),
+          cache: TusPersistentCache(''),
         );
         bool isComplete = false;
         onProgress(count, total) {
@@ -286,7 +285,7 @@ void main() async {
         }
         final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
         try {
-          await tusAPI.upload(
+          await tusAPI.startUpload(
             onProgress: testProgressCallback,
             onComplete: (cloudflareStreamVideo) {
               addId(cloudflareStreamVideo?.id);
@@ -341,15 +340,15 @@ void main() async {
         }
         final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: dataUploadDraft!,
-          file: videoFile,
+          file: videoFile3,
         );
         bool isComplete = false;
         onProgress(count, total) {
           if(isComplete) return;
-          print('tus direct video stream from file: $videoFile progress: $count/$total');
+          print('tus direct video stream from file: ${p.basename(videoFile3.path)} progress: $count/$total');
         }
         final testProgressCallback = expectAsyncUntil2(onProgress, () => isComplete);
-        tusAPI.upload(
+        tusAPI.startUpload(
           onProgress: testProgressCallback,
           onComplete: (cloudflareStreamVideo) {
             addId(cloudflareStreamVideo?.id);
@@ -366,12 +365,12 @@ void main() async {
 
         await Future.delayed(const Duration(seconds: 2), () {
           print('Upload paused');
-          tusAPI.pause();
+          tusAPI.pauseUpload();
         });
 
         await Future.delayed(const Duration(seconds: 4), () {
           print('Upload resumed');
-          tusAPI.resume();
+          tusAPI.resumeUpload();
         });
 
       }, timeout: Timeout(Duration(minutes: 5)));

@@ -23,7 +23,7 @@ flutter pub add cloudflare
 This command will add **cloudflare** to the **pubspec.yaml** of your project.
 Finally you just have to run:
 
-`dart pub get` **or** `flutter pub get` depending on the project type to download the dependency to your pub-cache
+`dart pub get` **or** `flutter pub get` depending on the project type and this will download the dependency to your pub-cache
 
 ## How to use
 ### **Very simple, just build an instance of Cloudflare SDK like this:**

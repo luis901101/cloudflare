@@ -2,7 +2,7 @@ import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/apiservice/tus/store.dart';
+import 'package:tusc/tusc.dart' as tus;
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/data_upload_draft.dart';
@@ -208,7 +208,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// See [TusMemoryStore] or [TusPersistentStore]
     ///
     /// Default value: [TusMemoryStore]
-    TusStore? tusStore,
+    tus.TusCache? cache,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -234,7 +234,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     final tusAPI = TusAPI(
       dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
       file: xFile,
-      store: tusStore,
+      cache: cache,
       chunkSize: chunkSize,
       headers: restAPI.headers,
       metadata: {
@@ -405,7 +405,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// See [TusMemoryStore] or [TusPersistentStore]
     ///
     /// Default value: [TusMemoryStore]
-    TusStore? tusStore,
+    tus.TusCache? cache,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -431,7 +431,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     final tusAPI = TusAPI(
       dataUploadDraft: dataUploadDraft,
       file: xFile,
-      store: tusStore,
+      cache: cache,
       chunkSize: chunkSize,
       metadata: {
         Params.thumbnailTimestampPct: thumbnailTimestampPct,
