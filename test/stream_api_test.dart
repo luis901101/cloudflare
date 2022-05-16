@@ -21,10 +21,10 @@ void main() async {
       videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
       videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
   final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
-  Set<String> videoIds = {};
+  Set<String> cacheIds = {};
 
   void addId(String? id) {
-    if(id != null) videoIds.add(id);
+    if(id != null) cacheIds.add(id);
   }
 
   test('Handling video from url tests', (){
@@ -401,7 +401,7 @@ void main() async {
   });
 
   test('Delete video test', () async {
-    final videoId = videoIds.isNotEmpty ? videoIds.first : null;
+    final videoId = cacheIds.isNotEmpty ? cacheIds.first : null;
     if (videoId == null) {
       fail('No video available to delete');
     }
@@ -409,25 +409,25 @@ void main() async {
       id: videoId,
     );
     expect(response, ResponseMatcher());
-    videoIds.remove(videoId);
+    cacheIds.remove(videoId);
   });
 
   test('Delete multiple videos', () async {
     /// This code below is not part of the tests and should remain commented, be careful.
     // final responseList = await cloudflare.streamAPI.getAll();
     // if(responseList.isSuccessful && (responseList.body?.isNotEmpty ?? false)) {
-    //   videoIds = responseList.body!.map((e) => e.id).toSet();
+    //   cacheIds = responseList.body!.map((e) => e.id).toSet();
     // }
     
-    if (videoIds.isEmpty) {
+    if (cacheIds.isEmpty) {
       fail('There are no streamed videos to test multi delete.');
     }
 
     final responses = await cloudflare.streamAPI.deleteMultiple(
-      ids: videoIds.toList(),
+      ids: cacheIds.toList(),
     );
     int deleted = responses.where((response) => response.isSuccessful).length;
-    print('Deleted: $deleted of ${videoIds.length}');
+    print('Deleted: $deleted of ${cacheIds.length}');
     for (final response in responses) {
       expect(response, ResponseMatcher());
     }

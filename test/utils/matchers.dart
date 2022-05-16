@@ -1,4 +1,5 @@
 import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/entity/cloudflare_live_input.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
@@ -59,5 +60,17 @@ class StreamVideoMatcher extends ResponseMatcher {
     if (response is! CloudflareHTTPResponse<CloudflareStreamVideo?>) return false;
     return response.body != null && response.body!.thumbnail.isNotEmpty &&
         response.body!.preview.isNotEmpty;
+  }
+}
+
+class LiveInputMatcher extends ResponseMatcher {
+  LiveInputMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    super.matches(response, matchState);
+    if (response is! CloudflareHTTPResponse<CloudflareLiveInput?>) return false;
+    return response.body != null && response.body!.id.isNotEmpty &&
+        response.body!.rtmps.streamKey.isNotEmpty;
   }
 }

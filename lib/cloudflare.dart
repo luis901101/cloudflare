@@ -5,6 +5,7 @@ library cloudflare;
 //Imports
 import 'dart:io';
 import 'package:cloudflare/src/apiservice/image_api.dart';
+import 'package:cloudflare/src/apiservice/live_input_api.dart';
 import 'package:cloudflare/src/apiservice/stream_api.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/utils/callbacks.dart';
@@ -83,9 +84,10 @@ class Cloudflare {
   /// Not supported in Web
   final HttpClient? httpClient;
 
-  /// Image API
+  /// APIs
   late final ImageAPI imageAPI;
   late final StreamAPI streamAPI;
+  late final LiveInputAPI liveInputAPI;
   bool _initialized = false;
 
   /// Cloudflare brings you full access to different apis like ImageAPI and
@@ -144,6 +146,7 @@ class Cloudflare {
 
     imageAPI = ImageAPI(restAPI: restAPI, accountId: accountId);
     streamAPI = StreamAPI(restAPI: restAPI, accountId: accountId);
+    liveInputAPI = LiveInputAPI(restAPI: restAPI, accountId: accountId);
     _initialized = true;
   }
 }

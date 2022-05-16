@@ -20,6 +20,9 @@ abstract class _$CloudflareLiveInputCWProxy {
     DateTime? modified,
     LiveInputRecording? recording,
     RTMPS? rtmps,
+    RTMPS? rtmpsPlayback,
+    SRT? srt,
+    SRT? srtPlayback,
   });
 }
 
@@ -44,6 +47,9 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
     Object? modified = const $CopyWithPlaceholder(),
     Object? recording = const $CopyWithPlaceholder(),
     Object? rtmps = const $CopyWithPlaceholder(),
+    Object? rtmpsPlayback = const $CopyWithPlaceholder(),
+    Object? srt = const $CopyWithPlaceholder(),
+    Object? srtPlayback = const $CopyWithPlaceholder(),
   }) {
     return CloudflareLiveInput(
       created: created == const $CopyWithPlaceholder()
@@ -70,6 +76,18 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
           ? _value.rtmps
           // ignore: cast_nullable_to_non_nullable
           : rtmps as RTMPS?,
+      rtmpsPlayback: rtmpsPlayback == const $CopyWithPlaceholder()
+          ? _value.rtmpsPlayback
+          // ignore: cast_nullable_to_non_nullable
+          : rtmpsPlayback as RTMPS?,
+      srt: srt == const $CopyWithPlaceholder()
+          ? _value.srt
+          // ignore: cast_nullable_to_non_nullable
+          : srt as SRT?,
+      srtPlayback: srtPlayback == const $CopyWithPlaceholder()
+          ? _value.srtPlayback
+          // ignore: cast_nullable_to_non_nullable
+          : srtPlayback as SRT?,
     );
   }
 }
@@ -97,6 +115,15 @@ CloudflareLiveInput _$CloudflareLiveInputFromJson(Map<String, dynamic> json) =>
       rtmps: json['rtmps'] == null
           ? null
           : RTMPS.fromJson(json['rtmps'] as Map<String, dynamic>),
+      rtmpsPlayback: json['rtmpsPlayback'] == null
+          ? null
+          : RTMPS.fromJson(json['rtmpsPlayback'] as Map<String, dynamic>),
+      srt: json['srt'] == null
+          ? null
+          : SRT.fromJson(json['srt'] as Map<String, dynamic>),
+      srtPlayback: json['srtPlayback'] == null
+          ? null
+          : SRT.fromJson(json['srtPlayback'] as Map<String, dynamic>),
       recording: json['recording'] == null
           ? null
           : LiveInputRecording.fromJson(
@@ -118,6 +145,9 @@ Map<String, dynamic> _$CloudflareLiveInputToJson(CloudflareLiveInput instance) {
   val['created'] = instance.created.toIso8601String();
   val['modified'] = instance.modified.toIso8601String();
   val['rtmps'] = instance.rtmps;
+  val['rtmpsPlayback'] = instance.rtmpsPlayback;
+  val['srt'] = instance.srt;
+  val['srtPlayback'] = instance.srtPlayback;
   val['recording'] = instance.recording;
   return val;
 }

@@ -17,10 +17,10 @@ void main() async {
       imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
       imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
   final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
-  Set<String> imageIds = {};
+  Set<String> cacheIds = {};
 
   void addId(String? id) {
-    if(id != null) imageIds.add(id);
+    if(id != null) cacheIds.add(id);
   }
 
   test('Handling image from url tests', (){
@@ -330,7 +330,7 @@ void main() async {
         metadata: metadata,
       );
       expect(response, ImageMatcher());
-      imageIds.remove(imageId);//After image updated the imageId changes
+      cacheIds.remove(imageId);//After image updated the imageId changes
       addId(response.body?.id);
       expect(response.body!.requireSignedURLs, false);
       expect(response.body!.meta, metadata);
@@ -338,7 +338,7 @@ void main() async {
   });
 
   test('Delete image test', () async {
-    final imageId = imageIds.isNotEmpty ? imageIds.first : null;
+    final imageId = cacheIds.isNotEmpty ? cacheIds.first : null;
     if (imageId == null) {
       fail('No image available to delete');
     }
@@ -346,25 +346,25 @@ void main() async {
       id: imageId,
     );
     expect(response, ResponseMatcher());
-    imageIds.remove(imageId);
+    cacheIds.remove(imageId);
   });
   
   test('Delete multiple images', () async {
     /// This code below is not part of the tests and should remain commented, be careful.
     // final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
     // if(responseList.isSuccessful && (responseList.body?.isNotEmpty ?? false)) {
-    //   imageIds = responseList.body!.map((e) => e.id).toSet();
+    //   cacheIds = responseList.body!.map((e) => e.id).toSet();
     // }
 
-    if (imageIds.isEmpty) {
+    if (cacheIds.isEmpty) {
       fail('There are no uploaded images to test multi delete.');
     }
 
     final responses = await cloudflare.imageAPI.deleteMultiple(
-      ids: imageIds.toList(),
+      ids: cacheIds.toList(),
     );
     int deleted = responses.where((response) => response.isSuccessful).length;
-    print('Deleted: $deleted of ${imageIds.length}');
+    print('Deleted: $deleted of ${cacheIds.length}');
     for (final response in responses) {
       expect(response, ResponseMatcher());
     }

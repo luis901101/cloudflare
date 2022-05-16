@@ -36,7 +36,9 @@ class LiveInputRecording extends Jsonable<LiveInputRecording> {
   /// e.g: ["example.com"]
   List<String> allowedOrigins;
 
-  /// Duration a live input configured in 'automatic' mode waits before
+  /// Specifies how long a live feed can be disconnected before it results in
+  /// a new video being created.
+  /// A live input configured in 'automatic' mode waits before
   /// determining a recording should transition from live to on-demand. A value
   /// of 0 indicates the platform default should be used. 0 is recommended for
   /// most use cases.

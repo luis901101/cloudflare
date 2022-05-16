@@ -1,5 +1,6 @@
 import 'package:cloudflare/src/entity/live_input_recording.dart';
 import 'package:cloudflare/src/entity/rtmps.dart';
+import 'package:cloudflare/src/entity/srt.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
@@ -44,6 +45,11 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
 
   /// An object that contains RTMPS url and key
   final RTMPS rtmps;
+  final RTMPS rtmpsPlayback;
+
+  /// An object that contains SRT url, streamID and passphrase
+  final SRT srt;
+  final SRT srtPlayback;
 
   /// Control recording the input to a Stream video. Behavior depends on the
   /// mode. In most cases, the video will initially be viewable as a live video
@@ -56,12 +62,18 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
     DateTime? created,
     DateTime? modified,
     RTMPS? rtmps,
+    RTMPS? rtmpsPlayback,
+    SRT? srt,
+    SRT? srtPlayback,
     LiveInputRecording? recording,
   }) :
     id = id ?? '',
     created = created ?? DateTime.now(),
     modified = modified ?? DateTime.now(),
     rtmps = rtmps ?? RTMPS(),
+    rtmpsPlayback = rtmpsPlayback ?? RTMPS(),
+    srt = srt ?? SRT(),
+    srtPlayback = srtPlayback ?? SRT(),
     recording = recording ?? LiveInputRecording()
   ;
 

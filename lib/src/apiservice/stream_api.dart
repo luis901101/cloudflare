@@ -253,7 +253,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// This function is to be used specifically after a video
   /// createDirectStreamUpload has been requested.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  /// Official documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> directStreamUpload({
     /// Information on where to stream upload the video without an API key or token
     required DataUploadDraft dataUploadDraft,
@@ -261,7 +261,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// Video file to upload
     DataTransmit<File>? contentFromFile,
 
-    /// Path to the image file to upload
+    /// Path to the video file to upload
     DataTransmit<String>? contentFromPath,
 
     /// Image byte array representation to upload
@@ -862,7 +862,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert((ids?.isNotEmpty ?? false) || (videos?.isNotEmpty ?? false),
-        'One of ids or images must not be empty.');
+        'One of ids or live inputs must not be empty.');
 
     ids ??= videos?.map((video) => video.id).toList();
 
