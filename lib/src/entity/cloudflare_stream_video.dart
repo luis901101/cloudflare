@@ -211,6 +211,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   final String? liveInput;
 
   CloudflareStreamVideo({
+    String? id,
     DateTime? uploaded,
     int? size,
     this.watermark,
@@ -223,7 +224,6 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     DateTime? modified,
     VideoSize? input,
     String? thumbnail,
-    String? id,
     VideoStatus? status,
     double? duration,
     this.uploadExpiry,

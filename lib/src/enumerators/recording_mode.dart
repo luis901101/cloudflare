@@ -1,0 +1,4 @@
+enum RecordingMode {
+  off,
+  automatic,
+}

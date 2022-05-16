@@ -179,6 +179,7 @@ extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
 CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
         Map<String, dynamic> json) =>
     CloudflareStreamVideo(
+      id: json['uid'] as String?,
       uploaded: json['uploaded'] == null
           ? null
           : DateTime.parse(json['uploaded'] as String),
@@ -203,7 +204,6 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
           ? null
           : VideoSize.fromJson(json['input'] as Map<String, dynamic>),
       thumbnail: json['thumbnail'] as String?,
-      id: json['uid'] as String?,
       status: json['status'] == null
           ? null
           : VideoStatus.fromJson(json['status'] as Map<String, dynamic>),
