@@ -116,6 +116,7 @@ void main() async {
     setUpAll(() async {
       final response = await cloudflare.liveInputAPI.create();
       liveInputId = response.body?.id;
+      addId(response.body?.id);
     });
 
     test('Add an output to a live input', () async {
