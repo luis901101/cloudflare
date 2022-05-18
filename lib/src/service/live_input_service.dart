@@ -1,6 +1,5 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/cloudflare_live_input.dart';
 import 'package:dio/dio.dart' hide Headers;
 import 'package:retrofit/retrofit.dart';
 
@@ -40,5 +39,25 @@ abstract class LiveInputService {
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse> delete({
     @Path() required String id,
+  });
+
+  @POST('/{liveInputId}/outputs')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> addOutput({
+    @Path() required String liveInputId,
+    @Body() required Map<String, dynamic> data,
+  });
+
+  @GET('/{liveInputId}/outputs')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> getOutputs({
+    @Path() required String liveInputId,
+  });
+
+  @DELETE('/{liveInputId}/outputs/{outputId}')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse> removeOutput({
+    @Path() required String liveInputId,
+    @Path() required String outputId,
   });
 }

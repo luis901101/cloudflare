@@ -17,7 +17,7 @@ abstract class _$CloudflareResponseCWProxy {
     List<ErrorInfo>? errors,
     List<String>? messages,
     Pagination? paginationInfo,
-    dynamic? result,
+    dynamic result,
     bool? success,
   });
 }

@@ -4,8 +4,6 @@ import 'dart:typed_data';
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
-import 'package:cloudflare/src/entity/image_stats.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
@@ -348,7 +346,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image identifier
     String? id,
 
-    /// Image object
+    /// Image with the required identifier
     CloudflareImage? image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
@@ -370,7 +368,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image identifier
     String? id,
 
-    /// Image object
+    /// Image with the required identifier
     CloudflareImage? image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
@@ -394,7 +392,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// Image identifier
     String? id,
 
-    /// Image object
+    /// Image with the required identifier
     CloudflareImage? image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
@@ -410,10 +408,10 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Delete a list of images on Cloudflare Images. On success, all copies of the images
   /// are deleted and purged from Cache.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
-    /// List of image ids
+    /// List of image identifiers
     List<String>? ids,
 
-    /// List of image objects
+    /// List of images with their required identifiers
     List<CloudflareImage>? images,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);

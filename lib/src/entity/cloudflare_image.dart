@@ -1,4 +1,3 @@
-import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
@@ -47,7 +46,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// {
   ///   "meta": "metaID"
   /// }
-  @JsonKey(readValue: JsonUtils.stringToMapReadValue) Map? meta;
+  @JsonKey(readValue: Jsonable.stringToMapReadValue) Map? meta;
 
   /// Indicates whether the image can be a accessed only using it's UID.
   /// If set to true, a signed token needs to be generated with a signing key

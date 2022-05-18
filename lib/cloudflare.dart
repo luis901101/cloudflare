@@ -11,22 +11,34 @@ import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/utils/callbacks.dart';
 
 //Exports
+// APIs
 export 'package:cloudflare/src/apiservice/image_api.dart';
 export 'package:cloudflare/src/apiservice/stream_api.dart';
 export 'package:cloudflare/src/apiservice/tus_api.dart';
 
+// Entities
 export 'package:cloudflare/src/entity/cloudflare_image.dart';
+export 'package:cloudflare/src/entity/cloudflare_live_input.dart';
 export 'package:cloudflare/src/entity/cloudflare_response.dart';
 export 'package:cloudflare/src/entity/cloudflare_stream_video.dart';
+export 'package:cloudflare/src/entity/data_upload_draft.dart';
+export 'package:cloudflare/src/entity/image_stats.dart';
+export 'package:cloudflare/src/entity/live_input_output.dart';
+export 'package:cloudflare/src/entity/live_input_recording.dart';
 export 'package:cloudflare/src/entity/media_nft.dart';
+export 'package:cloudflare/src/entity/rtmps.dart';
+export 'package:cloudflare/src/entity/srt.dart';
 export 'package:cloudflare/src/entity/video_playback_info.dart';
 export 'package:cloudflare/src/entity/video_size.dart';
 export 'package:cloudflare/src/entity/video_status.dart';
 export 'package:cloudflare/src/entity/watermark.dart';
 
+// Enums
 export 'package:cloudflare/src/enumerators/media_processing_state.dart';
+export 'package:cloudflare/src/enumerators/recording_mode.dart';
 export 'package:cloudflare/src/enumerators/watermark_position.dart';
 
+// Models
 export 'package:cloudflare/src/model/cloudflare_error_response.dart';
 export 'package:cloudflare/src/model/cloudflare_http_response.dart';
 export 'package:cloudflare/src/model/cloudflare_images_error_codes.dart';
@@ -35,6 +47,7 @@ export 'package:cloudflare/src/model/data_transmit.dart';
 export 'package:cloudflare/src/model/error_info.dart';
 export 'package:cloudflare/src/model/pagination.dart';
 
+// Utils
 export 'package:cloudflare/src/utils/callbacks.dart';
 
 class Cloudflare {

@@ -74,7 +74,7 @@ extension $VideoStatusCopyWith on VideoStatus {
 VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
       state: $enumDecodeNullable(_$MediaProcessingStateEnumMap, json['state'],
           unknownValue: MediaProcessingState.unknown),
-      pctComplete: JsonUtils.intReadValue(json, 'pctComplete') as int?,
+      pctComplete: Jsonable.intReadValue(json, 'pctComplete') as int?,
       errorReasonCode: json['errorReasonCode'] as String?,
       errorReasonText: json['errorReasonText'] as String?,
     );

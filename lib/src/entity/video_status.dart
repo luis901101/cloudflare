@@ -1,5 +1,4 @@
 import 'package:cloudflare/src/enumerators/media_processing_state.dart';
-import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -30,7 +29,7 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// min value:0
   /// max value:100
   /// Fixme: This property is officially documented as an integer however actual response is a String with a double representation
-  @JsonKey(readValue: JsonUtils.intReadValue) final int pctComplete;
+  @JsonKey(readValue: Jsonable.intReadValue) final int pctComplete;
 
   /// Provides an error code on why this video failed to encode.
   /// Empty if the state is not in "error". This field should be preferred

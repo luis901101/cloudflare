@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -224,7 +223,7 @@ void main() async {
       });
 
       test('Create authenticated direct image upload URL', () async {
-        expect(response, ResponseMatcher());
+        expect(response, ResponseMatcher(), reason: response.error?.toString());
         expect(dataUploadDraft?.id, isNotEmpty);
         expect(dataUploadDraft?.uploadURL, isNotEmpty);
       });
@@ -260,7 +259,7 @@ void main() async {
 
   test('Get image usage statistics', () async {
     final response = await cloudflare.imageAPI.getStats();
-    expect(response, ResponseMatcher());
+    expect(response, ResponseMatcher(), reason: response.error?.toString());
     print('Stats: ${response.body?.toJson()}');
   });
 
@@ -292,7 +291,7 @@ void main() async {
         fail('No base image available to get by Id');
       }
       final response = await cloudflare.imageAPI.getBase(id: imageId!);
-      expect(response, ResponseMatcher());
+      expect(response, ResponseMatcher(), reason: response.error?.toString());
       expect(response.body, isNotNull);
     });
   });
@@ -342,7 +341,7 @@ void main() async {
     final response = await cloudflare.imageAPI.delete(
       id: imageId,
     );
-    expect(response, ResponseMatcher());
+    expect(response, ResponseMatcher(), reason: response.error?.toString());
     cacheIds.remove(imageId);
   });
   
@@ -363,7 +362,7 @@ void main() async {
     int deleted = responses.where((response) => response.isSuccessful).length;
     print('Deleted: $deleted of ${cacheIds.length}');
     for (final response in responses) {
-      expect(response, ResponseMatcher());
+      expect(response, ResponseMatcher(), reason: response.error?.toString());
     }
   }, timeout: Timeout(Duration(minutes: 10)));
 }

@@ -67,7 +67,7 @@ extension $DataUploadDraftCopyWith on DataUploadDraft {
 
 DataUploadDraft _$DataUploadDraftFromJson(Map<String, dynamic> json) =>
     DataUploadDraft(
-      id: JsonUtils.idReadValue(json, 'id') as String?,
+      id: Jsonable.idReadValue(json, 'id') as String?,
       uploadURL: json['uploadURL'] as String?,
       watermark: json['watermark'] == null
           ? null

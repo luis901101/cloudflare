@@ -1,7 +1,4 @@
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/entity/cloudflare_live_input.dart';
-import 'package:cloudflare/src/entity/live_input_recording.dart';
-import 'package:cloudflare/src/enumerators/recording_mode.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:test/test.dart';
 
@@ -13,8 +10,12 @@ import 'utils/matchers.dart';
 void main() async {
   await init();
   Set<String> cacheIds = {};
+  Set<String> outputCacheIds = {};
   void addId(String? id) {
     if(id != null) cacheIds.add(id);
+  }
+  void addOutputId(String? id) {
+    if(id != null) outputCacheIds.add(id);
   }
 
   group('Create live input tests', () {
@@ -44,14 +45,11 @@ void main() async {
     }, timeout: Timeout(Duration(minutes: 1)));
   });
 
-  group('Retrieve live input tests', () {
-    late final CloudflareHTTPResponse<List<CloudflareLiveInput>?> responseList;
+  group('Get live input tests', () {
     String? liveInputId;
-    setUpAll(() async {
-      responseList = await cloudflare.liveInputAPI.getAll();
-    });
 
     test('Get live input list', () async {
+      final responseList = await cloudflare.liveInputAPI.getAll();
       expect(responseList, ResponseMatcher());
       expect(responseList.body, isNotNull);
       expect(responseList.body, isNotEmpty);
@@ -112,6 +110,59 @@ void main() async {
     });
   });
 
+  group('Outputs tests', () {
+    String? liveInputId;
+    List<LiveInputOutput>? outputs;
+    setUpAll(() async {
+      final response = await cloudflare.liveInputAPI.create();
+      liveInputId = response.body?.id;
+    });
+
+    test('Add an output to a live input', () async {
+      if (liveInputId == null) {
+        fail('No live input available to add an output to');
+      }
+      final response = await cloudflare.liveInputAPI.addOutput(
+        liveInputId: liveInputId,
+        data: LiveInputOutput(
+          url: 'rtmp://a.rtmp.youtube.com/live2',
+          streamKey: 'uzya-f19y-g2g9-a2ee-51j2'
+        )
+      );
+      expect(response, OutputMatcher(), reason: response.error?.toString());
+      addOutputId(response.body?.id);
+    }, timeout: Timeout(Duration(minutes: 1)));
+
+    test('Get the output list associated to a live input', () async {
+      if (liveInputId == null) {
+        fail('No live input available to get output list');
+      }
+      final responseList = await cloudflare.liveInputAPI.getOutputs(
+        liveInputId: liveInputId,
+      );
+      expect(responseList, ResponseMatcher(), reason: responseList.error?.toString());
+      expect(responseList.body, isNotNull);
+      expect(responseList.body, isNotEmpty);
+      outputs = responseList.body!;
+    }, timeout: Timeout(Duration(minutes: 1)));
+
+    test('Remove the outputs associated to a live input', () async {
+      if (liveInputId == null) {
+        fail('No live input available to remove outputs');
+      }
+      if (outputs?.isEmpty ?? true) {
+        fail('No outputs available to remove');
+      }
+      final responses = await cloudflare.liveInputAPI.removeMultipleOutputs(
+        liveInputId: liveInputId,
+        outputs: outputs,
+      );
+      for (final response in responses) {
+        expect(response, ResponseMatcher(), reason: response.error?.toString());
+      }
+    }, timeout: Timeout(Duration(minutes: 1)));
+  });
+
   test('Delete live input test', () async {
     final liveInputId = cacheIds.isNotEmpty ? cacheIds.first : null;
     if (liveInputId == null) {
@@ -120,7 +171,7 @@ void main() async {
     final response = await cloudflare.liveInputAPI.delete(
       id: liveInputId,
     );
-    expect(response, ResponseMatcher());
+    expect(response, ResponseMatcher(), reason: response.error?.toString());
     cacheIds.remove(liveInputId);
   });
 
@@ -141,7 +192,7 @@ void main() async {
     int deleted = responses.where((response) => response.isSuccessful).length;
     print('Deleted: $deleted of ${cacheIds.length}');
     for (final response in responses) {
-      expect(response, ResponseMatcher());
+      expect(response, ResponseMatcher(), reason: response.error?.toString());
     }
   }, timeout: Timeout(Duration(minutes: 10)));
 }

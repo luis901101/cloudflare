@@ -101,7 +101,7 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
       imageDeliveryId: json['imageDeliveryId'] as String?,
       filename: json['filename'] as String?,
       meta:
-          JsonUtils.stringToMapReadValue(json, 'meta') as Map<String, dynamic>?,
+          Jsonable.stringToMapReadValue(json, 'meta') as Map<String, dynamic>?,
       requireSignedURLs: json['requireSignedURLs'] as bool?,
       variants: (json['variants'] as List<dynamic>?)
           ?.map((e) => e as String)

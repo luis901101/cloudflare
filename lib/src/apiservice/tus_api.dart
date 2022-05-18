@@ -4,7 +4,6 @@ import 'package:cloudflare/src/utils/params.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:cloudflare/cloudflare.dart';
 import 'package:tusc/tusc.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/utils/map_utils.dart';
 import 'package:cross_file/cross_file.dart' show XFile;
 

@@ -1,5 +1,4 @@
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -13,7 +12,7 @@ part 'data_upload_draft.g.dart';
 class DataUploadDraft extends Jsonable<DataUploadDraft> {
 
   /// Resource id.
-  @JsonKey(readValue: JsonUtils.idReadValue) final String id;
+  @JsonKey(readValue: Jsonable.idReadValue) final String id;
 
   /// Url to upload resource without API key or token
   final String uploadURL;

@@ -4,7 +4,6 @@ import 'package:tusc/tusc.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -223,7 +222,7 @@ void main() async {
       });
 
       test('Create authenticated direct stream video URL', () async {
-        expect(response, ResponseMatcher());
+        expect(response, ResponseMatcher(), reason: response.error?.toString());
         expect(dataUploadDraft?.id, isNotEmpty);
         expect(dataUploadDraft?.uploadURL, isNotEmpty, reason: 'Just created video stream uploadURL  can\'t be empty');
       });
@@ -311,7 +310,7 @@ void main() async {
           // maxDurationSeconds: 60, //when using tus protocol [maxDurationSeconds] is not required because Cloudflare reserves a loose amount of minutes for the video to be uploaded
         );
         dataUploadDraft = response.body;
-        expect(response, ResponseMatcher());
+        expect(response, ResponseMatcher(), reason: response.error?.toString());
         expect(dataUploadDraft?.id, isNotEmpty);
         expect(dataUploadDraft?.uploadURL, isNotEmpty, reason: 'Just created video stream uploadURL can\'t be empty');
       }, timeout: Timeout(Duration(minutes: 1)));
@@ -402,7 +401,7 @@ void main() async {
     final response = await cloudflare.streamAPI.delete(
       id: videoId,
     );
-    expect(response, ResponseMatcher());
+    expect(response, ResponseMatcher(), reason: response.error?.toString());
     cacheIds.remove(videoId);
   });
 
@@ -423,7 +422,7 @@ void main() async {
     int deleted = responses.where((response) => response.isSuccessful).length;
     print('Deleted: $deleted of ${cacheIds.length}');
     for (final response in responses) {
-      expect(response, ResponseMatcher());
+      expect(response, ResponseMatcher(), reason: response.error?.toString());
     }
   }, timeout: Timeout(Duration(minutes: 10)));
 }

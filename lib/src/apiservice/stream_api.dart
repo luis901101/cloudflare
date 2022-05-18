@@ -5,7 +5,6 @@ import 'package:cloudflare/cloudflare.dart';
 import 'package:tusc/tusc.dart' as tus;
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
@@ -824,7 +823,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// Fetch details of a single video.
   /// Official documentation: https://api.cloudflare.com/#stream-videos-video-details
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> get({
+    /// CloudflareStreamVideo identifier
     String? id,
+
+    /// CloudflareStreamVideo with the required identifier
     CloudflareStreamVideo? video,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
@@ -841,7 +843,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// are deleted.
   /// Official documentation: https://api.cloudflare.com/#stream-videos-delete-video
   Future<CloudflareHTTPResponse> delete({
+    /// CloudflareStreamVideo identifier
     String? id,
+
+    /// CloudflareStreamVideo with the required identifier
     CloudflareStreamVideo? video,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
@@ -857,7 +862,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// Delete a list of videos on Cloudflare Stream. On success, all copies of
   /// the videos are deleted.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
+    /// CloudflareStreamVideo identifiers
     List<String>? ids,
+
+    /// CloudflareStreamVideo with their required identifiers
     List<CloudflareStreamVideo>? videos,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
