@@ -58,6 +58,28 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     return response;
   }
 
+  /// Get the [CloudflareStreamVideo] list associated to a [CloudflareLiveInput]
+  ///
+  /// Official documentation: https://developers.cloudflare.com/stream/stream-live/watch-live-stream/
+  Future<CloudflareHTTPResponse<List<CloudflareStreamVideo>?>> getVideos({
+    /// CloudflareLiveInput identifier
+    String? id,
+
+    /// CloudflareLiveInput with the required identifier
+    CloudflareLiveInput? liveInput,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert(
+    id != null || liveInput != null, 'One of id or liveInput must not be null.');
+    id ??= liveInput?.id;
+    return genericParseResponseAsList(
+      service.getVideos(
+        id: id!
+      ),
+      dataType: CloudflareStreamVideo()
+    );
+  }
+
   /// Update details about a single live input
   ///
   /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-update-live-input-details

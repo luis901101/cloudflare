@@ -1,8 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
+
 enum MediaProcessingState {
-  pendingupload,
+  @JsonValue('pendingupload')
+  pendingUpload,
   downloading,
   queued,
-  inprogress,
+  @JsonValue('inprogress')
+  inProgress,
+  @JsonValue('live-inprogress')
+  liveInProgress,
   ready,
   error,
   unknown,

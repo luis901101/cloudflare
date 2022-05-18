@@ -377,7 +377,7 @@ void main() async {
     });
 
     test('Get video list', () async {
-      expect(responseList, ResponseMatcher());
+      expect(responseList, ResponseMatcher(), reason: responseList.error?.toString());
       expect(responseList.body, isNotNull);
       expect(responseList.body, isNotEmpty);
       videoId = responseList.body![0].id;

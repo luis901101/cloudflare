@@ -88,10 +88,11 @@ Map<String, dynamic> _$VideoStatusToJson(VideoStatus instance) =>
     };
 
 const _$MediaProcessingStateEnumMap = {
-  MediaProcessingState.pendingupload: 'pendingupload',
+  MediaProcessingState.pendingUpload: 'pendingupload',
   MediaProcessingState.downloading: 'downloading',
   MediaProcessingState.queued: 'queued',
-  MediaProcessingState.inprogress: 'inprogress',
+  MediaProcessingState.inProgress: 'inprogress',
+  MediaProcessingState.liveInProgress: 'live-inprogress',
   MediaProcessingState.ready: 'ready',
   MediaProcessingState.error: 'error',
   MediaProcessingState.unknown: 'unknown',

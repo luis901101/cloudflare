@@ -28,6 +28,12 @@ abstract class LiveInputService {
     @Path() required String id,
   });
 
+  @GET('/{id}/videos')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> getVideos({
+    @Path() required String id,
+  });
+
   @PUT('/{id}')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> update({

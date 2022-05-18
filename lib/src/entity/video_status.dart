@@ -19,7 +19,7 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// read only
   ///
   /// e.g: "inprogress"
-  @JsonKey(unknownEnumValue: MediaProcessingState.unknown) final MediaProcessingState state;
+  @JsonKey(unknownEnumValue: MediaProcessingState.unknown, ) final MediaProcessingState state;
 
   /// Indicates the percent upload completed of the entire upload in bytes.
   /// The value must be a non-negative integer.

@@ -21,7 +21,7 @@ class LiveInputRecording extends Jsonable<LiveInputRecording> {
   /// Valid values: off, automatic
   ///
   /// e.g: "automatic"
-  final RecordingMode mode;
+  final LiveInputRecordingMode mode;
 
   /// Indicates whether videos created using this Live Input has the
   /// requireSignedURLs property set. This enforces access controls on any
@@ -50,12 +50,12 @@ class LiveInputRecording extends Jsonable<LiveInputRecording> {
 
 
   LiveInputRecording({
-    RecordingMode? mode,
+    LiveInputRecordingMode? mode,
     bool? requireSignedURLs,
     List<String>? allowedOrigins,
     int? timeoutSeconds,
   }) :
-    mode = mode ?? RecordingMode.automatic,
+    mode = mode ?? LiveInputRecordingMode.automatic,
     requireSignedURLs = requireSignedURLs ?? false,
     allowedOrigins = allowedOrigins ?? [],
     timeoutSeconds = timeoutSeconds ?? 0

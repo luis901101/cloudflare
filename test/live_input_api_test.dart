@@ -21,7 +21,7 @@ void main() async {
   group('Create live input tests', () {
     test('Default live input creation test', () async {
       final response = await cloudflare.liveInputAPI.create();
-      expect(response, LiveInputMatcher());
+      expect(response, LiveInputMatcher(), reason: response.error?.toString());
       addId(response.body?.id);
     }, timeout: Timeout(Duration(minutes: 1)));
 
@@ -31,14 +31,14 @@ void main() async {
           Params.name: 'live input test name'
         },
         recording: LiveInputRecording(
-          mode: RecordingMode.automatic,
+          mode: LiveInputRecordingMode.automatic,
           allowedOrigins: ['example.com'],
           timeoutSeconds: 4,
           requireSignedURLs: true
         )
       );
       final response = await cloudflare.liveInputAPI.create(data: customLiveInput);
-      expect(response, LiveInputMatcher());
+      expect(response, LiveInputMatcher(), reason: response.error?.toString());
       addId(response.body?.id);
       expect(response.body?.meta, customLiveInput.meta);
       expect(response.body?.recording.mode, customLiveInput.recording.mode);
@@ -50,7 +50,7 @@ void main() async {
 
     test('Get live input list', () async {
       final responseList = await cloudflare.liveInputAPI.getAll();
-      expect(responseList, ResponseMatcher());
+      expect(responseList, ResponseMatcher(), reason: responseList.error?.toString());
       expect(responseList.body, isNotNull);
       expect(responseList.body, isNotEmpty);
       liveInputId = responseList.body![0].id;
@@ -62,7 +62,15 @@ void main() async {
         fail('No live input available to get by Id');
       }
       final response = await cloudflare.liveInputAPI.get(id: liveInputId!);
-      expect(response, LiveInputMatcher());
+      expect(response, LiveInputMatcher(), reason: response.error?.toString());
+    });
+
+    test('Get live input associated videos', () async {
+      if (liveInputId == null) {
+        fail('No live input available to get associated videos');
+      }
+      final responseList = await cloudflare.liveInputAPI.getVideos(id: liveInputId!);
+      expect(responseList, ResponseMatcher(), reason: responseList.error?.toString());
     });
   });
 
@@ -72,7 +80,7 @@ void main() async {
       Params.name: 'live input test name'
     };
     var recording = LiveInputRecording(
-      mode: RecordingMode.automatic,
+      mode: LiveInputRecordingMode.automatic,
       allowedOrigins: ['example.com'],
       timeoutSeconds: 4,
       requireSignedURLs: true
@@ -101,7 +109,7 @@ void main() async {
           recording: recording,
         )
       );
-      expect(response, LiveInputMatcher());
+      expect(response, LiveInputMatcher(), reason: response.error?.toString());
       cacheIds.remove(liveInputId);//After live input updated the liveInputId changes
       addId(response.body?.id);
       expect(response.body!.meta, metadata);

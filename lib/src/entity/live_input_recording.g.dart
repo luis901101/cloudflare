@@ -15,7 +15,7 @@ abstract class _$LiveInputRecordingCWProxy {
   /// ````
   LiveInputRecording call({
     List<String>? allowedOrigins,
-    RecordingMode? mode,
+    LiveInputRecordingMode? mode,
     bool? requireSignedURLs,
     int? timeoutSeconds,
   });
@@ -49,7 +49,7 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
       mode: mode == const $CopyWithPlaceholder()
           ? _value.mode
           // ignore: cast_nullable_to_non_nullable
-          : mode as RecordingMode?,
+          : mode as LiveInputRecordingMode?,
       requireSignedURLs: requireSignedURLs == const $CopyWithPlaceholder()
           ? _value.requireSignedURLs
           // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,7 @@ extension $LiveInputRecordingCopyWith on LiveInputRecording {
 
 LiveInputRecording _$LiveInputRecordingFromJson(Map<String, dynamic> json) =>
     LiveInputRecording(
-      mode: $enumDecodeNullable(_$RecordingModeEnumMap, json['mode']),
+      mode: $enumDecodeNullable(_$LiveInputRecordingModeEnumMap, json['mode']),
       requireSignedURLs: json['requireSignedURLs'] as bool?,
       allowedOrigins: (json['allowedOrigins'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -84,13 +84,13 @@ LiveInputRecording _$LiveInputRecordingFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputRecordingToJson(LiveInputRecording instance) =>
     <String, dynamic>{
-      'mode': _$RecordingModeEnumMap[instance.mode],
+      'mode': _$LiveInputRecordingModeEnumMap[instance.mode],
       'requireSignedURLs': instance.requireSignedURLs,
       'allowedOrigins': instance.allowedOrigins,
       'timeoutSeconds': instance.timeoutSeconds,
     };
 
-const _$RecordingModeEnumMap = {
-  RecordingMode.off: 'off',
-  RecordingMode.automatic: 'automatic',
+const _$LiveInputRecordingModeEnumMap = {
+  LiveInputRecordingMode.off: 'off',
+  LiveInputRecordingMode.automatic: 'automatic',
 };
