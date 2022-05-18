@@ -23,6 +23,7 @@ abstract class _$CloudflareLiveInputCWProxy {
     RTMPS? rtmpsPlayback,
     SRT? srt,
     SRT? srtPlayback,
+    LiveInputStatus? status,
   });
 }
 
@@ -50,6 +51,7 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
     Object? rtmpsPlayback = const $CopyWithPlaceholder(),
     Object? srt = const $CopyWithPlaceholder(),
     Object? srtPlayback = const $CopyWithPlaceholder(),
+    Object? status = const $CopyWithPlaceholder(),
   }) {
     return CloudflareLiveInput(
       created: created == const $CopyWithPlaceholder()
@@ -88,6 +90,10 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
           ? _value.srtPlayback
           // ignore: cast_nullable_to_non_nullable
           : srtPlayback as SRT?,
+      status: status == const $CopyWithPlaceholder()
+          ? _value.status
+          // ignore: cast_nullable_to_non_nullable
+          : status as LiveInputStatus?,
     );
   }
 }
@@ -128,6 +134,9 @@ CloudflareLiveInput _$CloudflareLiveInputFromJson(Map<String, dynamic> json) =>
           ? null
           : LiveInputRecording.fromJson(
               json['recording'] as Map<String, dynamic>),
+      status: json['status'] == null
+          ? null
+          : LiveInputStatus.fromJson(json['status'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CloudflareLiveInputToJson(CloudflareLiveInput instance) {
@@ -149,5 +158,6 @@ Map<String, dynamic> _$CloudflareLiveInputToJson(CloudflareLiveInput instance) {
   val['srt'] = instance.srt;
   val['srtPlayback'] = instance.srtPlayback;
   val['recording'] = instance.recording;
+  writeNotNull('status', instance.status);
   return val;
 }

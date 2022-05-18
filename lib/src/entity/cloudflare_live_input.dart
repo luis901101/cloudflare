@@ -1,4 +1,5 @@
 import 'package:cloudflare/src/entity/live_input_recording.dart';
+import 'package:cloudflare/src/entity/live_input_status.dart';
 import 'package:cloudflare/src/entity/rtmps.dart';
 import 'package:cloudflare/src/entity/srt.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
@@ -56,6 +57,8 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
   /// and transition to on-demand after a condition is satisfied.
   final LiveInputRecording recording;
 
+  final LiveInputStatus? status;
+
   CloudflareLiveInput({
     String? id,
     this.meta,
@@ -66,6 +69,7 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
     SRT? srt,
     SRT? srtPlayback,
     LiveInputRecording? recording,
+    this.status,
   }) :
     id = id ?? '',
     created = created ?? DateTime.now(),
