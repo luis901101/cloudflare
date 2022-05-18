@@ -1,19 +1,8 @@
-import 'dart:io' hide HttpResponse;
-import 'dart:typed_data';
-
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/entity/cloudflare_live_input.dart';
-import 'package:cloudflare/src/service/live_input_service.dart';
-import 'package:tusc/tusc.dart' as tus;
 import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
-import 'package:cloudflare/src/entity/data_upload_draft.dart';
-import 'package:cloudflare/src/utils/date_time_utils.dart';
-import 'package:cloudflare/src/utils/params.dart';
-import 'package:cloudflare/src/utils/platform_utils.dart';
-import 'package:cross_file/cross_file.dart' show XFile;
-import 'package:dio/dio.dart';
-import 'package:retrofit/dio.dart';
+import 'package:cloudflare/src/entity/cloudflare_live_input.dart';
+import 'package:cloudflare/src/service/live_input_service.dart';
 
 class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareErrorResponse> {
@@ -37,6 +26,88 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
       service.create(data: data)
     );
   }
+
+  /// View the live inputs that have been created on this account. Some
+  /// information is not included on list requests, such as the URL to stream
+  /// to. To get that information, request a single live input.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-list-live-inputs
+  Future<CloudflareHTTPResponse<List<CloudflareLiveInput>?>> getAll() async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    final response = await parseResponseAsList(service.getAll());
+    return response;
+  }
+
+  /// Fetch details about a single live input
+  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-live-input-details
+  Future<CloudflareHTTPResponse<CloudflareLiveInput?>> get({
+    String? id,
+    CloudflareLiveInput? liveInput,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert(
+    id != null || liveInput != null, 'One of id or liveInput must not be empty.');
+    id ??= liveInput?.id;
+    final response = await parseResponse(service.get(
+      id: id!,
+    ));
+    return response;
+  }
+
+  /// Update details about a single live input
+  ///
+  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-update-live-input-details
+  Future<CloudflareHTTPResponse<CloudflareLiveInput?>> update({
+    /// Only [id], [meta] and [recording] properties will be taken into account
+    /// when updating a live input.
+    required CloudflareLiveInput liveInput,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    final response = await parseResponse(service.update(
+      id: liveInput.id,
+      data: liveInput,
+    ));
+    return response;
+  }
+
+  /// Prevent a live input from being streamed to. This makes the live input
+  /// inaccessible to any future API calls or RTMPS transmission.
+  ///
+  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-delete-live-input
+  Future<CloudflareHTTPResponse> delete({
+    String? id,
+    CloudflareLiveInput? liveInput,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert(
+    id != null || liveInput != null, 'One of id or liveInput must not be null.');
+    id ??= liveInput?.id;
+    final response = await getSaveResponse(
+        service.delete(id: id!,),
+        parseCloudflareResponse: false);
+    return response;
+  }
+
+  /// Delete a list of live inputs on Cloudflare LiveInput. On success, all
+  /// copies of the live inputs are deleted.
+  Future<List<CloudflareHTTPResponse>> deleteMultiple({
+    List<String>? ids,
+    List<CloudflareLiveInput>? liveInputs,
+  }) async {
+    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
+    assert((ids?.isNotEmpty ?? false) || (liveInputs?.isNotEmpty ?? false),
+    'One of ids or live inputs must not be empty.');
+
+    ids ??= liveInputs?.map((video) => video.id).toList();
+
+    List<CloudflareHTTPResponse> responses = [];
+    for (final id in ids!) {
+      final response = await delete(id: id,);
+      responses.add(response);
+    }
+    return responses;
+  }
+
   //
   // /// For larger than 200 MegaBytes video direct stream upload using
   // /// tus(https://tus.io) protocol without API key or token.
@@ -443,69 +514,4 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
   //     extraData: rawResponse.extraData,
   //   );
   // }
-
-  /// View the live inputs that have been created on this account. Some
-  /// information is not included on list requests, such as the URL to stream
-  /// to. To get that information, request a single live input.
-  ///
-  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-list-live-inputs
-  Future<CloudflareHTTPResponse<List<CloudflareLiveInput>?>> getAll() async {
-    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    final response = await parseResponseAsList(service.getAll());
-    return response;
-  }
-  //
-  // /// Fetch details of a single video.
-  // /// Official documentation: https://api.cloudflare.com/#stream-videos-video-details
-  // Future<CloudflareHTTPResponse<CloudflareLiveInput?>> get({
-  //   String? id,
-  //   CloudflareLiveInput? video,
-  // }) async {
-  //   assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-  //   assert(
-  //       id != null || video != null, 'One of id or video must not be empty.');
-  //   id ??= video?.id;
-  //   final response = await parseResponse(service.get(
-  //     id: id!,
-  //   ));
-  //   return response;
-  // }
-  //
-  /// Prevent a live input from being streamed to. This makes the live input
-  /// inaccessible to any future API calls or RTMPS transmission.
-  ///
-  /// Official documentation: https://api.cloudflare.com/#stream-live-inputs-delete-live-input
-  Future<CloudflareHTTPResponse> delete({
-    String? id,
-    CloudflareLiveInput? liveInput,
-  }) async {
-    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-        id != null || liveInput != null, 'One of id or liveInput must not be null.');
-    id ??= liveInput?.id;
-    final response = await getSaveResponse(
-      service.delete(id: id!,),
-      parseCloudflareResponse: false);
-    return response;
-  }
-
-  /// Delete a list of live inputs on Cloudflare LiveInput. On success, all
-  /// copies of the live inputs are deleted.
-  Future<List<CloudflareHTTPResponse>> deleteMultiple({
-    List<String>? ids,
-    List<CloudflareLiveInput>? liveInputs,
-  }) async {
-    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert((ids?.isNotEmpty ?? false) || (liveInputs?.isNotEmpty ?? false),
-        'One of ids or live inputs must not be empty.');
-
-    ids ??= liveInputs?.map((video) => video.id).toList();
-
-    List<CloudflareHTTPResponse> responses = [];
-    for (final id in ids!) {
-      final response = await delete(id: id,);
-      responses.add(response);
-    }
-    return responses;
-  }
 }

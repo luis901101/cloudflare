@@ -117,7 +117,7 @@ class Cloudflare {
         apiUrl = apiUrl ?? 'https://api.cloudflare.com/client/v4',
         tokenCallback = tokenCallback ?? (() async => token);
 
-  /// Usi this constructor when you don't need to make authorized requests
+  /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
   factory Cloudflare.basic() {

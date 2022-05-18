@@ -8,6 +8,7 @@ part 'data_upload_draft.g.dart';
 
 /// DataUploadDraft is the response object when requesting `direct_upload`
 /// For instance: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+@CopyWith(skipFields: true)
 @JsonSerializable()
 class DataUploadDraft extends Jsonable<DataUploadDraft> {
 
@@ -22,25 +23,12 @@ class DataUploadDraft extends Jsonable<DataUploadDraft> {
 
   const DataUploadDraft({
     String? id,
-    @CopyWithField(immutable: true) String? uid,
     String? uploadURL,
     this.watermark,
   }) :
-    id = id ?? uid ?? '',
+    id = id ?? '',
     uploadURL = uploadURL ?? ''
   ;
-
-  DataUploadDraft copyWith({
-    String? id,
-    String? uploadURL,
-    Watermark? watermark,
-  }) {
-    return DataUploadDraft(
-      id: id ?? this.id,
-      uploadURL: uploadURL ?? this.uploadURL,
-      watermark: watermark ?? this.watermark,
-    );
-  }
 
   @override
   Map<String, dynamic> toJson() => _$DataUploadDraftToJson(this);

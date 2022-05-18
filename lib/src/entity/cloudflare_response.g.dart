@@ -3,6 +3,78 @@
 part of 'cloudflare_response.dart';
 
 // **************************************************************************
+// CopyWithGenerator
+// **************************************************************************
+
+abstract class _$CloudflareResponseCWProxy {
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  ///
+  /// Usage
+  /// ```dart
+  /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CloudflareResponse call({
+    List<ErrorInfo>? errors,
+    List<String>? messages,
+    Pagination? paginationInfo,
+    dynamic? result,
+    bool? success,
+  });
+}
+
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
+class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
+  final CloudflareResponse _value;
+
+  const _$CloudflareResponseCWProxyImpl(this._value);
+
+  @override
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  ///
+  /// Usage
+  /// ```dart
+  /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
+  /// ````
+  CloudflareResponse call({
+    Object? errors = const $CopyWithPlaceholder(),
+    Object? messages = const $CopyWithPlaceholder(),
+    Object? paginationInfo = const $CopyWithPlaceholder(),
+    Object? result = const $CopyWithPlaceholder(),
+    Object? success = const $CopyWithPlaceholder(),
+  }) {
+    return CloudflareResponse(
+      errors: errors == const $CopyWithPlaceholder()
+          ? _value.errors
+          // ignore: cast_nullable_to_non_nullable
+          : errors as List<ErrorInfo>?,
+      messages: messages == const $CopyWithPlaceholder()
+          ? _value.messages
+          // ignore: cast_nullable_to_non_nullable
+          : messages as List<String>?,
+      paginationInfo: paginationInfo == const $CopyWithPlaceholder()
+          ? _value.paginationInfo
+          // ignore: cast_nullable_to_non_nullable
+          : paginationInfo as Pagination?,
+      result: result == const $CopyWithPlaceholder() || result == null
+          ? _value.result
+          // ignore: cast_nullable_to_non_nullable
+          : result as dynamic,
+      success: success == const $CopyWithPlaceholder()
+          ? _value.success
+          // ignore: cast_nullable_to_non_nullable
+          : success as bool?,
+    );
+  }
+}
+
+extension $CloudflareResponseCopyWith on CloudflareResponse {
+  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareResponse extends Jsonable<CloudflareResponse>.name.copyWith(...)`.
+  _$CloudflareResponseCWProxy get copyWith =>
+      _$CloudflareResponseCWProxyImpl(this);
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

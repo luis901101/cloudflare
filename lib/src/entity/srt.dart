@@ -1,4 +1,5 @@
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'srt.g.dart';
@@ -6,6 +7,7 @@ part 'srt.g.dart';
 /// Support for SRT(Secure Reliable Transfer)
 ///
 /// Check here: https://blog.cloudflare.com/stream-now-supports-srt-as-a-drop-in-replacement-for-rtmp/
+@CopyWith(skipFields: true)
 @JsonSerializable()
 class SRT extends Jsonable<SRT> {
 

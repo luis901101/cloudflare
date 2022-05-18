@@ -16,13 +16,7 @@ import 'utils/matchers.dart';
 // ignore_for_file: void_checks
 void main() async {
   await init();
-  final File videoFile = File(Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? ''),
-      videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
-      videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
-      videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
-  final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
   Set<String> cacheIds = {};
-
   void addId(String? id) {
     if(id != null) cacheIds.add(id);
   }

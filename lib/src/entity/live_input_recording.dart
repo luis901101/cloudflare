@@ -1,5 +1,6 @@
 import 'package:cloudflare/src/enumerators/recording_mode.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'live_input_recording.g.dart';
@@ -7,6 +8,7 @@ part 'live_input_recording.g.dart';
 /// Control recording the input to a Stream video. Behavior depends on the mode.
 /// In most cases, the video will initially be viewable as a live video and
 /// transition to on-demand after a condition is satisfied.
+@CopyWith(skipFields: true)
 @JsonSerializable()
 class LiveInputRecording extends Jsonable<LiveInputRecording> {
 

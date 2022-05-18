@@ -1,5 +1,6 @@
 import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:cloudflare/src/model/pagination.dart';
@@ -8,6 +9,7 @@ part 'cloudflare_response.g.dart';
 
 /// Official documentation here:
 /// API docs: https://api.cloudflare.com/#getting-started-responses
+@CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareResponse extends Jsonable<CloudflareResponse> {
   dynamic result;

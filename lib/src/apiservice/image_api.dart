@@ -260,33 +260,15 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   ///
   /// Official documentation: https://api.cloudflare.com/#cloudflare-images-update-image
   Future<CloudflareHTTPResponse<CloudflareImage?>> update({
-    /// Image identifier
-    String? id,
-
-    /// Image object
-    CloudflareImage? image,
-
-    /// Indicates whether the image can be accessed only using it's UID.
-    /// If set to true, a signed token needs to be generated with a signing key
-    /// to view the image. Returns a new UID on a change. No-op if not specified
-    ///
-    /// e.g: true
-    bool? requireSignedURLs,
-
-    /// User modifiable key-value store. Can use used for keeping references to
-    /// another system of record for managing images. No-op if not specified.
-    ///
-    /// e.g: "{\"meta\": \"metaID\"}"
-    Map<String, dynamic>? metadata,
+    /// Only [id], [requireSignedURLs] and [meta] properties will be taken into
+    /// account when updating image.
+    required CloudflareImage image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-        id != null || image != null, 'One of id or image must not be empty.');
-    id ??= image?.id;
     final response = await parseResponse(service.update(
-      id: id!,
-      requireSignedURLs: requireSignedURLs,
-      metadata: metadata,
+      id: image.id,
+      requireSignedURLs: image.requireSignedURLs,
+      metadata: image.meta?.map((key, value) => MapEntry<String, dynamic>(key.toString(), value)),
     ));
 
     return response;

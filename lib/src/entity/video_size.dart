@@ -1,8 +1,10 @@
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'video_size.g.dart';
 
+@CopyWith(skipFields: true)
 @JsonSerializable()
 class VideoSize extends Jsonable<VideoSize> {
   /// Width of the video in pixels. A value of -1 means the width is unknown.

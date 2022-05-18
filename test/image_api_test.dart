@@ -13,12 +13,7 @@ import 'utils/matchers.dart';
 /// These tests ensures that every uploaded test image gets deleted.
 void main() async {
   await init();
-  final File imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? ''),
-      imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
-      imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
-  final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
   Set<String> cacheIds = {};
-
   void addId(String? id) {
     if(id != null) cacheIds.add(id);
   }
@@ -325,9 +320,11 @@ void main() async {
       metadata['system_id'] = '${metadata['system_id']}-updated';
       metadata['description'] = '${metadata['description']}-updated';
       final response = await cloudflare.imageAPI.update(
-        id: imageId!,
-        requireSignedURLs: false,
-        metadata: metadata,
+        image: CloudflareImage(
+          id: imageId!,
+          requireSignedURLs: false,
+          meta: metadata,
+        )
       );
       expect(response, ImageMatcher());
       cacheIds.remove(imageId);//After image updated the imageId changes

@@ -1,6 +1,7 @@
 import 'package:cloudflare/src/enumerators/media_processing_state.dart';
 import 'package:cloudflare/src/utils/json_utils.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'video_status.g.dart';
@@ -11,6 +12,7 @@ part 'video_status.g.dart';
 /// between 0 and 100 indicating the approximate percent of that step that has
 /// been completed. If the "state" is "error", "errorReasonCode" and
 /// "errorReasonText" will contain additional details.
+@CopyWith(skipFields: true)
 @JsonSerializable()
 class VideoStatus extends Jsonable<VideoStatus> {
   /// Specifies the processing status of the video.

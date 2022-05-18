@@ -21,6 +21,7 @@ import 'package:cloudflare/cloudflare.dart';
 /// export CLOUDFLARE_VIDEO_FILE=/Users/user/Desktop/video-test.mp4
 /// export CLOUDFLARE_VIDEO_FILE_1=/Users/user/Desktop/video-test-1.mp4
 /// export CLOUDFLARE_VIDEO_FILE_2=/Users/user/Desktop/video-test-2.mp4
+/// export CLOUDFLARE_VIDEO_FILE_3=/Users/user/Desktop/video-test-3.mp4
 /// export CLOUDFLARE_VIDEO_URL=http://clips.vorwaerts-gmbh.de/VfE_html5.mp4
 ///
 final String? apiUrl = Platform.environment['CLOUDFLARE_API_URL'];
@@ -31,13 +32,20 @@ final String? accountEmail = Platform.environment['CLOUDFLARE_ACCOUNT_EMAIL'];
 final String? userServiceKey =
     Platform.environment['CLOUDFLARE_USER_SERVICE_KEY'];
 
+final File imageFile = File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? ''),
+    imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
+    imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
+final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
+final File videoFile = File(Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? ''),
+    videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
+    videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
+    videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
+final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
+
+
 Cloudflare cloudflare = Cloudflare.basic();
 
 Future<void> init() async {
-  // print(apiUrl);
-  // print(accountId);
-  // print(token);
-
   if (accountId == null) throw Exception("accountId can't be null");
 
   if (cloudflare.isInitialized) return;

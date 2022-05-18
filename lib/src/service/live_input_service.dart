@@ -19,31 +19,23 @@ abstract class LiveInputService {
     @Body() CloudflareLiveInput? data,
   });
 
-  // @PATCH('/v1/{id}')
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> update({
-  //   @Path() required String id,
-  //   @Field() bool? requireSignedURLs,
-  //   @Field() Map<String, dynamic>? metadata,
-  // });
-  //
   @GET('')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> getAll();
-  //
-  // @GET('/v1/{id}')
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse<CloudflareResponse?>> get({
-  //   @Path() required String id,
-  // });
-  //
-  // @GET('/v1/{id}/blob')
-  // @DioResponseType(ResponseType.bytes)
-  // @Headers(RestAPIService.defaultHeaders)
-  // Future<HttpResponse> getBase({
-  //   @Path() required String id,
-  // });
-  //
+
+  @GET('/{id}')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> get({
+    @Path() required String id,
+  });
+
+  @PUT('/{id}')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> update({
+    @Path() required String id,
+    @Body() CloudflareLiveInput? data,
+  });
+
   @DELETE('/{id}')
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse> delete({
