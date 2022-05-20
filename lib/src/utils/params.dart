@@ -31,4 +31,10 @@ class Params {
   static const String streamMediaIdKC = 'stream-media-id'; //Kebab case
   static const String location = 'location';
   static const String name = 'name';
+  static const String time = 'time';
+  static const String width = 'width';
+  static const String height = 'height';
+  static const String fit = 'fit';
+  static const String duration = 'duration';
+  static const String fps = 'fps';
 }

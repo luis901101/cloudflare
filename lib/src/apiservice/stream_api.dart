@@ -28,7 +28,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// HTTP POST (multipart/form-data) request.
   /// For larger file sizes, please upload using the TUS protocol.
   ///
-  /// Official documentation:
+  /// Documentation:
   /// https://api.cloudflare.com/#stream-videos-upload-a-video-using-a-single-http-request
   /// https://api.cloudflare.com/#stream-videos-upload-a-video-from-a-url
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> stream({
@@ -140,7 +140,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
   /// For videos larger than 200 MegaBytes tus(https://tus.io) protocol is used
   ///
-  /// Official documentation:
+  /// Documentation:
   /// https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files
   Future<TusAPI> tusStream({
     /// Video file to stream
@@ -252,7 +252,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// This function is to be used specifically after a video
   /// createDirectStreamUpload has been requested.
   ///
-  /// Official documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
+  /// Documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> directStreamUpload({
     /// Information on where to stream upload the video without an API key or token
     required DataUploadDraft dataUploadDraft,
@@ -553,7 +553,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// place to use direct uploads is on web apps, client side applications,
   /// or on mobile devices where users upload content directly to Stream.
   ///
-  /// Official documentation: https://api.cloudflare.com/#stream-videos-create-a-video-and-get-authenticated-direct-upload-url
+  /// Documentation: https://api.cloudflare.com/#stream-videos-create-a-video-and-get-authenticated-direct-upload-url
   Future<CloudflareHTTPResponse<DataUploadDraft?>> createDirectStreamUpload({
     /// Direct uploads occupy minutes of videos on your Stream account until
     /// they are expired. This value will be used to calculate the duration the
@@ -642,7 +642,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// loose amount o minutes for the video to be uploaded, for instance 240
   /// minutes will be reserved from you available storage.
   ///
-  /// Official documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb
+  /// Documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb
   Future<CloudflareHTTPResponse<DataUploadDraft?>> createTusDirectStreamUpload({
     /// The size of the file to upload in bytes
     required int size,
@@ -748,7 +748,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// videos, make multiple requests to the API using the created date-time of
   /// the last item in the previous request as the before or after parameter.
   ///
-  /// Official documentation: https://api.cloudflare.com/#stream-videos-list-videos
+  /// Documentation: https://api.cloudflare.com/#stream-videos-list-videos
   Future<CloudflareHTTPResponse<List<CloudflareStreamVideo>?>> getAll({
     /// Show videos created after this date-time
     /// Using  ISO 8601 ZonedDateTime
@@ -821,7 +821,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }
 
   /// Fetch details of a single video.
-  /// Official documentation: https://api.cloudflare.com/#stream-videos-video-details
+  /// Documentation: https://api.cloudflare.com/#stream-videos-video-details
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> get({
     /// CloudflareStreamVideo identifier
     String? id,
@@ -841,7 +841,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
   /// Delete a video on Cloudflare Stream. On success, all copies of the video
   /// are deleted.
-  /// Official documentation: https://api.cloudflare.com/#stream-videos-delete-video
+  /// Documentation: https://api.cloudflare.com/#stream-videos-delete-video
   Future<CloudflareHTTPResponse> delete({
     /// CloudflareStreamVideo identifier
     String? id,

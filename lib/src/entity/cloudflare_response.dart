@@ -7,7 +7,7 @@ import 'package:cloudflare/src/model/pagination.dart';
 
 part 'cloudflare_response.g.dart';
 
-/// Official documentation here:
+/// Documentation here:
 /// API docs: https://api.cloudflare.com/#getting-started-responses
 @CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)

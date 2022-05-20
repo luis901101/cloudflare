@@ -34,6 +34,7 @@ export 'package:cloudflare/src/entity/video_status.dart';
 export 'package:cloudflare/src/entity/watermark.dart';
 
 // Enums
+export 'package:cloudflare/src/enumerators/fit.dart';
 export 'package:cloudflare/src/enumerators/media_processing_state.dart';
 export 'package:cloudflare/src/enumerators/recording_mode.dart';
 export 'package:cloudflare/src/enumerators/watermark_position.dart';
@@ -51,6 +52,7 @@ export 'package:cloudflare/src/model/pagination.dart';
 export 'package:cloudflare/src/utils/callbacks.dart';
 
 class Cloudflare {
+  static const defaultApiUrl = 'https://api.cloudflare.com/client/v4';
   static const xAuthKeyHeader = 'X-Auth-Key';
   static const xAuthEmailHeader = 'X-Auth-Email';
   static const xAuthUserServiceKeyHeader = 'X-Auth-User-Service-Key';
@@ -106,7 +108,10 @@ class Cloudflare {
   /// Cloudflare brings you full access to different apis like ImageAPI and
   /// StreamAPI.
   ///
-  /// The `accountId` is required as well as on of (`token` or `tokenCallback`)
+  /// By default cloudflare [api url v4](https://api.cloudflare.com/client/v4)
+  /// will be used unless you set a specific [apiUrl].
+  ///
+  /// The `accountId` is required as well as one of (`token` or `tokenCallback`)
   /// or (`apiKey` and `accountEmail`) or `userServiceKey`
   Cloudflare({
     String? apiUrl,
@@ -127,15 +132,14 @@ class Cloudflare {
             '\n\nA token or tokenCallback must be specified, only one of both. '
             '\nOtherwise an apiKey and accountEmail must be specified. '
             '\nOtherwise a userServiceKey must be specified.'),
-        apiUrl = apiUrl ?? 'https://api.cloudflare.com/client/v4',
+        apiUrl = apiUrl ?? defaultApiUrl,
         tokenCallback = tokenCallback ?? (() async => token);
 
   /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
-  factory Cloudflare.basic() {
-    return Cloudflare(accountId: '', tokenCallback: () async => '');
-  }
+  factory Cloudflare.basic() =>
+    Cloudflare(accountId: '', tokenCallback: () async => '');
 
   bool get isInitialized => _initialized;
 

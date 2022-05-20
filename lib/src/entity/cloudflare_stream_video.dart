@@ -1,3 +1,4 @@
+import 'package:cloudflare/src/enumerators/fit.dart';
 import 'package:cloudflare/src/entity/media_nft.dart';
 import 'package:cloudflare/src/entity/video_playback_info.dart';
 import 'package:cloudflare/src/entity/video_size.dart';
@@ -10,7 +11,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_stream_video.g.dart';
 
-/// Official documentation here:
+/// Documentation here:
 /// API docs: https://api.cloudflare.com/#stream-videos-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/stream
 @CopyWith(skipFields: true)
@@ -19,7 +20,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
 
   static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
-  static const videoDeliveryUrl = 'https://videodelivery.net';
+  static const videoDeliveryHost = 'videodelivery.net';
+  static const videoDeliveryUrl = 'https://$videoDeliveryHost';
   static const videoCloudflareUrl = 'https://cloudflarestream.com';
 
   /// Media item unique identifier
@@ -122,12 +124,19 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   /// }
   final VideoSize input;
 
-  /// URI to thumbnail for a media item. Omitted until encoding is complete.
+  /// URI to JPG thumbnail for a media item. Omitted until encoding is complete.
   ///
   /// read only
   ///
   /// e.g: "https://videodelivery.net/ea95132c15732412d22c1476fa83f27a/thumbnails/thumbnail.jpg"
   final String thumbnail;
+
+  /// URI to GIF thumbnail for a media item. Omitted until encoding is complete.
+  ///
+  /// read only
+  ///
+  /// e.g: "https://videodelivery.net/ea95132c15732412d22c1476fa83f27a/thumbnails/thumbnail.gif"
+  final String animatedThumbnail;
 
   /// Object specifying more fine-grained status for this video item.
   /// If "state" is "inprogress" or "error", "step" will be one of "encoding"
@@ -224,6 +233,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     DateTime? modified,
     VideoSize? input,
     String? thumbnail,
+    String? animatedThumbnail,
     VideoStatus? status,
     double? duration,
     this.uploadExpiry,
@@ -243,6 +253,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     modified = modified ?? DateTime.now(),
     input = input ?? VideoSize(),
     thumbnail = thumbnail ?? (id.isNotEmpty ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.jpg' : ''),
+    animatedThumbnail = thumbnail ?? (id.isNotEmpty ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.gif' : ''),
     status = status ?? VideoStatus(),
     duration = duration ?? -1,
     thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
@@ -254,6 +265,102 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   ;
 
   bool get isReady => readyToStream;
+
+  /// Customizing static JPG thumbnails on the fly
+  ///
+  /// Documentation: https://developers.cloudflare.com/stream/viewing-videos/displaying-thumbnails/#use-case-1-generating-a-thumbnail-on-the-fly
+  String customThumbnail({
+    /// Start time from the video
+    ///
+    /// Default value: 0s
+    ///
+    /// e.g: 8m, 5m2s
+    String? time,
+
+    /// Width of the thumbnail
+    ///
+    /// Default value: 640
+    int? width,
+
+    /// Height of the thumbnail
+    ///
+    /// Default value: 640
+    int? height,
+
+    /// Clarifies what to do when requested width and height doesn't match the
+    /// original upload, which should be one of [Fit] enum values
+    ///
+    /// Default value: crop
+    ///
+    /// e.g: scale
+    Fit? fit,
+  }) => Uri(
+      scheme: 'https',
+      host: videoDeliveryHost,
+      path: '/$id/thumbnails/thumbnail.jpg',
+      queryParameters: {
+        if(time != null) Params.time: time.toString(),
+        if(width != null) Params.width: width.toString(),
+        if(height != null) Params.height: height.toString(),
+        if(fit != null) Params.fit: fit.name,
+      },
+    ).toString();
+
+  /// Customizing animated GIF thumbnails on the fly
+  ///
+  /// Documentation: https://developers.cloudflare.com/stream/viewing-videos/displaying-thumbnails/#use-case-3-generating-animated-thumbnails
+  String customAnimatedThumbnail({
+    /// Start time from the video
+    ///
+    /// Default value: 0s
+    ///
+    /// e.g: 8m, 5m2s
+    String? time,
+
+    /// Width of the thumbnail
+    ///
+    /// Default value: 640
+    int? width,
+
+    /// Height of the thumbnail
+    ///
+    /// Default value: 640
+    int? height,
+
+    /// Clarifies what to do when requested width and height doesn't match the
+    /// original upload, which should be one of [Fit] enum values
+    ///
+    /// Default value: crop
+    ///
+    /// e.g: scale
+    Fit? fit,
+
+    /// Start time from the video
+    ///
+    /// Default value: 5s
+    ///
+    /// e.g: 1m, 5s
+    String? duration,
+
+    /// Frames per second for the GIF
+    ///
+    /// Min value: 1
+    /// Max value: 15
+    /// Default value: 8
+    int? fps,
+  }) => Uri(
+    scheme: 'https',
+    host: videoDeliveryHost,
+    path: '/$id/thumbnails/thumbnail.gif',
+    queryParameters: {
+      if(time != null) Params.time: time.toString(),
+      if(width != null) Params.width: width.toString(),
+      if(height != null) Params.height: height.toString(),
+      if(fit != null) Params.fit: fit.name,
+      if(duration != null) Params.duration: duration.toString(),
+      if(fps != null) Params.fps: fps.toString(),
+    },
+  ).toString();
 
   static Map<String, dynamic> _dataFromVideoDeliveryUrl(String url) {
     final split = url.replaceAll('$uploadVideoDeliveryUrl/', '')

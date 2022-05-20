@@ -9,7 +9,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_live_input.g.dart';
 
-/// Official documentation here:
+/// Documentation here:
 /// API docs: https://api.cloudflare.com/#stream-live-inputs-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/stream/stream-live/
 @CopyWith(skipFields: true)

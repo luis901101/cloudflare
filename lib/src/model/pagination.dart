@@ -4,7 +4,7 @@ import 'package:cloudflare/src/utils/params.dart';
 
 part 'pagination.g.dart';
 
-/// Official documentation here:
+/// Documentation here:
 /// API docs: https://api.cloudflare.com/#getting-started-responses
 @JsonSerializable(includeIfNull: false)
 class Pagination extends Jsonable<Pagination> {

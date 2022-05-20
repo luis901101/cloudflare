@@ -22,7 +22,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// An image up to 10 Megabytes can be upload.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-upload-an-image-using-a-single-http-request
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-upload-an-image-using-a-single-http-request
   Future<CloudflareHTTPResponse<CloudflareImage?>> upload({
     /// Image file to upload
     DataTransmit<File>? contentFromFile,
@@ -105,7 +105,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// This function is to be used specifically after an image createDirectUpload
   /// has been requested.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
   Future<CloudflareHTTPResponse<CloudflareImage?>> directUpload({
     /// Information on where to upload the image without an API key or token
     required DataUploadDraft dataUploadDraft,
@@ -256,7 +256,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Update image access control. On access control change,
   /// all copies of the image are purged from Cache.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-update-image
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-update-image
   Future<CloudflareHTTPResponse<CloudflareImage?>> update({
     /// Only [id], [requireSignedURLs] and [meta] properties will be taken into
     /// account when updating image.
@@ -280,7 +280,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// itself has been uploaded or not with the draft: true property in the
   /// image response.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
   Future<CloudflareHTTPResponse<DataUploadDraft?>> createDirectUpload({
     /// Indicates whether the image requires a signature token for the access
     ///
@@ -317,7 +317,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Up to 100 images can be listed with one request, use optional parameters
   /// to get a specific range of images.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-list-images
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-list-images
   Future<CloudflareHTTPResponse<List<CloudflareImage>?>> getAll({
     /// Page number of paginated results.
     ///
@@ -341,7 +341,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Fetch details of a single image.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-image-details
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-image-details
   Future<CloudflareHTTPResponse<CloudflareImage?>> get({
     /// Image identifier
     String? id,
@@ -363,7 +363,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// file. For larger images it can be a near-lossless version of the original.
   /// Note: the response is <image blob data>
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-base-image
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-base-image
   Future<CloudflareHTTPResponse<Uint8List?>> getBase({
     /// Image identifier
     String? id,
@@ -387,7 +387,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   /// Delete an image on Cloudflare Images. On success, all copies of the image
   /// are deleted and purged from Cache.
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-delete-image
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-delete-image
   Future<CloudflareHTTPResponse> delete({
     /// Image identifier
     String? id,
@@ -430,7 +430,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Fetch details of Cloudflare Images usage statistics
   ///
-  /// Official documentation: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
+  /// Documentation: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
   Future<CloudflareHTTPResponse<ImageStats?>> getStats() async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(

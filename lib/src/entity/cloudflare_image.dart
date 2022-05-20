@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_image.g.dart';
 
-/// Official documentation here:
+/// Documentation here:
 /// API docs: https://api.cloudflare.com/#cloudflare-images-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/images/cloudflare-images
 @CopyWith(skipFields: true)
