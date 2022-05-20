@@ -1,4 +1,4 @@
-enum Fit {
+enum ThumbnailFit {
   /// cut parts of the image that doesn't fit in the given size
   crop,
 

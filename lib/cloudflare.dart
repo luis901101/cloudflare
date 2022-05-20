@@ -34,7 +34,7 @@ export 'package:cloudflare/src/entity/video_status.dart';
 export 'package:cloudflare/src/entity/watermark.dart';
 
 // Enums
-export 'package:cloudflare/src/enumerators/fit.dart';
+export 'package:cloudflare/src/enumerators/thumbnail_fit.dart';
 export 'package:cloudflare/src/enumerators/media_processing_state.dart';
 export 'package:cloudflare/src/enumerators/recording_mode.dart';
 export 'package:cloudflare/src/enumerators/watermark_position.dart';

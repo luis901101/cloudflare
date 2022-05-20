@@ -1,4 +1,4 @@
-import 'package:cloudflare/src/enumerators/fit.dart';
+import 'package:cloudflare/src/enumerators/thumbnail_fit.dart';
 import 'package:cloudflare/src/entity/media_nft.dart';
 import 'package:cloudflare/src/entity/video_playback_info.dart';
 import 'package:cloudflare/src/entity/video_size.dart';
@@ -288,12 +288,12 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     int? height,
 
     /// Clarifies what to do when requested width and height doesn't match the
-    /// original upload, which should be one of [Fit] enum values
+    /// original upload, which should be one of [ThumbnailFit] enum values
     ///
     /// Default value: crop
     ///
     /// e.g: scale
-    Fit? fit,
+    ThumbnailFit? fit,
   }) => Uri(
       scheme: 'https',
       host: videoDeliveryHost,
@@ -328,12 +328,12 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     int? height,
 
     /// Clarifies what to do when requested width and height doesn't match the
-    /// original upload, which should be one of [Fit] enum values
+    /// original upload, which should be one of [ThumbnailFit] enum values
     ///
     /// Default value: crop
     ///
     /// e.g: scale
-    Fit? fit,
+    ThumbnailFit? fit,
 
     /// Start time from the video
     ///
