@@ -208,6 +208,11 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     ///
     /// Default value: [TusMemoryStore]
     tus.TusCache? cache,
+
+    /// Timeout duration for upload chunks
+    ///
+    /// Defaults to Cloudflare timeout
+    Duration? timeout,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -243,7 +248,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         Params.requireSignedURLs: requireSignedURLs,
         Params.watermark: watermark?.id,
       },
-      timeout: restAPI.timeout
+      timeout: timeout ?? restAPI.timeout
     );
     return tusAPI;
   }
@@ -405,6 +410,11 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     ///
     /// Default value: [TusMemoryStore]
     tus.TusCache? cache,
+
+    /// Timeout duration for upload chunks
+    ///
+    /// Defaults to Cloudflare timeout
+    Duration? timeout,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -438,7 +448,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         Params.requireSignedURLs: requireSignedURLs,
         Params.watermark: watermark?.id,
       },
-      timeout: restAPI.timeout,
+      timeout: timeout ?? restAPI.timeout,
     );
     return tusAPI;
   }
