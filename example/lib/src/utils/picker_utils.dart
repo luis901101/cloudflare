@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ImageUtils {
+class PickerUtils {
   static Future<String?> _retrieveLostData() async {
     if (!Platform.isAndroid) return null;
     final LostDataResponse response = await ImagePicker().retrieveLostData();
@@ -13,62 +13,50 @@ class ImageUtils {
   static const String cameraAccessDenied = "camera_access_denied";
   static const String galleryAccessDenied = "photo_access_denied";
 
-  static Future<Map<String, dynamic>> _pickImageFrom({
+  static Future<Map<String, dynamic>> _pickFrom({
     ImageSource source = ImageSource.camera,
     CameraDevice cameraDevice = CameraDevice.rear,
     bool multiple = true,
+    bool pickImage = true,
   }) async {
     Map<String, dynamic> resource = {};
 
-    XFile? pickedImage;
-    List<XFile>? pickedImages;
+    XFile? pickedFile;
+    List<XFile>? pickedFiles;
     try {
-      Future<void> pickMultipleFromGallery() async {
-        pickedImages = await ImagePicker().pickMultiImage(
+      Future<void> pickMultiple() async {
+        pickedFiles = await ImagePicker().pickMultiImage(
           maxWidth: 1920,
           maxHeight: 1080,
           imageQuality: 100,
         );
       }
 
-      Future<void> pickSingleFromGallery() async {
-        pickedImage = await ImagePicker().pickImage(
+      Future<void> pickSingle() async {
+        pickedFile = pickImage ?
+        await ImagePicker().pickImage(
           source: source,
           preferredCameraDevice: cameraDevice,
           maxWidth: 1920,
           maxHeight: 1080,
           imageQuality: 100,
-        );
-        if (pickedImage != null) pickedImages = [pickedImage!];
-      }
-
-      Future<void> pickFromCamera() async {
-        pickedImage = await ImagePicker().pickImage(
+        ) :
+        await ImagePicker().pickVideo(
           source: source,
           preferredCameraDevice: cameraDevice,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          imageQuality: 100,
         );
-        if (pickedImage != null) pickedImages = [pickedImage!];
+        if (pickedFile != null) pickedFiles = [pickedFile!];
       }
 
-      switch (source) {
-        case ImageSource.gallery:
-          if (multiple) {
-            await pickMultipleFromGallery();
-          } else {
-            await pickSingleFromGallery();
-          }
-          break;
-        case ImageSource.camera:
-          await pickFromCamera();
-          break;
+      if (pickImage && multiple) {
+        await pickMultiple();
+      } else {
+        await pickSingle();
       }
 
       List<String> filePaths = [];
       String? path;
-      pickedImages?.forEach((item) => filePaths.add(item.path));
+      pickedFiles?.forEach((item) => filePaths.add(item.path));
       if (filePaths.isEmpty) {
         path = await _retrieveLostData();
         if (path != null) filePaths.add(path);
@@ -103,14 +91,13 @@ class ImageUtils {
     return resource;
   }
 
-  static Future<Map<String, dynamic>> pickImageFromGallery(
-          {bool multiple = true}) async =>
-      await _pickImageFrom(source: ImageSource.gallery, multiple: multiple);
+  static Future<Map<String, dynamic>> pickFromGallery(
+      {bool multiple = true, bool pickImage = true}) async =>
+      await _pickFrom(source: ImageSource.gallery, multiple: multiple, pickImage: pickImage);
 
-  static Future<Map<String, dynamic>> takePhoto(
-          {CameraDevice cameraDevice = CameraDevice.rear}) async =>
-      await _pickImageFrom(
-          source: ImageSource.camera, cameraDevice: cameraDevice);
+  static Future<Map<String, dynamic>> takeFromCamera(
+          {CameraDevice cameraDevice = CameraDevice.rear, bool pickImage = true}) async =>
+      await _pickFrom(source: ImageSource.camera, cameraDevice: cameraDevice, multiple: false, pickImage: pickImage);
 
   static showPermissionExplanation(
       {required BuildContext context, String? message}) {

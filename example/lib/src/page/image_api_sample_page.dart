@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/utils/alert_utils.dart';
-import 'package:cloudflare_example/src/utils/image_utils.dart';
+import 'package:cloudflare_example/src/utils/picker_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,17 +20,6 @@ class ImageAPIDemoPage extends StatefulWidget {
 enum FileSource {
   path,
   bytes,
-}
-
-class DataTransmitNotifier {
-  final DataTransmit<String> dataTransmit;
-  final notifier = ValueNotifier<double>(0);
-
-  DataTransmitNotifier({required this.dataTransmit}) {
-    dataTransmit.progressCallback ??= (count, total) {
-      notifier.value = count.toDouble() / total.toDouble();
-    };
-  }
 }
 
 class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
@@ -87,11 +76,12 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         children: [
           Image.file(
             File(data.dataTransmit.data),
+            key: ValueKey('image-file-${data.dataTransmit.data}'),
             width: 100,
             height: 100,
           ),
           ValueListenableBuilder<double>(
-            key: ValueKey(data.dataTransmit.data),
+            key: ValueKey('image-file-progress-${data.dataTransmit.data}'),
             valueListenable: data.notifier,
             builder: (context, value, child) {
               if (value == 0 && !loading) return const SizedBox();
@@ -561,15 +551,15 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     try {
       switch (id) {
         case loadImage:
-          AlertUtils.showImagePickerModal(
+          AlertUtils.showPickerModal(
             context: context,
-            onImageFromCamera: () async {
+            onFromCamera: () async {
               onNewImages(await handleImagePickerResponse(
-                  ImageUtils.takePhoto(cameraDevice: CameraDevice.rear)));
+                  PickerUtils.takeFromCamera(cameraDevice: CameraDevice.rear)));
             },
-            onImageFromGallery: () async {
+            onFromGallery: () async {
               onNewImages(await handleImagePickerResponse(
-                  ImageUtils.pickImageFromGallery()));
+                  PickerUtils.pickFromGallery()));
             },
           );
           break;
@@ -605,7 +595,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
         Navigator.pop(context);
         return resource['data'];
       default:
-        ImageUtils.showPermissionExplanation(
+        PickerUtils.showPermissionExplanation(
             context: context, message: resource['message']);
         break;
     }

@@ -34,6 +34,17 @@ const String userServiceKey =
 late Cloudflare cloudflare;
 String? cloudflareInitMessage;
 
+class DataTransmitNotifier {
+  final DataTransmit<String> dataTransmit;
+  final notifier = ValueNotifier<double>(0);
+
+  DataTransmitNotifier({required this.dataTransmit}) {
+    dataTransmit.progressCallback ??= (count, total) {
+      notifier.value = count.toDouble() / total.toDouble();
+    };
+  }
+}
+
 void main() async {
   try {
     cloudflare = Cloudflare(

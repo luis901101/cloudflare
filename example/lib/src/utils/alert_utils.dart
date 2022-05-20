@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 typedef ReviewCallback<T> = Function(T rate);
 
 class AlertUtils {
-  static showImagePickerModal({
+  static showPickerModal({
     required BuildContext context,
-    VoidCallback? onImageFromCamera,
-    VoidCallback? onImageFromGallery,
-    VoidCallback? onImageRemove,
+    VoidCallback? onFromCamera,
+    VoidCallback? onFromGallery,
+    VoidCallback? onRemove,
   }) {
     showModalBottomSheet(
         context: context,
@@ -37,7 +37,7 @@ class AlertUtils {
                         ],
                       ),
                     ),
-                    onTap: onImageFromCamera,
+                    onTap: onFromCamera,
                   ),
                   InkWell(
                     child: Container(
@@ -59,7 +59,7 @@ class AlertUtils {
                         ],
                       ),
                     ),
-                    onTap: onImageFromGallery,
+                    onTap: onFromGallery,
                   ),
                   Visibility(
                     child: InkWell(
@@ -84,9 +84,9 @@ class AlertUtils {
                           ],
                         ),
                       ),
-                      onTap: onImageRemove,
+                      onTap: onRemove,
                     ),
-                    visible: onImageRemove != null,
+                    visible: onRemove != null,
                   ),
                 ],
               ),

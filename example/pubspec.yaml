@@ -32,6 +32,7 @@ dependencies:
   cloudflare:
     path: ../
   image_picker: ^0.8.5+3
+  chewie: ^1.3.3
 
 
 dev_dependencies:

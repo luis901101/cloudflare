@@ -1,10 +1,12 @@
 import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/page/image_api_sample_page.dart';
+import 'package:cloudflare_example/src/page/stream_api_sample_page.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
   static const pages = [
     {'title': 'Image API Demo', 'page': ImageAPIDemoPage()},
+    {'title': 'Stream API Demo', 'page': StreamAPIDemoPage()},
   ];
 
   const App({Key? key}) : super(key: key);
@@ -39,8 +41,8 @@ class App extends StatelessWidget {
             : ListView.builder(
                 itemCount: pages.length,
                 itemBuilder: (context, index) {
-                  final title = pages[0]['title'].toString();
-                  final page = pages[0]['page'] as Widget;
+                  final title = pages[index]['title'].toString();
+                  final page = pages[index]['page'] as Widget;
                   return ListTile(
                     onTap: () => Navigator.push(
                         context, MaterialPageRoute(builder: (context) => page)),
