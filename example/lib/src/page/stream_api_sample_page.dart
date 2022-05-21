@@ -129,15 +129,12 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: chewieControllerFromPath!.videoPlayerController.value.isInitialized ?
-          SizedBox(
-            width: MediaQueryData.fromWindow(window).size.width * 70 / 100,
-            child: AspectRatio(
-              key: ValueKey('video-file-$path'),
-              // aspectRatio: chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
-              aspectRatio: 3,
-              child: Chewie(
-                controller: chewieControllerFromPath!,
-              ),
+          AspectRatio(
+            key: ValueKey('video-file-$path'),
+            aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
+            // aspectRatio: 3,
+            child: Chewie(
+              controller: chewieControllerFromPath!,
             ),
           ) : const CircularProgressIndicator(),
         ),
@@ -179,15 +176,11 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized ?
-      SizedBox(
-        width: MediaQueryData.fromWindow(window).size.width * 70 / 100,
-        child: AspectRatio(
-          key: ValueKey('video-file-$url'),
-          // aspectRatio: chewieControllerFromUrl!.videoPlayerController.value.aspectRatio,
-          aspectRatio: 3,
-          child: Chewie(
-            controller: chewieControllerFromUrl!,
-          ),
+      AspectRatio(
+        key: ValueKey('video-file-$url'),
+        aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
+        child: Chewie(
+          controller: chewieControllerFromUrl!,
         ),
       ) : const CircularProgressIndicator(),
     );
