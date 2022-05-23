@@ -87,8 +87,17 @@ class TusAPI {
     );
   }
 
+  /// Get the upload state
+  TusUploadState get state => _tusClient.state;
+
+  /// Get the error message in case of any error
+  String? get errorMessage => _tusClient.errorMessage;
+
   /// Pause the current upload
   Future? pauseUpload() => _tusClient.pauseUpload();
+
+  /// Cancels the current upload
+  Future? cancelUpload() => _tusClient.cancelUpload();
 
   /// Resume the current upload
   Future<void> resumeUpload() => _tusClient.resumeUpload();

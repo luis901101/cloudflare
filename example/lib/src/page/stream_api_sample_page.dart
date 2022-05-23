@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:tusc/tusc.dart';
 
 class StreamAPIDemoPage extends StatefulWidget {
   const StreamAPIDemoPage({Key? key}) : super(key: key);
@@ -41,6 +42,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   ChewieController? chewieControllerFromPath;
   ChewieController? chewieControllerFromUrl;
   Timer? awaitingToBeReadyToStreamTimer;
+  TusAPI? tusAPI;
 
   bool loading = false;
   String? errorMessage;
@@ -85,6 +87,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   void onUploadTypeChanged(UploadType? value) =>
       setState(() => uploadType = value!);
 
+  bool get tusCanPlay => tusAPI?.state != TusUploadState.uploading;
+  bool get tusCanPause => tusAPI?.state == TusUploadState.uploading;
+
   Widget get uploadTypeView => Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -106,7 +111,38 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                 value: UploadType.tus,
                 groupValue: uploadType,
                 onChanged: onUploadTypeChanged),
-          )
+          ),
+          if(tusAPI != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    if(tusCanPlay) {
+                      await tusAPI?.resumeUpload();
+                    } else {
+                      await tusAPI?.pauseUpload();
+                    }
+                    setState(() {
+
+                    });
+                  },
+                  iconSize: 32,
+                  icon: Icon(tusCanPlay ? Icons.play_circle_fill : Icons.pause_circle_filled, color: Colors.green,),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () async {
+                    await tusAPI?.cancelUpload();
+                    setState(() {
+
+                    });
+                  },
+                  iconSize: 32,
+                  icon: const Icon(Icons.cancel, color: Colors.red,),
+                )
+              ],
+            ),
         ],
       );
 
@@ -552,17 +588,18 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
         default:
       }
 
-      final tusAPI = await cloudflare.streamAPI.tusStream(
+      tusAPI = await cloudflare.streamAPI.tusStream(
         path: path,
         bytes: bytes,
         timeout: const Duration(minutes: 2),
       );
-
-      await tusAPI.startUpload(
+      setState(() {});
+      await tusAPI?.startUpload(
         onProgress: (count, total) {
           dataVideo?.dataTransmit.progressCallback?.call(count, total);
         },
         onComplete: (cloudflareStreamVideo) {
+          tusAPI = null;
           if(cloudflareStreamVideo != null) {
             awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
           } else {
@@ -659,17 +696,19 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
               maxDurationSeconds: chewieControllerFromPath!
                   .videoPlayerController.value.duration.inSeconds);
       if(responseCreateDirectUpload.isSuccessful && responseCreateDirectUpload.body != null) {
-        final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
+        tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: responseCreateDirectUpload.body!,
           path: path,
           bytes: bytes,
           timeout: const Duration(minutes: 2),
         );
-        await tusAPI.startUpload(
+        setState(() {});
+        await tusAPI?.startUpload(
           onProgress: (count, total) {
             dataVideo?.dataTransmit.progressCallback?.call(count, total);
           },
           onComplete: (cloudflareStreamVideo) {
+            tusAPI = null;
             if(cloudflareStreamVideo != null) {
               awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
             } else {
