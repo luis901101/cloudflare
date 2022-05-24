@@ -383,6 +383,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     };
   }
 
+  /// Builds a CloudflareStreamVideo from an url if url is properly created
   static CloudflareStreamVideo? fromUrl(String url) {
     final data = _dataFromVideoDeliveryUrl(url);
     return data.isEmpty ? null : CloudflareStreamVideo(

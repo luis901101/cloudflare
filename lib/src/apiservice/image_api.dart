@@ -405,7 +405,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     return response;
   }
 
-  /// Delete a list of images on Cloudflare Images. On success, all copies of the images
+  /// Deletes a list of images on Cloudflare Images. On success, all copies of the images
   /// are deleted and purged from Cache.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
     /// List of image identifiers

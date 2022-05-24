@@ -123,6 +123,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     };
   }
 
+  /// Builds a CloudflareImage from an url if url is properly created
   static CloudflareImage? fromUrl(String url) {
     final data = _dataFromImageDeliveryUrl(url);
     return data.isEmpty ? null : CloudflareImage(

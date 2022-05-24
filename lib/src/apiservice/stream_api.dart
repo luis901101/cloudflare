@@ -257,6 +257,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// This function is to be used specifically after a video
   /// createDirectStreamUpload has been requested.
   ///
+  /// A video up to 200 MegaBytes can be uploaded using a single HTTP POST
+  /// (multipart/form-data) request.  For larger file sizes, please upload
+  /// using the TUS protocol.
+  ///
   /// Documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> directStreamUpload({
     /// Information on where to stream upload the video without an API key or token
@@ -642,7 +646,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return response;
   }
 
-  /// Direct upload using tus(https://tus.io) protocol
+  /// Direct upload using tus(https://tus.io) protocol.
   /// Direct uploads allow users to upload videos without API keys. A common
   /// place to use direct uploads is on web apps, client side applications,
   /// or on mobile devices where users upload content directly to Stream.
@@ -650,7 +654,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// IMPORTANT: when using tus protocol for direct stream upload it's not
   /// required to set a [maxDurationSeconds] because Cloudflare will reserve a
   /// loose amount o minutes for the video to be uploaded, for instance 240
-  /// minutes will be reserved from you available storage.
+  /// minutes will be reserved from your available storage. Nevertheless it's
+  /// recommended to set the `maxDurationSeconds` to avoid running out of
+  /// available minutes when multiple simultaneously tus uploads are taking
+  /// place.
   ///
   /// Documentation: https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb
   Future<CloudflareHTTPResponse<DataUploadDraft?>> createTusDirectStreamUpload({
@@ -869,7 +876,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     return response;
   }
 
-  /// Delete a list of videos on Cloudflare Stream. On success, all copies of
+  /// Deletes a list of videos on Cloudflare Stream. On success, all copies of
   /// the videos are deleted.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
     /// CloudflareStreamVideo identifiers

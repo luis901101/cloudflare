@@ -13,9 +13,9 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
 
 - [Installation](#installation)
 - [How to use](#how-to-use)
-  - [Authorized api access](#authorized-api-access)
+  - [Signed api access](#signed-api-access)
     - [Authorization Important Note](#authorization-important-note)
-  - [Not authorization required api access](#not-authorization-required-api-access)
+  - [Unsigned api access](#unsigned-api-access)
   - [Initialization](#once-cloudflare-instance-is-created-then-initialize-it-like-this)
   - [Some important clases](#some-important-clases)
   - [ImageAPI](#how-to-use-imageapi)
@@ -29,7 +29,20 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
     - [Get stats](#get-stats)
     - [Delete image](#delete-image)
     - [Delete multiple images](#delete-multiple-images)
-- [Recommendations](#recommendations)
+  - [StreamAPI](#how-to-use-streamapi)
+    - [Stream upload](#stream-upload)
+    - [Multiple stream upload](#multiple-stream-upload)
+    - [Create a direct stream upload](#create-a-direct-stream-upload)
+    - [Doing a direct stream upload](#doing-a-direct-stream-upload)
+    - [TUS stream upload](#tus-stream-upload)
+    - [Create a TUS direct stream upload](#create-a-tus-direct-stream-upload)
+    - [Doing a TUS direct stream upload](#doing-a-tus-direct-stream-upload)
+    - [About TUS implementation](#about-tus-implementation)
+    - [Get all videos](#get-all-videos)
+    - [Get video by id](#get-video-by-id)
+    - [Delete video](#delete-video)
+    - [Delete multiple videos](#delete-multiple-videos)
+- [Final notes](#final-notes)
 
 
 ## Installation
@@ -49,7 +62,7 @@ Finally you just have to run:
 `dart pub get` **or** `flutter pub get` depending on the project type and this will download the dependency to your pub-cache
 
 ## How to use
-### **Authorized api access:**
+### **Signed api access:**
 For server side apps where you can securely store `accountId`, `token` or any cloudflare credential, you can use the full `Cloudflare` constructor.
 ```dart
 cloudflare = Cloudflare(  
@@ -106,7 +119,7 @@ cloudflare = Cloudflare(
 );
 ```
 
-### **Not authorization required api access:**
+### **Unsigned api access:**
 For client side apps like flutter apps where you can't securely store `accountId`, `token` or any cloudflare credential, like when you just need to do image or stream **direct upload**, it's recommended to use the `.basic()` constructor.
 ```dart
 cloudflare = Cloudflare.basic(apiUrl: apiUrl); //apiUrl is optional
@@ -132,6 +145,7 @@ Done, you can now access Cloudflare API.
 
 ### Upload image
 You can upload an image from **file**, **file path** or directly from it's binary representation as a **byte array**.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-upload-an-image-using-a-single-http-request)
 ```dart
 //From file
 CloudflareHTTPResponse<CloudflareImage?> responseFromFile = await cloudflare.imageAPI.upload(  
@@ -157,7 +171,6 @@ CloudflareHTTPResponse<CloudflareImage?> responseFromBytes = await cloudflare.im
 
 ### Upload multiple images
 Just like you upload an image you can also upload multiple images from **files**, **file paths** or **byte arrays**.
-
 ```dart
 //From files
 List<CloudflareHTTPResponse<CloudflareImage?>> responseFromFiles = await cloudflare.imageAPI.uploadMultiple(contentFromFiles: contentFromFiles);
@@ -171,6 +184,7 @@ List<CloudflareHTTPResponse<CloudflareImage?>> responseFromBytes = await cloudfl
 
 ### Create a direct upload
 Creates a draft record for a future image and returns upload URL and image identifier that can be used later to verify if image itself has been uploaded or not with the draft: true property in the image response. This request is used to allow client side apps to later direct upload an image without API key or token.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2)
 ```dart
 final response = await cloudflare.imageAPI.createDirectUpload();  
 final dataUploadDraft = response.body;
@@ -180,6 +194,7 @@ print(dataUploadDraft?.uploadURL);
 
 ### Doing a direct upload
 For image direct upload without API key or token. This function is to be used specifically after an image `createDirectUpload` has been requested. A common place to use this is in client side apps.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2)
 ```dart
 final response = await cloudflare.imageAPI.directUpload(  
   dataUploadDraft: dataUploadDraft!,  
@@ -192,21 +207,28 @@ final response = await cloudflare.imageAPI.directUpload(
 ```
 
 ### Get all images
+Up to 100 images can be listed with one request, use optional parameters to get a specific range of images.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-list-images)
 ```dart
 CloudflareHTTPResponse<List<CloudflareImage>?> responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);
 ```
 
 ### Get image by id
+Fetch details of a single image.
+
 This way you get the `CloudflareImage` object.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-image-details)
 ```dart
 CloudflareHTTPResponse<CloudflareImage> response = await cloudflare.imageAPI.get(id: imageId);
 ```
 This way you get the binary from the originally uploaded image:
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-base-image)
 ```dart
 CloudflareHTTPResponse<List<int>?> response = await cloudflare.imageAPI.getBase(id: imageId!);
 ```
 ### Update an image
 Update image access control. On access control change,  all copies of the image are purged from Cache.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-update-image)
 ```dart
 final response = await cloudflare.imageAPI.update(  
   image: CloudflareImage(  
@@ -217,12 +239,14 @@ final response = await cloudflare.imageAPI.update(
 );
 ```
 ### Get stats
-Fetch details of Cloudflare Images usage statistics
+Fetch details of Cloudflare Images usage statistics.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-images-usage-statistics)
 ```dart
 final CloudflareHTTPResponse<ImageStats?> response = await cloudflare.imageAPI.getStats();
 ```
 ### Delete image
 Delete an image on Cloudflare Images. On success, all copies of the image are deleted and purged from Cache.
+[Official documentation here](https://api.cloudflare.com/#cloudflare-images-delete-image)
 ```dart
 final response = await cloudflare.imageAPI.delete(id: imageId);
 ```
@@ -234,8 +258,210 @@ for (final response in responses) {
   print(response.isSuccessful);  
 }
 ```
+## How to use StreamAPI
+### Stream upload
+A video up to 200 MegaBytes can be uploaded using a single HTTP POST (multipart/form-data) request.  For larger file sizes, please upload using the TUS protocol.
+You can upload a video from **url**, **file**, **file path** or directly from it’s binary representation as a **byte array**
+[Official documentation here](https://api.cloudflare.com/#stream-videos-upload-a-video-using-a-single-http-request) and [here](https://api.cloudflare.com/#stream-videos-upload-a-video-from-a-url)
+```dart
+//From url
+CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
+	contentFromUrl: DataTransmit<String>(  
+		data: videoUrl,  
+		progressCallback: (count, total) {  
+			print('Stream video progress: $count/$total');  
+  }));
+  
+//From file
+CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
+	contentFromFile: DataTransmit<File>(  
+		data: videoFile,  
+		progressCallback: (count, total) {  
+			print('Stream video progress: $count/$total');  
+  }));
 
+//From path
+CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
+	contentFromFile: DataTransmit<String>(  
+		data: videoFile.path,  
+		progressCallback: (count, total) {  
+			print('Stream video progress: $count/$total');  
+  }));
+
+//From bytes
+CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
+	contentFromFile: DataTransmit<Uint8List>(  
+		data: videoFile.readAsBytesSync(),  
+		progressCallback: (count, total) {  
+			print('Stream video progress: $count/$total');  
+  }));
+```
+
+### Multiple stream upload
+Just like you do a stream upload you can also do multiple stream upload from **urls**, **files**, **file paths** or **byte arrays**.
+
+```dart
+//From urls
+List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromUrls = await cloudflare.streamAPI.streamMultiple(contentFromUrls: contentFromUrls);
+
+//From files
+List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromFiles = await cloudflare.streamAPI.streamMultiple(contentFromFiles: contentFromFiles);
+
+//From paths
+List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromPaths = await cloudflare.streamAPI.streamMultiple(contentFromPaths: contentFromPaths);
+
+//From bytes
+List<CloudflareHTTPResponse<CloudflareImageCloudflareStreamVideo?>> responseFromBytes = await cloudflare.streamAPI.streamMultiple(contentFromBytes: contentFromBytes);
+```
+
+### Create a direct stream upload
+Direct uploads allow users to upload videos without API keys. A common place to use direct uploads is on web apps, client side applications, or on mobile devices where users upload content directly to Stream. This request is used to allow client side apps to later direct stream upload a video without API key or token.
+
+*Direct uploads occupy minutes of videos on your Stream account until they are expired. A `maxDurationSeconds` value is required to calculate the duration the video will occupy before the video is uploaded. After upload, the duration of the uploaded will be used instead. If a video longer than this value is uploaded, the video will result in an error.*
+**Min value:** `1 second`
+**Max value:** `21600 seconds which is 360 mins, 6 hours  `
+**e.g:** `300 seconds which is 5 mins`
+[Official documentation here](https://api.cloudflare.com/#stream-videos-create-a-video-and-get-authenticated-direct-upload-url)
+```dart
+final response = await cloudflare.imageAPI.createDirectStreamUpload(maxDurationSeconds: 60);  
+final dataUploadDraft = response.body;
+print(dataUploadDraft?.id);  
+print(dataUploadDraft?.uploadURL);
+```
+
+### Doing a direct stream upload
+For video direct stream upload without API key or token. This function is to be used specifically after a video `createDirectStreamUpload` has been requested. A common place to use this is in client side apps.
+
+*A video up to 200 MegaBytes can be uploaded using a single HTTP POST (multipart/form-data) request.  For larger file sizes, please upload using the TUS protocol.*
+[Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/)
+```dart
+final response = await cloudflare.imageAPI.directStreamUpload(  
+  dataUploadDraft: dataUploadDraft!,  
+  contentFromFile: DataTransmit<File>(  
+	data: imageFile,  
+	progressCallback: (count, total) {  
+		print('Stream video to direct upload URL from file: $count/$total');  
+	})  
+);
+```
+### TUS stream upload
+For videos larger than 200 MegaBytes [tus](https://tus.io) protocol is used. **tus** protocol also allows you to pause/resume uploads. Similar to the normal stream upload described above you can also stream upload from a **file**, **file path** or **byte array** using **tus** protocol
+[Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files)
+```dart
+final tusAPI = await cloudflare.streamAPI.tusStream(  
+	file: videoFile,
+	name: 'test-video-upload',   
+	cache: TusMemoryCache()    
+);   
+tusAPI?.startUpload(  
+  onProgress: (count, total) {  
+	print('tus stream video: $count/$total');  
+  },  
+  onComplete: (cloudflareStreamVideo) { 
+  	print('tus stream video completed');   
+  },  
+  onTimeout: () {  
+	print('tus request timeout');  
+  }
+);
+await Future.delayed(const Duration(seconds: 2), () {  
+  print('Upload paused');  
+  tusAPI.pauseUpload();  
+});  
+await Future.delayed(const Duration(seconds: 4), () {  
+  print('Upload resumed');  
+  tusAPI.resumeUpload();  
+});
+```
+
+### Create a TUS direct stream upload
+Direct upload using tus(https://tus.io) protocol. Direct uploads allow users to upload videos without API keys. A common place to use direct uploads is on web apps, client side applications, or on mobile devices where users upload content directly to Stream.
+
+**IMPORTANT:** when using tus protocol for direct stream upload it's not required to set a `maxDurationSeconds` because Cloudflare will reserve a loose amount o minutes for the video to be uploaded, for instance 240 minutes will be reserved from your available storage. Nevertheless it's recommended to set the `maxDurationSeconds` to avoid running out of available minutes when multiple simultaneously **tus** uploads are taking place.
+
+**It's required to set the `size` of the file to upload.**
+
+*Direct uploads occupy minutes of videos on your Stream account until they are expired. A `maxDurationSeconds` value is used to calculate the duration the video will occupy before the video is uploaded. After upload, the duration of the uploaded will be used instead. If a video longer than this value is uploaded, the video will result in an error.*
+**Min value:** `1 second`
+**Max value:** `21600 seconds which is 360 mins, 6 hours  `
+**e.g:** `300 seconds which is 5 mins`
+[Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb)
+```dart
+final response = await cloudflare.imageAPI.createTusDirectStreamUpload(
+	size: File(dataVideo!.dataTransmit.data).lengthSync(),  
+	maxDurationSeconds: videoPlayerController.value.duration.inSeconds,
+	name: 'tus-video-direct-upload',
+);  
+final dataUploadDraft = response.body;
+print(dataUploadDraft?.id);  
+print(dataUploadDraft?.uploadURL);
+```
+
+### Doing a TUS direct stream upload
+For larger than 200 MegaBytes video direct stream upload using [tus](https://tus.io) protocol without API key or token. This function is to be used specifically after a video `createTusDirectStreamUpload` has been requested. A common place to use this is in client side apps.
+```dart
+final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(  
+	dataUploadDraft: dataUploadDraft!,  
+	file: videoFile,
+	cache: TusPersistentCache(''),    
+);   
+tusAPI?.startUpload(  
+  onProgress: (count, total) {  
+	print('tus stream video: $count/$total');  
+  },  
+  onComplete: (cloudflareStreamVideo) { 
+  	print('tus stream video completed');   
+  },  
+  onTimeout: () {  
+	print('tus request timeout');  
+  }
+);
+await Future.delayed(const Duration(seconds: 2), () {  
+  print('Upload paused');  
+  tusAPI.pauseUpload();  
+});  
+await Future.delayed(const Duration(seconds: 4), () {  
+  print('Upload resumed');  
+  tusAPI.resumeUpload();  
+});
+```
+
+#### About TUS implementation
+This package uses the [tusc](https://pub.dev/packages/tusc) package implementation, which brings two kinds of cache, `TusMemoryCache` which allows you to pause/resume uploads as long as app keeps running and `TusPersistentCache` which allows you to pause/resume uploads no matter if app closes or even device gets restarted.
+
+### Get all videos
+Up to 1000 videos can be listed with one request, use optional parameters to get a specific range of videos. Please note that Cloudflare Stream does not use pagination, instead it uses a cursor pattern to list more than 1000 videos. In order to list all videos, make multiple requests to the API using the created date-time of the last item in the previous request as the before or after parameter.
+[Official documentation here](https://api.cloudflare.com/#stream-videos-list-videos)
+```dart
+CloudflareHTTPResponse<List<CloudflareStreamVideo>?> responseList = await cloudflare.streamAPI.getAll(
+search: 'puppy.mp4',
+before: DateTime.now(),
+limit: 20,
+);
+```
+
+### Get video by id
+Fetch details of a single video.
+[Official documentation here](https://api.cloudflare.com/#stream-videos-video-details)
+```dart
+CloudflareHTTPResponse<CloudflareImage> response = await cloudflare.streamAPI.get(id: videoId);
+```
+### Delete video
+Delete a video on Cloudflare Stream. On success, all copies of the video are deleted.
+[Official documentation here](https://api.cloudflare.com/#stream-videos-delete-video)
+```dart
+final response = await cloudflare.streamAPI.delete(video: cloudflareStreamVideo,);
+```
+### Delete multiple videos
+Deletes a list of videos on Cloudflare Stream. On success, all copies of the videos are deleted.
+```dart
+final responses = await cloudflare.streamAPI.deleteMultiple(ids: idList);
+for (final response in responses) {
+print(response.isSuccessful);
+}
+```
 -------------
-### Recommendations:
+### Final notes:
+- Every class, property and function is documented and references Cloudfare's official documentation.
 - Check the example project to see how to use this package from a flutter app.
 - Check the unit tests to see how to use each api in details.

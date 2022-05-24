@@ -64,7 +64,7 @@ class TusAPI {
   Future<void> startUpload({
     dio.ProgressCallback? onProgress,
     Function(CloudflareStreamVideo? cloudflareStreamVideo)? onComplete,
-    Function()? onTimeoutCallback,
+    Function()? onTimeout,
   }) {
     return _tusClient.startUpload(
       onProgress: (count, total, response) {
@@ -83,7 +83,7 @@ class TusAPI {
           onComplete(cloudflareStreamVideo);
         }
       },
-      onTimeout: onTimeoutCallback,
+      onTimeout: onTimeout,
     );
   }
 

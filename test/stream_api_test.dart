@@ -351,7 +351,7 @@ void main() async {
             expect(cloudflareStreamVideo, isNotNull, reason: 'CloudFlareStreamVideo must not be null after tus stream upload');
             expect(cloudflareStreamVideo?.id, isNotEmpty, reason: 'CloudFlareStreamVideo id must not be empty after tus stream upload');
           },
-          onTimeoutCallback: () {
+          onTimeout: () {
             print('Request timeout');
           }
         );
@@ -373,7 +373,7 @@ void main() async {
     late final CloudflareHTTPResponse<List<CloudflareStreamVideo>?> responseList;
     String? videoId;
     setUpAll(() async {
-      responseList = await cloudflare.streamAPI.getAll(/*page: 1, size: 20*/);
+      responseList = await cloudflare.streamAPI.getAll(before: DateTime.now());
     });
 
     test('Get video list', () async {
