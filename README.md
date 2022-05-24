@@ -13,13 +13,24 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
 
 - [Installation](#installation)
 - [How to use](#how-to-use)
-  - [Constructor](#very-simple-just-build-an-instance-of-cloudflare-sdk-like-this)
-  - [Adding Extra Headers](#adding-extra-headers)
-  - [Adding extra data](#adding-extra-data)
-  - [Changing chunk size](#changing-chunk-size)
-  - [Pausing upload](#pausing-upload)
-  - [Example](#example)
-  - [Maintainers](#maintainers)
+  - [Authorized api access](#authorized-api-access)
+    - [Authorization Important Note](#authorization-important-note)
+  - [Not authorization required api access](#not-authorization-required-api-access)
+  - [Initialization](#once-cloudflare-instance-is-created-then-initialize-it-like-this)
+  - [Some important clases](#some-important-clases)
+  - [ImageAPI](#how-to-use-imageapi)
+    - [Upload image](#upload-image)
+    - [Upload multiple images](#upload-multiple-images)
+    - [Create a direct upload](#create-a-direct-upload)
+    - [Doing a direct upload](#doing-a-direct-upload)
+    - [Get all images](#get-all-images)
+    - [Get image by id](#get-image-by-id)
+    - [Update an image](#update_an-image)
+    - [Get stats](#get-stats)
+    - [Delete image](#delete-image)
+    - [Delete multiple images](#delete-multiple-images)
+- [Recommendations](#recommendations)
+
 
 ## Installation
 The first thing is to add **cloudflare** as a dependency of your project, for this you can use the command:
@@ -225,4 +236,6 @@ for (final response in responses) {
 ```
 
 -------------
-### **For more examples about how to use this package check the example project and unit tests**
+### Recommendations:
+- Check the example project to see how to use this package from a flutter app.
+- Check the unit tests to see how to use each api in details.
