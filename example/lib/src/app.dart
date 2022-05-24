@@ -1,5 +1,7 @@
 import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/page/image_api_sample_page.dart';
+import 'package:cloudflare_example/src/page/live_input_api_sample_page.dart';
+import 'package:cloudflare_example/src/page/sample_page.dart';
 import 'package:cloudflare_example/src/page/stream_api_sample_page.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,8 @@ class App extends StatelessWidget {
   static const pages = [
     {'title': 'Image API Demo', 'page': ImageAPIDemoPage()},
     {'title': 'Stream API Demo', 'page': StreamAPIDemoPage()},
+    {'title': 'Live Input API Demo', 'page': LiveInputAPIDemoPage()},
+    {'title': 'Sample page', 'page': LiveViewPage()},
   ];
 
   const App({Key? key}) : super(key: key);

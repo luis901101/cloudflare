@@ -49,5 +49,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- For webrtc live streaming -->
+	<key>NSCameraUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs Camera permission for live streaming</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs Microphone permission for live streaming</string>
 </dict>
 </plist>

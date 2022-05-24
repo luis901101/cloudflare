@@ -33,6 +33,8 @@ dependencies:
     path: ../
   image_picker: ^0.8.5+3
   chewie: ^1.3.3
+  apivideo_live_stream: ^1.0.1
+  settings_ui: ^2.0.1
 
 
 dev_dependencies:

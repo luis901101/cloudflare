@@ -46,6 +46,8 @@ class LiveInputStatusLog extends Jsonable<LiveInputStatusLog> {
     this.statusLastSeen,
   });
 
+  bool get isConnected => state == 'connected';
+
   @override
   Map<String, dynamic> toJson() => _$LiveInputStatusLogToJson(this);
 

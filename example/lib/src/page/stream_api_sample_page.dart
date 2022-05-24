@@ -166,7 +166,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           duration: const Duration(milliseconds: 300),
           child: chewieControllerFromPath!.videoPlayerController.value.isInitialized ?
           AspectRatio(
-            key: ValueKey('video-file-$path'),
+            key: ValueKey('video-from-file-$path'),
             aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
             // aspectRatio: 3,
             child: Chewie(
@@ -175,7 +175,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           ) : const CircularProgressIndicator(),
         ),
         ValueListenableBuilder<double>(
-          key: ValueKey('video-file-progress-$path'),
+          key: ValueKey('video-from-file-progress-$path'),
           valueListenable: data.notifier,
           builder: (context, value, child) {
             if (value == 0 && !loading) return const SizedBox();
@@ -195,7 +195,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   }
 
   Widget videoFromUrlView(CloudflareStreamVideo video) {
-    // String url = video.preview; // Cloudflare vide previews doesn't allow Range header which is required in iOS with https://pub.dev/packages/video_player
+    // String url = video.preview; // Cloudflare video previews doesn't allow Range header which is required in iOS with https://pub.dev/packages/video_player
     String url = video.playback?.hls ?? '';
     if(chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
       clearVideoUrlControllers();
@@ -213,8 +213,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
       duration: const Duration(milliseconds: 300),
       child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized ?
       AspectRatio(
-        key: ValueKey('video-file-$url'),
-        aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
+        key: ValueKey('video-from-url-$url'),
+        aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromUrl!.videoPlayerController.value.aspectRatio,
         child: Chewie(
           controller: chewieControllerFromUrl!,
         ),
@@ -319,22 +319,21 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                       ),
                     ],
                   ),
-                Visibility(
-                    visible: errorMessage?.isNotEmpty ?? false,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$errorMessage',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 18, color: Colors.red.shade900),
-                        ),
-                        const SizedBox(
-                          height: 128,
-                        ),
-                      ],
-                    )),
+                if(errorMessage?.isNotEmpty ?? false)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$errorMessage',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 18, color: Colors.red.shade900),
+                    ),
+                    const SizedBox(
+                      height: 128,
+                    ),
+                  ],
+                ),
                 ElevatedButton(
                   onPressed: loading || cloudflareStreamVideo == null
                       ? null
