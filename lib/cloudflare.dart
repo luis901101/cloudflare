@@ -138,8 +138,8 @@ class Cloudflare {
   /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
-  factory Cloudflare.basic() =>
-    Cloudflare(accountId: '', tokenCallback: () async => '');
+  factory Cloudflare.basic({String? apiUrl}) =>
+    Cloudflare(apiUrl: apiUrl, accountId: '', tokenCallback: () async => '');
 
   bool get isInitialized => _initialized;
 
