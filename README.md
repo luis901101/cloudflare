@@ -1,15 +1,15 @@
 
 
 ## Description
-This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](https://api.cloudflare.com/).
+This package aims to be a dart SDK for the [Cloudflare API](https://api.cloudflare.com/).
 
 ## Available APIs
 
 | API | Available |
 | ------ | ------ |
-| Cloudflare Images | :white_check_mark: |
-| Stream Videos | :white_check_mark: |
-| Stream Live Inputs | :white_check_mark: |
+| [Cloudflare Images](https://api.cloudflare.com/#cloudflare-images-properties) | :white_check_mark: |
+| [Stream Videos](https://api.cloudflare.com/#stream-videos-properties) | :white_check_mark: |
+| [Stream Live Inputs](https://api.cloudflare.com/#stream-live-inputs-properties) | :white_check_mark: |
 
 - [Installation](#installation)
 - [How to use](#how-to-use)

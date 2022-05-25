@@ -9,7 +9,7 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## 1.0.0+3
+## 1.0.0+4
 ### Added
 - StreamAPI implemented
 - LiveInputAPI implemented
