@@ -278,35 +278,43 @@ You can upload a video from **url**, **file**, **file path** or directly from it
 ```dart
 //From url
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-	contentFromUrl: DataTransmit<String>(  
-		data: videoUrl,  
-		progressCallback: (count, total) {  
-			print('Stream video progress: $count/$total');  
-  }));
+  contentFromUrl: DataTransmit<String>(  
+    data: videoUrl,  
+    progressCallback: (count, total) {  
+      print('Stream video progress: $count/$total');  
+    }
+  )
+);
   
 //From file
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-	contentFromFile: DataTransmit<File>(  
-		data: videoFile,  
-		progressCallback: (count, total) {  
-			print('Stream video progress: $count/$total');  
-  }));
+  contentFromFile: DataTransmit<File>(  
+    data: videoFile,  
+    progressCallback: (count, total) {  
+      print('Stream video progress: $count/$total');  
+    }
+  )
+);
 
 //From path
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-	contentFromFile: DataTransmit<String>(  
-		data: videoFile.path,  
-		progressCallback: (count, total) {  
-			print('Stream video progress: $count/$total');  
-  }));
+  contentFromFile: DataTransmit<String>(  
+    data: videoFile.path,  
+    progressCallback: (count, total) {  
+      print('Stream video progress: $count/$total');  
+    }
+  )
+);
 
 //From bytes
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-	contentFromFile: DataTransmit<Uint8List>(  
-		data: videoFile.readAsBytesSync(),  
-		progressCallback: (count, total) {  
-			print('Stream video progress: $count/$total');  
-  }));
+  contentFromFile: DataTransmit<Uint8List>(  
+    data: videoFile.readAsBytesSync(),  
+    progressCallback: (count, total) {  
+      print('Stream video progress: $count/$total');  
+    }
+  )
+);
 ```
 
 ### Multiple stream upload
@@ -352,7 +360,7 @@ final response = await cloudflare.imageAPI.directStreamUpload(
   contentFromFile: DataTransmit<File>(  
 	data: imageFile,  
 	progressCallback: (count, total) {  
-		print('Stream video to direct upload URL from file: $count/$total');  
+      print('Stream video to direct upload URL from file: $count/$total');  
 	})  
 );
 ```
@@ -361,9 +369,9 @@ For videos larger than 200 MegaBytes [tus](https://tus.io) protocol is used. **t
 [Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files)
 ```dart
 final tusAPI = await cloudflare.streamAPI.tusStream(  
-	file: videoFile,
-	name: 'test-video-upload',   
-	cache: TusMemoryCache()    
+  file: videoFile,
+  name: 'test-video-upload',   
+  cache: TusMemoryCache()    
 );   
 tusAPI?.startUpload(  
   onProgress: (count, total) {  
@@ -400,9 +408,9 @@ Direct upload using tus(https://tus.io) protocol. Direct uploads allow users to 
 [Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb)
 ```dart
 final response = await cloudflare.imageAPI.createTusDirectStreamUpload(
-	size: File(dataVideo!.dataTransmit.data).lengthSync(),  
-	maxDurationSeconds: videoPlayerController.value.duration.inSeconds,
-	name: 'tus-video-direct-upload',
+  size: File(dataVideo!.dataTransmit.data).lengthSync(),  
+  maxDurationSeconds: videoPlayerController.value.duration.inSeconds,
+  name: 'tus-video-direct-upload',
 );  
 final dataUploadDraft = response.body;
 print(dataUploadDraft?.id);  
@@ -413,9 +421,9 @@ print(dataUploadDraft?.uploadURL);
 For larger than 200 MegaBytes video direct stream upload using [tus](https://tus.io) protocol without API key or token. This function is to be used specifically after a video `createTusDirectStreamUpload` has been requested. A common place to use this is in client side apps.
 ```dart
 final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(  
-	dataUploadDraft: dataUploadDraft!,  
-	file: videoFile,
-	cache: TusPersistentCache(''),    
+  dataUploadDraft: dataUploadDraft!,  
+  file: videoFile,
+  cache: TusPersistentCache(''),    
 );   
 tusAPI?.startUpload(  
   onProgress: (count, total) {  
@@ -446,9 +454,9 @@ Up to 1000 videos can be listed with one request, use optional parameters to get
 [Official documentation here](https://api.cloudflare.com/#stream-videos-list-videos)
 ```dart
 CloudflareHTTPResponse<List<CloudflareStreamVideo>?> responseList = await cloudflare.streamAPI.getAll(
-	search: 'puppy.mp4',
-	before: DateTime.now(),
-	limit: 20,
+  search: 'puppy.mp4',
+  before: DateTime.now(),
+  limit: 20,
 );
 ```
 
@@ -484,13 +492,13 @@ final response = await cloudflare.liveInputAPI.create(
   data: CloudflareLiveInput(  
     meta: {  
       Params.name: 'live input test name'  
-  },  
-  recording: LiveInputRecording(  
-        mode: LiveInputRecordingMode.automatic,  
-  allowedOrigins: ['example.com'],  
-  timeoutSeconds: 4,  
-  requireSignedURLs: true  
-  )  
+    },  
+    recording: LiveInputRecording(  
+      mode: LiveInputRecordingMode.automatic,  
+      allowedOrigins: ['example.com'],  
+      timeoutSeconds: 4,  
+      requireSignedURLs: true,  
+    )  
   )  
 );
 ```
@@ -519,8 +527,8 @@ Update details about a single live input
 final response = await cloudflare.liveInputAPI.update(  
   liveInput: CloudflareLiveInput(  
     id: liveInputId,  
-  meta: metadata,  
-  recording: recording,  
+    meta: metadata,  
+    recording: recording,  
   )  
 );
 ```
@@ -543,11 +551,11 @@ Creates a new output which will be re-streamed to by a live input
 [Official documentation here](https://api.cloudflare.com/#stream-live-inputs-add-an-output-to-a-live-input)
 ```dart
 final response = await cloudflare.liveInputAPI.addOutput(
-liveInputId: liveInputId,
-data: LiveInputOutput(
-url: 'rtmp://a.rtmp.youtube.com/live2',
-streamKey: 'uzya-f19y-g2g9-a2ee-51j2'
-)
+  liveInputId: liveInputId,
+  data: LiveInputOutput(
+    url: 'rtmp://a.rtmp.youtube.com/live2',
+    streamKey: 'uzya-f19y-g2g9-a2ee-51j2'
+  )
 );
 ```
 ### Get outputs of a live input
