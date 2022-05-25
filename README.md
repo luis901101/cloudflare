@@ -25,7 +25,7 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
     - [Doing a direct upload](#doing-a-direct-upload)
     - [Get all images](#get-all-images)
     - [Get image by id](#get-image-by-id)
-    - [Update an image](#update_an-image)
+    - [Update an image](#update-an-image)
     - [Get stats](#get-stats)
     - [Delete image](#delete-image)
     - [Delete multiple images](#delete-multiple-images)
@@ -42,6 +42,18 @@ This package aims to be a flutter SDK for the Image and Stream [Cloudflare API](
     - [Get video by id](#get-video-by-id)
     - [Delete video](#delete-video)
     - [Delete multiple videos](#delete-multiple-videos)
+  - [LiveInputAPI](#how-to-use-liveinputapi)
+    - [Create live input](#create-live-input)
+    - [Get all live inputs](#get-all-live-inputs)
+    - [Get live input by id](#get-live-input-by-id)
+    - [Get stream videos associated to live input](#get-stream-videos-associated-to-live-input)
+    - [Update a live input](#update-a-live-input)
+    - [Delete live input](#delete-live-input)
+    - [Delete multiple live inputs](#delete-multiple-live-inputs)
+    - [Add output to live input](#add-output-to-live-input)
+    - [Get outputs of a live input](#get-outputs-of-a-live-input)
+    - [Remove output](#remove-output)
+    - [Delete multiple live inputs](#delete-multiple-live-inputs)
 - [Final notes](#final-notes)
 
 
@@ -434,9 +446,9 @@ Up to 1000 videos can be listed with one request, use optional parameters to get
 [Official documentation here](https://api.cloudflare.com/#stream-videos-list-videos)
 ```dart
 CloudflareHTTPResponse<List<CloudflareStreamVideo>?> responseList = await cloudflare.streamAPI.getAll(
-search: 'puppy.mp4',
-before: DateTime.now(),
-limit: 20,
+	search: 'puppy.mp4',
+	before: DateTime.now(),
+	limit: 20,
 );
 ```
 
@@ -455,10 +467,111 @@ final response = await cloudflare.streamAPI.delete(video: cloudflareStreamVideo,
 ### Delete multiple videos
 Deletes a list of videos on Cloudflare Stream. On success, all copies of the videos are deleted.
 ```dart
-final responses = await cloudflare.streamAPI.deleteMultiple(ids: idList);
-for (final response in responses) {
-print(response.isSuccessful);
+final responses = await cloudflare.streamAPI.deleteMultiple(ids: idList);  
+for (final response in responses) {  
+  print(response.isSuccessful);  
 }
+```
+
+
+
+## How to use LiveInputAPI
+### Create live input
+Creates a live input that can be streamed to.
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-create-a-live-input)
+```dart
+final response = await cloudflare.liveInputAPI.create(  
+  data: CloudflareLiveInput(  
+    meta: {  
+      Params.name: 'live input test name'  
+  },  
+  recording: LiveInputRecording(  
+        mode: LiveInputRecordingMode.automatic,  
+  allowedOrigins: ['example.com'],  
+  timeoutSeconds: 4,  
+  requireSignedURLs: true  
+  )  
+  )  
+);
+```
+### Get all live inputs
+View the live inputs that have been created. Some information is not included on list requests, such as the URL to stream to. To get that information, request a single live input.
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-list-live-inputs)
+```dart
+final responseList = await cloudflare.liveInputAPI.getAll();
+```
+### Get live input by id
+Fetch details about a single live input
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-live-input-details)
+```dart
+final response = await cloudflare.liveInputAPI.get(id: liveInputId!);
+```
+### Get stream videos associated to live input
+Get the`CloudflareStreamVideo` list associated to a `CloudflareLiveInput`
+[Official documentation here](https://developers.cloudflare.com/stream/stream-live/watch-live-stream/)
+```dart
+final responseList = await cloudflare.liveInputAPI.getVideos(id: liveInputId!);
+```
+### Update a live input
+Update details about a single live input
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-update-live-input-details)
+```dart
+final response = await cloudflare.liveInputAPI.update(  
+  liveInput: CloudflareLiveInput(  
+    id: liveInputId,  
+  meta: metadata,  
+  recording: recording,  
+  )  
+);
+```
+### Delete live input
+Prevent a live input from being streamed to. This makes the live input inaccessible to any future API calls or RTMPS transmission.
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-delete-live-input)
+```dart
+final response = await cloudflare.liveInputAPI.delete(id: liveInputId);
+```
+### Delete multiple live inputs
+Deletes a list of live inputs on Cloudflare LiveInput. On success, all copies of the live inputs are deleted.
+```dart
+final responses = await cloudflare.liveInputAPI.deleteMultiple(ids: idList);  
+for (final response in responses) {  
+  print(response.isSuccessful);  
+}
+```
+### Add output to live input
+Creates a new output which will be re-streamed to by a live input
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-add-an-output-to-a-live-input)
+```dart
+final response = await cloudflare.liveInputAPI.addOutput(
+liveInputId: liveInputId,
+data: LiveInputOutput(
+url: 'rtmp://a.rtmp.youtube.com/live2',
+streamKey: 'uzya-f19y-g2g9-a2ee-51j2'
+)
+);
+```
+### Get outputs of a live input
+List outputs associated with a live input
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-list-outputs-associated-with-a-live-input)
+```dart
+final responseList = await cloudflare.liveInputAPI.getOutputs(liveInputId: liveInputId);
+```
+### Remove output
+Removes an output from a live input
+[Official documentation here](https://api.cloudflare.com/#stream-live-inputs-remove-an-output-from-a-live-input)
+```dart
+final response = await removeOutput(  
+  liveInputId: liveInputId,  
+  outputId: outputId,  
+);
+```
+### Delete multiple live inputs
+Removes a list of outputs associated to a LiveInput
+```dart
+final responses = await cloudflare.liveInputAPI.removeMultipleOutputs(  
+  liveInputId: liveInputId,  
+  outputs: outputs,  
+);
 ```
 -------------
 ### Final notes:

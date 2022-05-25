@@ -13,7 +13,7 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
             accountId: accountId,
             dataType: CloudflareLiveInput());
 
-  /// Create a live input that can be streamed to. Add an output in order to
+  /// Creates a live input that can be streamed to. Add an output in order to
   /// direct traffic.
   ///
   /// Documentation: https://api.cloudflare.com/#stream-live-inputs-create-a-live-input
@@ -117,7 +117,7 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     return response;
   }
 
-  /// Delete a list of live inputs on Cloudflare LiveInput. On success, all
+  /// Deletes a list of live inputs on Cloudflare LiveInput. On success, all
   /// copies of the live inputs are deleted.
   Future<List<CloudflareHTTPResponse>> deleteMultiple({
     /// List of CloudflareLiveInput identifiers
@@ -185,7 +185,7 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     );
   }
 
-  /// Remove an output from a live input
+  /// Removes an output from a live input
   ///
   /// Documentation: https://api.cloudflare.com/#stream-live-inputs-remove-an-output-from-a-live-input
   Future<CloudflareHTTPResponse> removeOutput({
