@@ -43,14 +43,14 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
   Widget get uploadSourceView => Column(
         children: [
-          const Text("File source"),
+          const Text('File source'),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
                 width: 150,
                 child: RadioListTile<FileSource>(
-                    title: const Text("Path"),
+                    title: const Text('Path'),
                     value: FileSource.path,
                     groupValue: fileSource,
                     onChanged: onUploadSourceChanged),
@@ -58,7 +58,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
               SizedBox(
                 width: 150,
                 child: RadioListTile<FileSource>(
-                    title: const Text("Bytes"),
+                    title: const Text('Bytes'),
                     value: FileSource.bytes,
                     groupValue: fileSource,
                     onChanged: onUploadSourceChanged),
@@ -210,7 +210,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "$errorMessage",
+                          '$errorMessage',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 18, color: Colors.red.shade900),

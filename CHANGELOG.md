@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.0.0+5
+### Fixed
+- Minor bugs fixed in flutter example project
+
 ## 1.0.0+4
 ### Added
 - StreamAPI implemented

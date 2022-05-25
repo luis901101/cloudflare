@@ -10,8 +10,8 @@ class PickerUtils {
     return response.file?.path != null ? response.file!.path : null;
   }
 
-  static const String cameraAccessDenied = "camera_access_denied";
-  static const String galleryAccessDenied = "photo_access_denied";
+  static const String cameraAccessDenied = 'camera_access_denied';
+  static const String galleryAccessDenied = 'photo_access_denied';
 
   static Future<Map<String, dynamic>> _pickFrom({
     ImageSource source = ImageSource.camera,

@@ -10,16 +10,16 @@ Map<Channel, String> getChannelsMap() {
 
 extension ChannelExtension on Channel {
   String toPrettyString() {
-    var result = "";
+    var result = '';
     switch (this) {
       case Channel.mono:
-        result = "mono";
+        result = 'mono';
         break;
       case Channel.stereo:
-        result = "stereo";
+        result = 'stereo';
         break;
       default:
-        result = "stereo";
+        result = 'stereo';
         break;
     }
     return result;

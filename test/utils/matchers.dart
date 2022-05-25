@@ -56,8 +56,9 @@ class StreamVideoMatcher extends ResponseMatcher {
   @override
   bool matches(response, Map matchState) {
     super.matches(response, matchState);
-    if (response is! CloudflareHTTPResponse<CloudflareStreamVideo?>)
+    if (response is! CloudflareHTTPResponse<CloudflareStreamVideo?>) {
       return false;
+    }
     return response.body != null &&
         response.body!.thumbnail.isNotEmpty &&
         response.body!.preview.isNotEmpty;
