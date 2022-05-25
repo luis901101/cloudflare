@@ -10,7 +10,6 @@ part 'live_input_status.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class LiveInputStatus extends Jsonable<LiveInputStatus> {
-
   /// The current status for the Live Input
   final LiveInputStatusLog? current;
 

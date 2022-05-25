@@ -10,7 +10,6 @@ part 'srt.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class SRT extends Jsonable<SRT> {
-
   /// The URL the live input can be sent SRT data
   ///
   /// e.g: "srt://live.cloudflare.com:778/live/"
@@ -22,11 +21,9 @@ class SRT extends Jsonable<SRT> {
     String? url,
     String? streamId,
     String? passphrase,
-  }) :
-      url = url ?? '',
+  })  : url = url ?? '',
         streamId = streamId ?? '',
-        passphrase = passphrase ?? ''
-  ;
+        passphrase = passphrase ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$SRTToJson(this);
@@ -35,6 +32,5 @@ class SRT extends Jsonable<SRT> {
   SRT? fromJsonMap(Map<String, dynamic>? json) =>
       json != null ? SRT.fromJson(json) : null;
 
-  factory SRT.fromJson(Map<String, dynamic> json) =>
-      _$SRTFromJson(json);
+  factory SRT.fromJson(Map<String, dynamic> json) => _$SRTFromJson(json);
 }

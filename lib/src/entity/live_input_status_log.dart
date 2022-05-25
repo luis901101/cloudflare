@@ -8,7 +8,6 @@ part 'live_input_status_log.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class LiveInputStatusLog extends Jsonable<LiveInputStatusLog> {
-
   /// Specifies the state of the Live Input.
   ///
   /// read only

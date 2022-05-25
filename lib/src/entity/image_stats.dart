@@ -8,7 +8,6 @@ part 'image_stats.g.dart';
 /// For instance: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
 @JsonSerializable()
 class ImageStats extends Jsonable<ImageStats> {
-
   /// Current usage
   final int current;
 
@@ -18,10 +17,8 @@ class ImageStats extends Jsonable<ImageStats> {
   const ImageStats({
     int? current,
     int? allowed,
-  }) :
-    current = current ?? 0,
-    allowed = allowed ??0
-  ;
+  })  : current = current ?? 0,
+        allowed = allowed ?? 0;
 
   @override
   Map<String, dynamic> toJson() => _$ImageStatsToJson(this);
@@ -31,5 +28,5 @@ class ImageStats extends Jsonable<ImageStats> {
       json != null ? ImageStats.fromJson(json) : null;
 
   factory ImageStats.fromJson(Map<String, dynamic> json) =>
-    _$ImageStatsFromJson(json[Params.count] ?? json);
+      _$ImageStatsFromJson(json[Params.count] ?? json);
 }

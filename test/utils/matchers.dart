@@ -56,8 +56,10 @@ class StreamVideoMatcher extends ResponseMatcher {
   @override
   bool matches(response, Map matchState) {
     super.matches(response, matchState);
-    if (response is! CloudflareHTTPResponse<CloudflareStreamVideo?>) return false;
-    return response.body != null && response.body!.thumbnail.isNotEmpty &&
+    if (response is! CloudflareHTTPResponse<CloudflareStreamVideo?>)
+      return false;
+    return response.body != null &&
+        response.body!.thumbnail.isNotEmpty &&
         response.body!.preview.isNotEmpty;
   }
 }
@@ -69,7 +71,8 @@ class LiveInputMatcher extends ResponseMatcher {
   bool matches(response, Map matchState) {
     super.matches(response, matchState);
     if (response is! CloudflareHTTPResponse<CloudflareLiveInput?>) return false;
-    return response.body != null && response.body!.id.isNotEmpty &&
+    return response.body != null &&
+        response.body!.id.isNotEmpty &&
         response.body!.rtmps.streamKey.isNotEmpty;
   }
 }
@@ -81,7 +84,9 @@ class OutputMatcher extends ResponseMatcher {
   bool matches(response, Map matchState) {
     super.matches(response, matchState);
     if (response is! CloudflareHTTPResponse<LiveInputOutput?>) return false;
-    return response.body != null && response.body!.id.isNotEmpty &&
-        response.body!.url.isNotEmpty && response.body!.streamKey.isNotEmpty;
+    return response.body != null &&
+        response.body!.id.isNotEmpty &&
+        response.body!.url.isNotEmpty &&
+        response.body!.streamKey.isNotEmpty;
   }
 }

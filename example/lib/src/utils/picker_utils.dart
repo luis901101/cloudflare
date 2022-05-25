@@ -33,18 +33,18 @@ class PickerUtils {
       }
 
       Future<void> pickSingle() async {
-        pickedFile = pickImage ?
-        await ImagePicker().pickImage(
-          source: source,
-          preferredCameraDevice: cameraDevice,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          imageQuality: 100,
-        ) :
-        await ImagePicker().pickVideo(
-          source: source,
-          preferredCameraDevice: cameraDevice,
-        );
+        pickedFile = pickImage
+            ? await ImagePicker().pickImage(
+                source: source,
+                preferredCameraDevice: cameraDevice,
+                maxWidth: 1920,
+                maxHeight: 1080,
+                imageQuality: 100,
+              )
+            : await ImagePicker().pickVideo(
+                source: source,
+                preferredCameraDevice: cameraDevice,
+              );
         if (pickedFile != null) pickedFiles = [pickedFile!];
       }
 
@@ -92,12 +92,20 @@ class PickerUtils {
   }
 
   static Future<Map<String, dynamic>> pickFromGallery(
-      {bool multiple = true, bool pickImage = true}) async =>
-      await _pickFrom(source: ImageSource.gallery, multiple: multiple, pickImage: pickImage);
+          {bool multiple = true, bool pickImage = true}) async =>
+      await _pickFrom(
+          source: ImageSource.gallery,
+          multiple: multiple,
+          pickImage: pickImage);
 
   static Future<Map<String, dynamic>> takeFromCamera(
-          {CameraDevice cameraDevice = CameraDevice.rear, bool pickImage = true}) async =>
-      await _pickFrom(source: ImageSource.camera, cameraDevice: cameraDevice, multiple: false, pickImage: pickImage);
+          {CameraDevice cameraDevice = CameraDevice.rear,
+          bool pickImage = true}) async =>
+      await _pickFrom(
+          source: ImageSource.camera,
+          cameraDevice: cameraDevice,
+          multiple: false,
+          pickImage: pickImage);
 
   static showPermissionExplanation(
       {required BuildContext context, String? message}) {

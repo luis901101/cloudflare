@@ -139,7 +139,7 @@ class Cloudflare {
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
   factory Cloudflare.basic({String? apiUrl}) =>
-    Cloudflare(apiUrl: apiUrl, accountId: '', tokenCallback: () async => '');
+      Cloudflare(apiUrl: apiUrl, accountId: '', tokenCallback: () async => '');
 
   bool get isInitialized => _initialized;
 

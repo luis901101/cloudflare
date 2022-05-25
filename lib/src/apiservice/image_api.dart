@@ -68,7 +68,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     }
 
     /// Web support
-    if(contentFromFile != null && PlatformUtils.isWeb) {
+    if (contentFromFile != null && PlatformUtils.isWeb) {
       contentFromBytes ??= DataTransmit<Uint8List>(
           data: contentFromFile.data.readAsBytesSync(),
           progressCallback: contentFromFile.progressCallback);
@@ -82,7 +82,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         metadata: metadata,
         onUploadProgress: contentFromFile.progressCallback,
       ));
-    } else if (contentFromBytes != null){
+    } else if (contentFromBytes != null) {
       response = await parseResponse(service.uploadFromBytes(
         bytes: contentFromBytes.data,
         requireSignedURLs: requireSignedURLs,
@@ -132,7 +132,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     }
 
     /// Web support
-    if(contentFromFile != null && PlatformUtils.isWeb) {
+    if (contentFromFile != null && PlatformUtils.isWeb) {
       contentFromBytes ??= DataTransmit<Uint8List>(
           data: contentFromFile.data.readAsBytesSync(),
           progressCallback: contentFromFile.progressCallback);
@@ -146,8 +146,9 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
       formData.files.add(MapEntry(
-        Params.file,
-        MultipartFile.fromFileSync(file.path, filename: file.path.split(Platform.pathSeparator).last)));
+          Params.file,
+          MultipartFile.fromFileSync(file.path,
+              filename: file.path.split(Platform.pathSeparator).last)));
     } else {
       final bytes = contentFromBytes!.data;
       progressCallback = contentFromBytes.progressCallback;
@@ -231,7 +232,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         );
         responses.add(response);
       }
-    } else if (contentFromBytes?.isNotEmpty ?? false){
+    } else if (contentFromBytes?.isNotEmpty ?? false) {
       for (final content in contentFromBytes!) {
         final response = await upload(
           contentFromBytes: content,
@@ -266,7 +267,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     final response = await parseResponse(service.update(
       id: image.id,
       requireSignedURLs: image.requireSignedURLs,
-      metadata: image.meta?.map((key, value) => MapEntry<String, dynamic>(key.toString(), value)),
+      metadata: image.meta?.map(
+          (key, value) => MapEntry<String, dynamic>(key.toString(), value)),
     ));
 
     return response;
@@ -396,12 +398,13 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     CloudflareImage? image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-        id != null || image != null, 'One of id or image must not be null.');
+    assert(id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
     final response = await getSaveResponse(
-      service.delete(id: id!,),
-      parseCloudflareResponse: false);
+        service.delete(
+          id: id!,
+        ),
+        parseCloudflareResponse: false);
     return response;
   }
 
@@ -422,7 +425,9 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(id: id,);
+      final response = await delete(
+        id: id,
+      );
       responses.add(response);
     }
     return responses;
@@ -434,7 +439,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   Future<CloudflareHTTPResponse<ImageStats?>> getStats() async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
-      service.getStats(), dataType: ImageStats(),
+      service.getStats(),
+      dataType: ImageStats(),
     );
     return response;
   }

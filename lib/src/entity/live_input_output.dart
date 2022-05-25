@@ -8,9 +8,9 @@ part 'live_input_output.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class LiveInputOutput extends Jsonable<LiveInputOutput> {
-
   /// Output id.
-  @JsonKey(readValue: Jsonable.idReadValue) final String id;
+  @JsonKey(readValue: Jsonable.idReadValue)
+  final String id;
 
   /// The URL an output will re-stream to
   ///
@@ -18,7 +18,7 @@ class LiveInputOutput extends Jsonable<LiveInputOutput> {
   final String url;
 
   /// The streamKey used to authenticate against an output's target
-  /// 
+  ///
   /// e.g: "uzya-f19y-g2g9-a2ee-51j2"
   final String streamKey;
 
@@ -26,11 +26,9 @@ class LiveInputOutput extends Jsonable<LiveInputOutput> {
     String? id,
     String? url,
     String? streamKey,
-  }) :
-    id = id ?? '',
-    url = url ?? '',
-    streamKey = streamKey ?? ''
-  ;
+  })  : id = id ?? '',
+        url = url ?? '',
+        streamKey = streamKey ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$LiveInputOutputToJson(this);

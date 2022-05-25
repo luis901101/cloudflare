@@ -17,7 +17,6 @@ part 'cloudflare_stream_video.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
-
   static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
   static const videoDeliveryHost = 'videodelivery.net';
@@ -30,7 +29,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   /// read only
   ///
   /// e.g: "ea95132c15732412d22c1476fa83f27a"
-  @JsonKey(name: Params.uid) final String id;
+  @JsonKey(name: Params.uid)
+  final String id;
 
   /// When the media item was uploaded.
   /// Using  ISO 8601 ZonedDateTime
@@ -242,27 +242,35 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     this.nft,
     bool? readyToStream,
     this.liveInput,
-  }) :
-    id = id ??= '',
-    uploaded = uploaded ?? DateTime.now(),
-    size = size ?? 0,
-    requireSignedURLs = requireSignedURLs ?? false,
-    allowedOrigins = allowedOrigins ?? [],
-    created = created ?? DateTime.now(),
-    preview = preview ?? (id.isNotEmpty ? '$watchVideoDeliveryUrl/$id' : ''),
-    modified = modified ?? DateTime.now(),
-    input = input ?? VideoSize(),
-    thumbnail = thumbnail ?? (id.isNotEmpty ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.jpg' : ''),
-    animatedThumbnail = thumbnail ?? (id.isNotEmpty ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.gif' : ''),
-    status = status ?? VideoStatus(),
-    duration = duration ?? -1,
-    thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
-    playback = playback ?? (id.isNotEmpty ? VideoPlaybackInfo(
-      hls: '$videoDeliveryUrl/$id/manifest/video.m3u8',
-      dash: '$videoDeliveryUrl/$id/manifest/video.mpd',
-    ) : null),
-    readyToStream = readyToStream ?? false
-  ;
+  })  : id = id ??= '',
+        uploaded = uploaded ?? DateTime.now(),
+        size = size ?? 0,
+        requireSignedURLs = requireSignedURLs ?? false,
+        allowedOrigins = allowedOrigins ?? [],
+        created = created ?? DateTime.now(),
+        preview =
+            preview ?? (id.isNotEmpty ? '$watchVideoDeliveryUrl/$id' : ''),
+        modified = modified ?? DateTime.now(),
+        input = input ?? VideoSize(),
+        thumbnail = thumbnail ??
+            (id.isNotEmpty
+                ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.jpg'
+                : ''),
+        animatedThumbnail = thumbnail ??
+            (id.isNotEmpty
+                ? '$videoDeliveryUrl/$id/thumbnails/thumbnail.gif'
+                : ''),
+        status = status ?? VideoStatus(),
+        duration = duration ?? -1,
+        thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
+        playback = playback ??
+            (id.isNotEmpty
+                ? VideoPlaybackInfo(
+                    hls: '$videoDeliveryUrl/$id/manifest/video.m3u8',
+                    dash: '$videoDeliveryUrl/$id/manifest/video.mpd',
+                  )
+                : null),
+        readyToStream = readyToStream ?? false;
 
   bool get isReady => readyToStream;
 
@@ -294,17 +302,18 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     ///
     /// e.g: scale
     ThumbnailFit? fit,
-  }) => Uri(
-      scheme: 'https',
-      host: videoDeliveryHost,
-      path: '/$id/thumbnails/thumbnail.jpg',
-      queryParameters: {
-        if(time != null) Params.time: time.toString(),
-        if(width != null) Params.width: width.toString(),
-        if(height != null) Params.height: height.toString(),
-        if(fit != null) Params.fit: fit.name,
-      },
-    ).toString();
+  }) =>
+      Uri(
+        scheme: 'https',
+        host: videoDeliveryHost,
+        path: '/$id/thumbnails/thumbnail.jpg',
+        queryParameters: {
+          if (time != null) Params.time: time.toString(),
+          if (width != null) Params.width: width.toString(),
+          if (height != null) Params.height: height.toString(),
+          if (fit != null) Params.fit: fit.name,
+        },
+      ).toString();
 
   /// Customizing animated GIF thumbnails on the fly
   ///
@@ -348,22 +357,24 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     /// Max value: 15
     /// Default value: 8
     int? fps,
-  }) => Uri(
-    scheme: 'https',
-    host: videoDeliveryHost,
-    path: '/$id/thumbnails/thumbnail.gif',
-    queryParameters: {
-      if(time != null) Params.time: time.toString(),
-      if(width != null) Params.width: width.toString(),
-      if(height != null) Params.height: height.toString(),
-      if(fit != null) Params.fit: fit.name,
-      if(duration != null) Params.duration: duration.toString(),
-      if(fps != null) Params.fps: fps.toString(),
-    },
-  ).toString();
+  }) =>
+      Uri(
+        scheme: 'https',
+        host: videoDeliveryHost,
+        path: '/$id/thumbnails/thumbnail.gif',
+        queryParameters: {
+          if (time != null) Params.time: time.toString(),
+          if (width != null) Params.width: width.toString(),
+          if (height != null) Params.height: height.toString(),
+          if (fit != null) Params.fit: fit.name,
+          if (duration != null) Params.duration: duration.toString(),
+          if (fps != null) Params.fps: fps.toString(),
+        },
+      ).toString();
 
   static Map<String, dynamic> _dataFromVideoDeliveryUrl(String url) {
-    final split = url.replaceAll('$uploadVideoDeliveryUrl/', '')
+    final split = url
+        .replaceAll('$uploadVideoDeliveryUrl/', '')
         .replaceAll('$watchVideoDeliveryUrl/', '')
         .replaceAll('$videoDeliveryUrl/', '')
         .replaceAll('$videoCloudflareUrl/', '')
@@ -371,9 +382,9 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     String? videoId = split.isNotEmpty ? split[0] : null;
 
     if (!(url.startsWith(uploadVideoDeliveryUrl) ||
-        url.startsWith(watchVideoDeliveryUrl) ||
-        url.startsWith(videoDeliveryUrl) ||
-        url.startsWith(videoCloudflareUrl)) ||
+            url.startsWith(watchVideoDeliveryUrl) ||
+            url.startsWith(videoDeliveryUrl) ||
+            url.startsWith(videoCloudflareUrl)) ||
         videoId == null) {
       // throw Exception('Invalid Cloudflare video from url');
       return {};
@@ -386,10 +397,11 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   /// Builds a CloudflareStreamVideo from an url if url is properly created
   static CloudflareStreamVideo? fromUrl(String url) {
     final data = _dataFromVideoDeliveryUrl(url);
-    return data.isEmpty ? null : CloudflareStreamVideo(
-      id: data[Params.id],
-      readyToStream: !url.startsWith(uploadVideoDeliveryUrl)
-    );
+    return data.isEmpty
+        ? null
+        : CloudflareStreamVideo(
+            id: data[Params.id],
+            readyToStream: !url.startsWith(uploadVideoDeliveryUrl));
   }
 
   @override

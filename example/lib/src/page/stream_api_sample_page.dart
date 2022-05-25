@@ -98,7 +98,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           SizedBox(
             width: 300,
             child: RadioListTile<UploadType>(
-                title: const Text('Single http request, for videos under 200 MB'),
+                title:
+                    const Text('Single http request, for videos under 200 MB'),
                 value: UploadType.singleHttp,
                 groupValue: uploadType,
                 onChanged: onUploadTypeChanged),
@@ -112,34 +113,38 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                 groupValue: uploadType,
                 onChanged: onUploadTypeChanged),
           ),
-          if(tusAPI != null)
+          if (tusAPI != null)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
                   onPressed: () async {
-                    if(tusCanPlay) {
+                    if (tusCanPlay) {
                       await tusAPI?.resumeUpload();
                     } else {
                       await tusAPI?.pauseUpload();
                     }
-                    setState(() {
-
-                    });
+                    setState(() {});
                   },
                   iconSize: 32,
-                  icon: Icon(tusCanPlay ? Icons.play_circle_fill : Icons.pause_circle_filled, color: Colors.green,),
+                  icon: Icon(
+                    tusCanPlay
+                        ? Icons.play_circle_fill
+                        : Icons.pause_circle_filled,
+                    color: Colors.green,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: () async {
                     await tusAPI?.cancelUpload();
-                    setState(() {
-
-                    });
+                    setState(() {});
                   },
                   iconSize: 32,
-                  icon: const Icon(Icons.cancel, color: Colors.red,),
+                  icon: const Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                  ),
                 )
               ],
             ),
@@ -148,15 +153,17 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
   Widget videoFromPathView(DataTransmitNotifier data) {
     String path = data.dataTransmit.data;
-    if(chewieControllerFromPath?.videoPlayerController.dataSource != 'file://${data.dataTransmit.data}') {
+    if (chewieControllerFromPath?.videoPlayerController.dataSource !=
+        'file://${data.dataTransmit.data}') {
       clearVideoPathControllers();
       chewieControllerFromPath = ChewieController(
-        videoPlayerController: VideoPlayerController.file(File(path),)
-          ..initialize()
-          .then((_) => errorMessage = null)
-          .onError((error, stackTrace) {
+        videoPlayerController: VideoPlayerController.file(
+          File(path),
+        )..initialize()
+              .then((_) => errorMessage = null)
+              .onError((error, stackTrace) {
             errorMessage = error?.toString();
-          }).whenComplete(() => setState((){})),
+          }).whenComplete(() => setState(() {})),
       );
     }
     return Column(
@@ -164,15 +171,21 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
       children: [
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: chewieControllerFromPath!.videoPlayerController.value.isInitialized ?
-          AspectRatio(
-            key: ValueKey('video-from-file-$path'),
-            aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromPath!.videoPlayerController.value.aspectRatio,
-            // aspectRatio: 3,
-            child: Chewie(
-              controller: chewieControllerFromPath!,
-            ),
-          ) : const CircularProgressIndicator(),
+          child: chewieControllerFromPath!
+                  .videoPlayerController.value.isInitialized
+              ? AspectRatio(
+                  key: ValueKey('video-from-file-$path'),
+                  aspectRatio:
+                      MediaQueryData.fromWindow(window).size.shortestSide > 600
+                          ? 3
+                          : chewieControllerFromPath!
+                              .videoPlayerController.value.aspectRatio,
+                  // aspectRatio: 3,
+                  child: Chewie(
+                    controller: chewieControllerFromPath!,
+                  ),
+                )
+              : const CircularProgressIndicator(),
         ),
         ValueListenableBuilder<double>(
           key: ValueKey('video-from-file-progress-$path'),
@@ -197,28 +210,34 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   Widget videoFromUrlView(CloudflareStreamVideo video) {
     // String url = video.preview; // Cloudflare video previews doesn't allow Range header which is required in iOS with https://pub.dev/packages/video_player
     String url = video.playback?.hls ?? '';
-    if(chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
+    if (chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
       clearVideoUrlControllers();
       chewieControllerFromUrl = ChewieController(
-      videoPlayerController: VideoPlayerController.network(url,)
-        ..initialize()
-        .then((_) => errorMessage = null)
-        .onError((error, stackTrace) {
-          errorMessage = error?.toString();
-          clearVideoUrlControllers();
-        }).whenComplete(() => setState((){})),
+        videoPlayerController: VideoPlayerController.network(
+          url,
+        )..initialize()
+              .then((_) => errorMessage = null)
+              .onError((error, stackTrace) {
+            errorMessage = error?.toString();
+            clearVideoUrlControllers();
+          }).whenComplete(() => setState(() {})),
       );
     }
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized ?
-      AspectRatio(
-        key: ValueKey('video-from-url-$url'),
-        aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromUrl!.videoPlayerController.value.aspectRatio,
-        child: Chewie(
-          controller: chewieControllerFromUrl!,
-        ),
-      ) : const CircularProgressIndicator(),
+      child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized
+          ? AspectRatio(
+              key: ValueKey('video-from-url-$url'),
+              aspectRatio:
+                  MediaQueryData.fromWindow(window).size.shortestSide > 600
+                      ? 3
+                      : chewieControllerFromUrl!
+                          .videoPlayerController.value.aspectRatio,
+              child: Chewie(
+                controller: chewieControllerFromUrl!,
+              ),
+            )
+          : const CircularProgressIndicator(),
     );
   }
 
@@ -228,8 +247,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
     dynamic videoSource = fromPath ? dataVideo : cloudflareStreamVideo;
 
     final views = [
-      if(fromPath && videoSource != null) videoFromPathView(videoSource),
-      if(!fromPath && videoSource != null) videoFromUrlView(videoSource),
+      if (fromPath && videoSource != null) videoFromPathView(videoSource),
+      if (!fromPath && videoSource != null) videoFromUrlView(videoSource),
     ];
 
     if (loading && !fromPath) {
@@ -302,7 +321,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                 const SizedBox(
                   height: 32,
                 ),
-                if(awaitingToBeReadyToStream)
+                if (awaitingToBeReadyToStream)
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -319,21 +338,21 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                       ),
                     ],
                   ),
-                if(errorMessage?.isNotEmpty ?? false)
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '$errorMessage',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 18, color: Colors.red.shade900),
-                    ),
-                    const SizedBox(
-                      height: 128,
-                    ),
-                  ],
-                ),
+                if (errorMessage?.isNotEmpty ?? false)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$errorMessage',
+                        textAlign: TextAlign.center,
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.red.shade900),
+                      ),
+                      const SizedBox(
+                        height: 128,
+                      ),
+                    ],
+                  ),
                 ElevatedButton(
                   onPressed: loading || cloudflareStreamVideo == null
                       ? null
@@ -359,31 +378,36 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                   height: 16,
                 ),
                 uploadSourceView,
-                const SizedBox(height: 32,),
+                const SizedBox(
+                  height: 32,
+                ),
                 uploadTypeView,
-                const SizedBox(height: 32,),
+                const SizedBox(
+                  height: 32,
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: loading ||
-                          (dataVideo == null && cloudflareStreamVideo == null)
+                              (dataVideo == null &&
+                                  cloudflareStreamVideo == null)
                           ? null
                           : () {
-                        dataVideo = null;
-                        cloudflareStreamVideo = null;
-                        clearAllVideoControllers();
-                        setState(() {});
-                      },
+                              dataVideo = null;
+                              cloudflareStreamVideo = null;
+                              clearAllVideoControllers();
+                              setState(() {});
+                            },
                       style: ButtonStyle(
                         backgroundColor:
-                        MaterialStateProperty.resolveWith<Color?>(
+                            MaterialStateProperty.resolveWith<Color?>(
                                 (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
-                                  ? null
-                                  : Colors.blue;
-                            }),
+                          return states.contains(MaterialState.disabled)
+                              ? null
+                              : Colors.blue;
+                        }),
                       ),
                       child: const Text(
                         'Clear all',
@@ -401,20 +425,22 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           ? null
                           : () => onClick(doAuthenticatedUpload),
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.all(8))
-                      ),
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(8))),
                       child: Column(
                         children: const [
                           Text(
                             'Authenticated upload',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           Text(
                             'Authenticated uploads are recommended only for server side, because it requires a token or api key to be able to upload video to Cloudflare. For uploading videos from client side like mobile or web app consider "Direct upload".',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.normal),
                           ),
                         ],
                       ),
@@ -431,27 +457,30 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           ? null
                           : () => onClick(doDirectUpload),
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+                        padding:
+                            MaterialStateProperty.all(const EdgeInsets.all(8)),
                         backgroundColor:
-                        MaterialStateProperty.resolveWith<Color?>(
+                            MaterialStateProperty.resolveWith<Color?>(
                                 (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
-                                  ? null
-                                  : Colors.deepOrange;
-                            }),
+                          return states.contains(MaterialState.disabled)
+                              ? null
+                              : Colors.deepOrange;
+                        }),
                       ),
                       child: Column(
                         children: const [
                           Text(
                             'Direct upload',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           Text(
                             'Direct uploads are recommended from client side like mobile or web app. This upload consist on client apps first requests the server for an upload url to upload to without token or api key authorization and then uploads the video to the upload url returned by server.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.normal),
                           ),
                         ],
                       ),
@@ -485,7 +514,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom,),
+                SizedBox(
+                  height: MediaQuery.of(context).padding.bottom,
+                ),
               ],
             ),
           ),
@@ -501,7 +532,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
   void onNewVideos(List<String> filePaths) {
     if (filePaths.isNotEmpty) {
-      dataVideo = DataTransmitNotifier(dataTransmit: DataTransmit(data: filePaths.first));
+      dataVideo = DataTransmitNotifier(
+          dataTransmit: DataTransmit(data: filePaths.first));
       setState(() {});
     }
   }
@@ -510,16 +542,19 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
     return await File(path).readAsBytes();
   }
 
-  Future<void> awaitForVideoToBeReadyToStream(CloudflareStreamVideo video) async {
+  Future<void> awaitForVideoToBeReadyToStream(
+      CloudflareStreamVideo video) async {
     /// Code below is a hack to verify the readiness of the video to stream.
     /// This hack is only for test purposes
     /// The proper way to do this is described in the documentation here: https://developers.cloudflare.com/stream/uploading-videos/using-webhooks/
     setState(() => awaitingToBeReadyToStream = true);
     awaitingToBeReadyToStreamTimer?.cancel();
-    awaitingToBeReadyToStreamTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-      if(awaitingToBeReadyToStreamTimer?.isActive ?? false) {
+    awaitingToBeReadyToStreamTimer =
+        Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (awaitingToBeReadyToStreamTimer?.isActive ?? false) {
         final checkResponse = await cloudflare.streamAPI.get(video: video);
-        if (checkResponse.isSuccessful && (checkResponse.body?.isReady ?? false)) {
+        if (checkResponse.isSuccessful &&
+            (checkResponse.body?.isReady ?? false)) {
           awaitingToBeReadyToStreamTimer?.cancel();
           setState(() {
             awaitingToBeReadyToStream = false;
@@ -548,7 +583,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
       }
 
       CloudflareHTTPResponse<CloudflareStreamVideo?> response =
-      await cloudflare.streamAPI.stream(
+          await cloudflare.streamAPI.stream(
         contentFromPath: contentFromPath,
         contentFromBytes: contentFromBytes,
       );
@@ -599,7 +634,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
         },
         onComplete: (cloudflareStreamVideo) {
           tusAPI = null;
-          if(cloudflareStreamVideo != null) {
+          if (cloudflareStreamVideo != null) {
             awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
           } else {
             setState(() {
@@ -618,7 +653,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
   Future<void> authenticatedUpload() async {
     showLoading();
-    return uploadType == UploadType.singleHttp ? singleHttpRequestAuthenticatedUpload() : tusAuthenticatedUpload();
+    return uploadType == UploadType.singleHttp
+        ? singleHttpRequestAuthenticatedUpload()
+        : tusAuthenticatedUpload();
   }
 
   Future<void> singleHttpRequestDirectUpload() async {
@@ -639,16 +676,17 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
       DataTransmit<String>? contentFromPath;
       DataTransmit<Uint8List>? contentFromBytes;
-      if(content?.data is String) {
+      if (content?.data is String) {
         contentFromPath = content as DataTransmit<String>;
-      } else if(content?.data is Uint8List) {
+      } else if (content?.data is Uint8List) {
         contentFromBytes = content as DataTransmit<Uint8List>;
       }
       final responseCreateDirectUpload = await cloudflare.streamAPI
           .createDirectStreamUpload(
               maxDurationSeconds: chewieControllerFromPath!
                   .videoPlayerController.value.duration.inSeconds);
-      if(responseCreateDirectUpload.isSuccessful && responseCreateDirectUpload.body != null) {
+      if (responseCreateDirectUpload.isSuccessful &&
+          responseCreateDirectUpload.body != null) {
         final responseUpload = await cloudflare.streamAPI.directStreamUpload(
           dataUploadDraft: responseCreateDirectUpload.body!,
           contentFromPath: contentFromPath,
@@ -658,9 +696,12 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           awaitForVideoToBeReadyToStream(responseUpload.body!);
         } else {
           if (responseUpload.error is CloudflareErrorResponse &&
-              (responseUpload.error as CloudflareErrorResponse).messages.isNotEmpty) {
-            errorMessage =
-                (responseUpload.error as CloudflareErrorResponse).messages.first;
+              (responseUpload.error as CloudflareErrorResponse)
+                  .messages
+                  .isNotEmpty) {
+            errorMessage = (responseUpload.error as CloudflareErrorResponse)
+                .messages
+                .first;
           } else {
             errorMessage = responseUpload.error?.toString();
           }
@@ -691,10 +732,11 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
       final responseCreateDirectUpload = await cloudflare.streamAPI
           .createTusDirectStreamUpload(
-        size: File(dataVideo!.dataTransmit.data).lengthSync(),
+              size: File(dataVideo!.dataTransmit.data).lengthSync(),
               maxDurationSeconds: chewieControllerFromPath!
                   .videoPlayerController.value.duration.inSeconds);
-      if(responseCreateDirectUpload.isSuccessful && responseCreateDirectUpload.body != null) {
+      if (responseCreateDirectUpload.isSuccessful &&
+          responseCreateDirectUpload.body != null) {
         tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: responseCreateDirectUpload.body!,
           path: path,
@@ -708,7 +750,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           },
           onComplete: (cloudflareStreamVideo) {
             tusAPI = null;
-            if(cloudflareStreamVideo != null) {
+            if (cloudflareStreamVideo != null) {
               awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
             } else {
               setState(() {
@@ -728,7 +770,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
   Future<void> directUpload() async {
     showLoading();
-    return uploadType == UploadType.singleHttp ? singleHttpRequestDirectUpload() : tusDirectUpload();
+    return uploadType == UploadType.singleHttp
+        ? singleHttpRequestDirectUpload()
+        : tusDirectUpload();
   }
 
   Future<void> delete() async {
@@ -766,8 +810,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           AlertUtils.showPickerModal(
             context: context,
             onFromCamera: () async {
-              onNewVideos(await handlePickerResponse(
-                  PickerUtils.takeFromCamera(cameraDevice: CameraDevice.rear, pickImage: false)));
+              onNewVideos(await handlePickerResponse(PickerUtils.takeFromCamera(
+                  cameraDevice: CameraDevice.rear, pickImage: false)));
             },
             onFromGallery: () async {
               onNewVideos(await handlePickerResponse(

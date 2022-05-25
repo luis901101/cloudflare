@@ -10,9 +10,9 @@ part 'data_upload_draft.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class DataUploadDraft extends Jsonable<DataUploadDraft> {
-
   /// Resource id.
-  @JsonKey(readValue: Jsonable.idReadValue) final String id;
+  @JsonKey(readValue: Jsonable.idReadValue)
+  final String id;
 
   /// Url to upload resource without API key or token
   final String uploadURL;
@@ -24,10 +24,8 @@ class DataUploadDraft extends Jsonable<DataUploadDraft> {
     String? id,
     String? uploadURL,
     this.watermark,
-  }) :
-    id = id ?? '',
-    uploadURL = uploadURL ?? ''
-  ;
+  })  : id = id ?? '',
+        uploadURL = uploadURL ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$DataUploadDraftToJson(this);

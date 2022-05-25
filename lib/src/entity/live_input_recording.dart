@@ -11,7 +11,6 @@ part 'live_input_recording.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class LiveInputRecording extends Jsonable<LiveInputRecording> {
-
   /// Specifies the recording behavior of the live input. 'off' indicates no
   /// recording will be made. 'automatic' indicates a recording should be made,
   /// and that the recording should transition to on-demand after Stream Live
@@ -48,18 +47,15 @@ class LiveInputRecording extends Jsonable<LiveInputRecording> {
   /// Default value: 0
   int timeoutSeconds;
 
-
   LiveInputRecording({
     LiveInputRecordingMode? mode,
     bool? requireSignedURLs,
     List<String>? allowedOrigins,
     int? timeoutSeconds,
-  }) :
-    mode = mode ?? LiveInputRecordingMode.automatic,
-    requireSignedURLs = requireSignedURLs ?? false,
-    allowedOrigins = allowedOrigins ?? [],
-    timeoutSeconds = timeoutSeconds ?? 0
-  ;
+  })  : mode = mode ?? LiveInputRecordingMode.automatic,
+        requireSignedURLs = requireSignedURLs ?? false,
+        allowedOrigins = allowedOrigins ?? [],
+        timeoutSeconds = timeoutSeconds ?? 0;
 
   @override
   Map<String, dynamic> toJson() => _$LiveInputRecordingToJson(this);

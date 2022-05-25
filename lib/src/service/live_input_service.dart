@@ -9,7 +9,8 @@ part 'live_input_service.g.dart';
 abstract class LiveInputService {
   factory LiveInputService({required Dio dio, required String accountId}) {
     return _LiveInputService(dio,
-        baseUrl: '${dio.options.baseUrl}/accounts/$accountId/stream/live_inputs');
+        baseUrl:
+            '${dio.options.baseUrl}/accounts/$accountId/stream/live_inputs');
   }
 
   @POST('')

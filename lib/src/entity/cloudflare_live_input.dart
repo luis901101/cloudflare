@@ -15,14 +15,14 @@ part 'cloudflare_live_input.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
-
   /// Live input unique identifier
   /// max length: 32
   ///
   /// read only
   ///
   /// e.g: "66be4bf738797e01e1fca35a7bdecdcd"
-  @JsonKey(name: Params.uid) final String id;
+  @JsonKey(name: Params.uid)
+  final String id;
 
   /// User modifiable key-value store. Can be used for keeping references
   /// to another system of record for managing videos.
@@ -70,16 +70,14 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
     SRT? srtPlayback,
     LiveInputRecording? recording,
     this.status,
-  }) :
-    id = id ?? '',
-    created = created ?? DateTime.now(),
-    modified = modified ?? DateTime.now(),
-    rtmps = rtmps ?? RTMPS(),
-    rtmpsPlayback = rtmpsPlayback ?? RTMPS(),
-    srt = srt ?? SRT(),
-    srtPlayback = srtPlayback ?? SRT(),
-    recording = recording ?? LiveInputRecording()
-  ;
+  })  : id = id ?? '',
+        created = created ?? DateTime.now(),
+        modified = modified ?? DateTime.now(),
+        rtmps = rtmps ?? RTMPS(),
+        rtmpsPlayback = rtmpsPlayback ?? RTMPS(),
+        srt = srt ?? SRT(),
+        srtPlayback = srtPlayback ?? SRT(),
+        recording = recording ?? LiveInputRecording();
 
   @override
   bool operator ==(Object other) {

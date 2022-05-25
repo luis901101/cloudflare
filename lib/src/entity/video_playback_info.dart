@@ -7,7 +7,6 @@ part 'video_playback_info.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class VideoPlaybackInfo extends Jsonable<VideoPlaybackInfo> {
-
   /// HLS manifest for the video
   ///
   /// read only
@@ -17,7 +16,6 @@ class VideoPlaybackInfo extends Jsonable<VideoPlaybackInfo> {
   ///
   /// read only
   final String? dash;
-
 
   VideoPlaybackInfo({
     this.hls,

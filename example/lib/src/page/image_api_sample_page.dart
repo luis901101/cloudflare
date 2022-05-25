@@ -253,22 +253,21 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: loading ||
-                          (dataImages.isEmpty &&
-                              cloudflareImages.isEmpty)
+                              (dataImages.isEmpty && cloudflareImages.isEmpty)
                           ? null
                           : () {
-                        dataImages = [];
-                        cloudflareImages = [];
-                        setState(() {});
-                      },
+                              dataImages = [];
+                              cloudflareImages = [];
+                              setState(() {});
+                            },
                       style: ButtonStyle(
                         backgroundColor:
-                        MaterialStateProperty.resolveWith<Color?>(
+                            MaterialStateProperty.resolveWith<Color?>(
                                 (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
-                                  ? null
-                                  : Colors.blue;
-                            }),
+                          return states.contains(MaterialState.disabled)
+                              ? null
+                              : Colors.blue;
+                        }),
                       ),
                       child: const Text(
                         'Clear all',
@@ -286,20 +285,22 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           ? null
                           : () => onClick(doAuthenticatedUpload),
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.all(8))
-                      ),
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(8))),
                       child: Column(
                         children: const [
                           Text(
                             'Authenticated upload',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           Text(
                             'Authenticated uploads are recommended only for server side, because it requires a token or api key to be able to upload image to Cloudflare. For uploading images from client side like mobile or web app consider "Direct upload"',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.normal),
                           ),
                         ],
                       ),
@@ -316,27 +317,30 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           ? null
                           : () => onClick(doDirectUpload),
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+                        padding:
+                            MaterialStateProperty.all(const EdgeInsets.all(8)),
                         backgroundColor:
-                        MaterialStateProperty.resolveWith<Color?>(
+                            MaterialStateProperty.resolveWith<Color?>(
                                 (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
-                                  ? null
-                                  : Colors.deepOrange;
-                            }),
+                          return states.contains(MaterialState.disabled)
+                              ? null
+                              : Colors.deepOrange;
+                        }),
                       ),
                       child: Column(
                         children: const [
                           Text(
                             'Direct upload',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           Text(
                             'Direct uploads are recommended from client side like mobile or web app. This upload consist on client apps first requests the server for an upload url to upload to without token or api key authorization and then uploads the image to the upload url returned by server.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.normal),
                           ),
                         ],
                       ),
@@ -370,7 +374,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom,),
+                SizedBox(
+                  height: MediaQuery.of(context).padding.bottom,
+                ),
               ],
             ),
           ),
@@ -452,8 +458,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
 
       switch (fileSource) {
         case FileSource.path:
-          contents =
-              dataImages.map((data) => data.dataTransmit).toList();
+          contents = dataImages.map((data) => data.dataTransmit).toList();
           break;
         case FileSource.bytes:
           contents = await Future.wait(dataImages.map((data) async =>
@@ -467,13 +472,15 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
       for (final content in contents) {
         DataTransmit<String>? contentFromPath;
         DataTransmit<Uint8List>? contentFromBytes;
-        if(content.data is String) {
+        if (content.data is String) {
           contentFromPath = content as DataTransmit<String>;
-        } else if(content.data is Uint8List) {
+        } else if (content.data is Uint8List) {
           contentFromBytes = content as DataTransmit<Uint8List>;
         }
-        final responseCreateDirectUpload = await cloudflare.imageAPI.createDirectUpload();
-        if(responseCreateDirectUpload.isSuccessful && responseCreateDirectUpload.body != null) {
+        final responseCreateDirectUpload =
+            await cloudflare.imageAPI.createDirectUpload();
+        if (responseCreateDirectUpload.isSuccessful &&
+            responseCreateDirectUpload.body != null) {
           final responseUpload = await cloudflare.imageAPI.directUpload(
             dataUploadDraft: responseCreateDirectUpload.body!,
             contentFromPath: contentFromPath,
@@ -484,9 +491,12 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
             cloudflareImages.add(responseUpload.body!);
           } else {
             if (responseUpload.error is CloudflareErrorResponse &&
-                (responseUpload.error as CloudflareErrorResponse).messages.isNotEmpty) {
-              errorMessage =
-                  (responseUpload.error as CloudflareErrorResponse).messages.first;
+                (responseUpload.error as CloudflareErrorResponse)
+                    .messages
+                    .isNotEmpty) {
+              errorMessage = (responseUpload.error as CloudflareErrorResponse)
+                  .messages
+                  .first;
             } else {
               errorMessage = responseUpload.error?.toString();
             }

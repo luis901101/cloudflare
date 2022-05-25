@@ -19,7 +19,10 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// read only
   ///
   /// e.g: "inprogress"
-  @JsonKey(unknownEnumValue: MediaProcessingState.unknown, ) final MediaProcessingState state;
+  @JsonKey(
+    unknownEnumValue: MediaProcessingState.unknown,
+  )
+  final MediaProcessingState state;
 
   /// Indicates the percent upload completed of the entire upload in bytes.
   /// The value must be a non-negative integer.
@@ -29,7 +32,8 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// min value:0
   /// max value:100
   /// Fixme: This property is officially documented as an integer however actual response is a String with a double representation
-  @JsonKey(readValue: Jsonable.intReadValue) final int pctComplete;
+  @JsonKey(readValue: Jsonable.intReadValue)
+  final int pctComplete;
 
   /// Provides an error code on why this video failed to encode.
   /// Empty if the state is not in "error". This field should be preferred

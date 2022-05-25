@@ -46,7 +46,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// {
   ///   "meta": "metaID"
   /// }
-  @JsonKey(readValue: Jsonable.stringToMapReadValue) Map? meta;
+  @JsonKey(readValue: Jsonable.stringToMapReadValue)
+  Map? meta;
 
   /// Indicates whether the image can be a accessed only using it's UID.
   /// If set to true, a signed token needs to be generated with a signing key
@@ -84,7 +85,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// e.g: false
   final bool draft;
 
-  @JsonKey(ignore: true) String? _firstVariant;
+  @JsonKey(ignore: true)
+  String? _firstVariant;
 
   CloudflareImage({
     String? id,
@@ -97,19 +99,24 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     bool? draft,
   })  : id = id ??= '',
         requireSignedURLs = requireSignedURLs ?? false,
-        variants = variants ?? (id.isNotEmpty && imageDeliveryId != null ? ['$imageDeliveryUrl/$imageDeliveryId/$id/${Params.public}'] : []),
+        variants = variants ??
+            (id.isNotEmpty && imageDeliveryId != null
+                ? ['$imageDeliveryUrl/$imageDeliveryId/$id/${Params.public}']
+                : []),
         uploaded = uploaded ?? DateTime.now(),
         draft = draft ?? false;
 
   static Map<String, dynamic> _dataFromImageDeliveryUrl(String url) {
-    final split = url.replaceAll('$uploadImageDeliveryUrl/', '')
+    final split = url
+        .replaceAll('$uploadImageDeliveryUrl/', '')
         .replaceAll('$imageDeliveryUrl/', '')
         .split('/');
     String? imageDeliveryId = split.isNotEmpty ? split[0] : null,
         imageId = split.length > 1 ? split[1] : null,
         variantName = split.length > 2 ? split[2] : Params.public;
 
-    if (!(url.startsWith(uploadImageDeliveryUrl) || url.startsWith(imageDeliveryUrl)) ||
+    if (!(url.startsWith(uploadImageDeliveryUrl) ||
+            url.startsWith(imageDeliveryUrl)) ||
         imageDeliveryId == null ||
         imageId == null) {
       // throw Exception('Invalid CloudflareImage from url');
@@ -119,18 +126,22 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
       Params.id: imageId,
       Params.imageDeliveryId: imageDeliveryId,
       Params.variantName: variantName,
-      Params.variants: ['$imageDeliveryUrl/$imageDeliveryId/$imageId/$variantName']
+      Params.variants: [
+        '$imageDeliveryUrl/$imageDeliveryId/$imageId/$variantName'
+      ]
     };
   }
 
   /// Builds a CloudflareImage from an url if url is properly created
   static CloudflareImage? fromUrl(String url) {
     final data = _dataFromImageDeliveryUrl(url);
-    return data.isEmpty ? null : CloudflareImage(
-      id: data[Params.id],
-      imageDeliveryId: data[Params.imageDeliveryId],
-      variants: data[Params.variants],
-    );
+    return data.isEmpty
+        ? null
+        : CloudflareImage(
+            id: data[Params.id],
+            imageDeliveryId: data[Params.imageDeliveryId],
+            variants: data[Params.variants],
+          );
   }
 
   static String variantNameFromUrl(String url) {

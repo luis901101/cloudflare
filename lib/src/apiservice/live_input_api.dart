@@ -6,8 +6,8 @@ import 'package:cloudflare/src/utils/params.dart';
 
 class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareErrorResponse> {
-  LiveInputAPI({required RestAPI restAPI, required String accountId}) :
-      super(
+  LiveInputAPI({required RestAPI restAPI, required String accountId})
+      : super(
             restAPI: restAPI,
             service: LiveInputService(dio: restAPI.dio, accountId: accountId),
             accountId: accountId,
@@ -23,9 +23,7 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareLiveInput? data,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    return parseResponse(
-      service.create(data: data)
-    );
+    return parseResponse(service.create(data: data));
   }
 
   /// View the live inputs that have been created on this account. Some
@@ -49,8 +47,8 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareLiveInput? liveInput,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-    id != null || liveInput != null, 'One of id or liveInput must not be empty.');
+    assert(id != null || liveInput != null,
+        'One of id or liveInput must not be empty.');
     id ??= liveInput?.id;
     final response = await parseResponse(service.get(
       id: id!,
@@ -69,15 +67,11 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareLiveInput? liveInput,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-    id != null || liveInput != null, 'One of id or liveInput must not be null.');
+    assert(id != null || liveInput != null,
+        'One of id or liveInput must not be null.');
     id ??= liveInput?.id;
-    return genericParseResponseAsList(
-      service.getVideos(
-        id: id!
-      ),
-      dataType: CloudflareStreamVideo()
-    );
+    return genericParseResponseAsList(service.getVideos(id: id!),
+        dataType: CloudflareStreamVideo());
   }
 
   /// Update details about a single live input
@@ -108,11 +102,13 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareLiveInput? liveInput,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-    id != null || liveInput != null, 'One of id or liveInput must not be null.');
+    assert(id != null || liveInput != null,
+        'One of id or liveInput must not be null.');
     id ??= liveInput?.id;
     final response = await getSaveResponse(
-        service.delete(id: id!,),
+        service.delete(
+          id: id!,
+        ),
         parseCloudflareResponse: false);
     return response;
   }
@@ -128,13 +124,15 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert((ids?.isNotEmpty ?? false) || (liveInputs?.isNotEmpty ?? false),
-    'One of ids or live inputs must not be empty.');
+        'One of ids or live inputs must not be empty.');
 
     ids ??= liveInputs?.map((liveInput) => liveInput.id).toList();
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(id: id,);
+      final response = await delete(
+        id: id,
+      );
       responses.add(response);
     }
     return responses;
@@ -155,15 +153,14 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     required LiveInputOutput data,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(liveInputId != null || liveInput != null, 'One of liveInputId or liveInput must not be null.');
+    assert(liveInputId != null || liveInput != null,
+        'One of liveInputId or liveInput must not be null.');
     liveInputId ??= liveInput?.id;
     return genericParseResponse(
-      service.addOutput(
-        liveInputId: liveInputId!,
-        data: data.toJson()..removeWhere((key, value) => key == Params.id)
-      ),
-      dataType: LiveInputOutput()
-    );
+        service.addOutput(
+            liveInputId: liveInputId!,
+            data: data.toJson()..removeWhere((key, value) => key == Params.id)),
+        dataType: LiveInputOutput());
   }
 
   /// List outputs associated with a live input
@@ -177,12 +174,12 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareLiveInput? liveInput,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(liveInputId != null || liveInput != null, 'One of liveInputId or liveInput must not be null.');
+    assert(liveInputId != null || liveInput != null,
+        'One of liveInputId or liveInput must not be null.');
     liveInputId ??= liveInput?.id;
     return genericParseResponseAsList(
-      service.getOutputs(liveInputId: liveInputId!),
-      dataType: LiveInputOutput()
-    );
+        service.getOutputs(liveInputId: liveInputId!),
+        dataType: LiveInputOutput());
   }
 
   /// Removes an output from a live input
@@ -202,14 +199,15 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     LiveInputOutput? output,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(liveInputId != null || liveInput != null, 'One of liveInputId or liveInput must not be null.');
-    assert(outputId != null || output != null, 'One of outputId or output must not be null.');
+    assert(liveInputId != null || liveInput != null,
+        'One of liveInputId or liveInput must not be null.');
+    assert(outputId != null || output != null,
+        'One of outputId or output must not be null.');
     liveInputId ??= liveInput?.id;
     outputId ??= output?.id;
     final response = await getSaveResponse(
-      service.removeOutput(liveInputId: liveInputId!, outputId: outputId!),
-      parseCloudflareResponse: false
-    );
+        service.removeOutput(liveInputId: liveInputId!, outputId: outputId!),
+        parseCloudflareResponse: false);
     return response;
   }
 
@@ -228,8 +226,10 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     List<LiveInputOutput>? outputs,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(liveInputId != null || liveInput != null, 'One of liveInputId or liveInput must not be null.');
-    assert((outputIds?.isNotEmpty ?? false) || (outputs?.isNotEmpty ?? false), 'One of outputIds or outputs must not be empty.');
+    assert(liveInputId != null || liveInput != null,
+        'One of liveInputId or liveInput must not be null.');
+    assert((outputIds?.isNotEmpty ?? false) || (outputs?.isNotEmpty ?? false),
+        'One of outputIds or outputs must not be empty.');
 
     liveInputId ??= liveInput?.id;
     outputIds ??= outputs?.map((output) => output.id).toList();
@@ -244,5 +244,4 @@ class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     }
     return responses;
   }
-
 }

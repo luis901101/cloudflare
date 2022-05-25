@@ -7,7 +7,6 @@ part 'rtmps.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class RTMPS extends Jsonable<RTMPS> {
-
   /// The URL the live input can be sent RTMPS data
   ///
   /// e.g: "rtmps://live.cloudflare.com:443/live/"
@@ -18,14 +17,11 @@ class RTMPS extends Jsonable<RTMPS> {
   /// e.g: "MjE2OTAxNzQyMjQxNDkyNDYyNTAxNjc3MzE3NzY4MjAwMTYx
   final String streamKey;
 
-
   RTMPS({
     String? url,
     String? streamKey,
-  }) :
-      url = url ?? '',
-      streamKey = streamKey ?? ''
-  ;
+  })  : url = url ?? '',
+        streamKey = streamKey ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$RTMPSToJson(this);
@@ -34,6 +30,5 @@ class RTMPS extends Jsonable<RTMPS> {
   RTMPS? fromJsonMap(Map<String, dynamic>? json) =>
       json != null ? RTMPS.fromJson(json) : null;
 
-  factory RTMPS.fromJson(Map<String, dynamic> json) =>
-      _$RTMPSFromJson(json);
+  factory RTMPS.fromJson(Map<String, dynamic> json) => _$RTMPSFromJson(json);
 }

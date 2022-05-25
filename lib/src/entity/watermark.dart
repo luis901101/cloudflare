@@ -10,9 +10,9 @@ part 'watermark.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable()
 class Watermark extends Jsonable<Watermark> {
-
   /// Watermark profile unique identifier.
-  @JsonKey(name: Params.uid) final String id;
+  @JsonKey(name: Params.uid)
+  final String id;
 
   /// The size of the image in bytes.
   final int size;
@@ -31,7 +31,8 @@ class Watermark extends Jsonable<Watermark> {
   /// Note that "center" will ignore the "padding" parameter.
   ///
   /// default value: upperRight
-  @JsonKey(unknownEnumValue: WatermarkPosition.upperRight) final WatermarkPosition position;
+  @JsonKey(unknownEnumValue: WatermarkPosition.upperRight)
+  final WatermarkPosition position;
 
   /// The size of the image relative to the overall size of the video.
   /// This parameter will adapt to horizontal and vertical videos automatically.
@@ -81,17 +82,15 @@ class Watermark extends Jsonable<Watermark> {
     double? padding,
     this.name,
     this.downloadedFrom,
-  }) :
-      id = id ?? '',
-      size = size ?? 0,
-      width = width ?? 0,
-      height = height ?? 0,
-      created = created ?? DateTime.now(),
-      position = position ?? WatermarkPosition.upperRight,
-      scale = scale ?? 0.0,
-      opacity = opacity ?? 0.0,
-      padding = padding ?? 0.0
-  ;
+  })  : id = id ?? '',
+        size = size ?? 0,
+        width = width ?? 0,
+        height = height ?? 0,
+        created = created ?? DateTime.now(),
+        position = position ?? WatermarkPosition.upperRight,
+        scale = scale ?? 0.0,
+        opacity = opacity ?? 0.0,
+        padding = padding ?? 0.0;
 
   @override
   Map<String, dynamic> toJson() => _$WatermarkToJson(this);

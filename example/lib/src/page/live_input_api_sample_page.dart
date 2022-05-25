@@ -15,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:video_player/video_player.dart';
 
-
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key, required this.params}) : super(key: key);
   final Params params;
@@ -82,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             return PickerScreen(
                                 title: 'Pick a frame rate',
                                 initialValue:
-                                widget.params.video.fps.toString(),
+                                    widget.params.video.fps.toString(),
                                 values: fpsList.toMap());
                           }).then((value) {
                         if (value != null) {
@@ -107,8 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               onChanged: (newValue) {
                                 setState(() {
                                   widget.params.video.bitrate =
-                                      (newValue.roundToDouble() * 1024)
-                                          .toInt();
+                                      (newValue.roundToDouble() * 1024).toInt();
                                 });
                               },
                               min: 500,
@@ -135,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             return PickerScreen(
                                 title: 'Pick the number of channels',
                                 initialValue:
-                                widget.params.getChannelToString(),
+                                    widget.params.getChannelToString(),
                                 values: getChannelsMap());
                           }).then((value) {
                         if (value != null) {
@@ -156,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             return PickerScreen(
                                 title: 'Pick a bitrate',
                                 initialValue:
-                                widget.params.getChannelToString(),
+                                    widget.params.getChannelToString(),
                                 values: audioBitrateList.toMap(
                                     valueTransformation: (int e) =>
                                         bitrateToPrettyString(e)));
@@ -179,7 +177,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             return PickerScreen(
                                 title: 'Pick a sample rate',
                                 initialValue:
-                                widget.params.getSampleRateToString(),
+                                    widget.params.getSampleRateToString(),
                                 values: getSampleRatesMap());
                           }).then((value) {
                         if (value != null) {
@@ -295,9 +293,9 @@ class PickerScreen extends StatelessWidget {
 class EditTextScreen extends StatelessWidget {
   const EditTextScreen(
       {Key? key,
-        required this.title,
-        required this.initialValue,
-        required this.onChanged})
+      required this.title,
+      required this.initialValue,
+      required this.onChanged})
       : super(key: key);
 
   final String title;
@@ -363,36 +361,46 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
   Widget videoFromUrlView(CloudflareStreamVideo video) {
     // String url = video.preview; // Cloudflare video previews doesn't allow Range header which is required in iOS with https://pub.dev/packages/video_player
     String url = video.playback?.hls ?? '';
-    if(chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
+    if (chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
       // clearVideoControllers()
       chewieControllerFromUrl = ChewieController(
         autoPlay: true,
         allowPlaybackSpeedChanging: false,
         isLive: true,
-        placeholder: const Center(child: Icon(Icons.flutter_dash, size: 48, color: Colors.lightBlue,)),
-        videoPlayerController: VideoPlayerController.network(url,)
-          ..initialize()
-              .then((_) {
-              errorMessage = null;
-            })
-            .onError((error, stackTrace) {
+        placeholder: const Center(
+            child: Icon(
+          Icons.flutter_dash,
+          size: 48,
+          color: Colors.lightBlue,
+        )),
+        videoPlayerController: VideoPlayerController.network(
+          url,
+        )..initialize().then((_) {
+            errorMessage = null;
+          }).onError((error, stackTrace) {
             errorMessage = error?.toString();
             clearVideoControllers();
           }).whenComplete(() {
-              setState((){});
+            setState(() {});
           }),
       );
     }
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized ?
-      AspectRatio(
-        key: ValueKey('video-from-url-${chewieControllerFromUrl!.videoPlayerController.dataSource}'),
-        aspectRatio: MediaQueryData.fromWindow(window).size.shortestSide > 600 ? 3 : chewieControllerFromUrl!.videoPlayerController.value.aspectRatio,
-        child: Chewie(
-          controller: chewieControllerFromUrl!,
-        ),
-      ) : const CircularProgressIndicator(),
+      child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized
+          ? AspectRatio(
+              key: ValueKey(
+                  'video-from-url-${chewieControllerFromUrl!.videoPlayerController.dataSource}'),
+              aspectRatio:
+                  MediaQueryData.fromWindow(window).size.shortestSide > 600
+                      ? 3
+                      : chewieControllerFromUrl!
+                          .videoPlayerController.value.aspectRatio,
+              child: Chewie(
+                controller: chewieControllerFromUrl!,
+              ),
+            )
+          : const CircularProgressIndicator(),
     );
   }
 
@@ -400,23 +408,27 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
     VoidCallback? onPressed,
     Color? color,
     required String text,
-  }) => ElevatedButton(
-    onPressed: onPressed,
-    style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+  }) =>
+      ElevatedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) {
-            return states.contains(MaterialState.disabled)
-                ? null
-                : color;
+            return states.contains(MaterialState.disabled) ? null : color;
           }),
-    ),
-    child: Text(text, textAlign: TextAlign.center,),
-  );
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+        ),
+      );
 
-  Widget get loadingView => loading ? const Padding(
-    padding: EdgeInsets.all(8.0),
-    child: CircularProgressIndicator(),
-  ) : const SizedBox();
+  Widget get loadingView => loading
+      ? const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(),
+        )
+      : const SizedBox();
 
   @override
   Widget build(BuildContext context) {
@@ -431,51 +443,50 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                if(cloudflareLiveInput == null)
+                if (cloudflareLiveInput == null)
                   button(
                     text: 'Create Live Input',
                     color: Colors.blue,
                     onPressed:
                         loading ? null : () => onClick(doCreateLiveInput),
                   ),
-                if(cloudflareLiveInput != null && !streamingRequestStarted)
+                if (cloudflareLiveInput != null && !streamingRequestStarted)
                   button(
                     text: 'Start Live Streaming',
                     color: Colors.green,
                     onPressed:
-                    loading ? null : () => onClick(doStartLiveStreaming),
+                        loading ? null : () => onClick(doStartLiveStreaming),
                   ),
-                if(streamingRequestStarted) ...[
+                if (streamingRequestStarted) ...[
                   SizedBox(
                     height: 500,
                     child: LiveStreamingView(
-                      cloudflareLiveInput: cloudflareLiveInput!
-                    ),
+                        cloudflareLiveInput: cloudflareLiveInput!),
                   ),
                   const SizedBox(height: 8),
                   button(
                     text: 'Stop Live Streaming',
                     color: Colors.red,
                     onPressed:
-                    loading ? null : () => onClick(doStopLiveStreaming),
+                        loading ? null : () => onClick(doStopLiveStreaming),
                   ),
                   const SizedBox(height: 8),
                   button(
                     text: 'Watch Live Streaming',
                     color: Colors.orange,
                     onPressed:
-                    loading ? null : () => onClick(doWatchLiveStreaming),
+                        loading ? null : () => onClick(doWatchLiveStreaming),
                   ),
                 ],
-                if(errorMessage?.isNotEmpty ?? false)
+                if (errorMessage?.isNotEmpty ?? false)
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         '$errorMessage',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 18, color: Colors.red.shade900),
+                        style:
+                            TextStyle(fontSize: 18, color: Colors.red.shade900),
                       ),
                       const SizedBox(
                         height: 28,
@@ -483,7 +494,8 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
                     ],
                   ),
                 loadingView,
-                if(streamingRequestStarted && cloudflareStreamVideo != null) ...[
+                if (streamingRequestStarted &&
+                    cloudflareStreamVideo != null) ...[
                   const SizedBox(height: 8),
                   videoFromUrlView(cloudflareStreamVideo!),
                 ],
@@ -498,16 +510,12 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
   Future<void> createLiveInput() async {
     showLoading();
     try {
-
-      CloudflareHTTPResponse<CloudflareLiveInput?> response = await cloudflare.liveInputAPI.create(
+      CloudflareHTTPResponse<CloudflareLiveInput?> response =
+          await cloudflare.liveInputAPI.create(
         data: CloudflareLiveInput(
-          meta: {
-            'name': 'Live stream flutter example ${DateTime.now()}'
-          },
-          recording: LiveInputRecording(
-            mode: LiveInputRecordingMode.automatic
-          )
-        ),
+            meta: {'name': 'Live stream flutter example ${DateTime.now()}'},
+            recording:
+                LiveInputRecording(mode: LiveInputRecordingMode.automatic)),
       );
 
       if (response.isSuccessful && response.body != null) {
@@ -539,31 +547,39 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
 
       if (response.isSuccessful && response.body != null) {
         cloudflareLiveInput = response.body;
-        if(cloudflareLiveInput?.status?.current?.isConnected ?? false) {
-          final liveInputVideosResponse = await cloudflare.liveInputAPI.getVideos(
+        if (cloudflareLiveInput?.status?.current?.isConnected ?? false) {
+          final liveInputVideosResponse =
+              await cloudflare.liveInputAPI.getVideos(
             liveInput: cloudflareLiveInput,
           );
-          if (liveInputVideosResponse.isSuccessful && liveInputVideosResponse.body != null) {
+          if (liveInputVideosResponse.isSuccessful &&
+              liveInputVideosResponse.body != null) {
             for (final video in liveInputVideosResponse.body!) {
-              if(video.status.state == MediaProcessingState.liveInProgress){
+              if (video.status.state == MediaProcessingState.liveInProgress) {
                 cloudflareStreamVideo = video;
                 break;
               }
             }
-            if(cloudflareStreamVideo == null) {
-              errorMessage = 'No live video available to watch for this streaming. Try to watch again.';
+            if (cloudflareStreamVideo == null) {
+              errorMessage =
+                  'No live video available to watch for this streaming. Try to watch again.';
             }
           } else {
             if (liveInputVideosResponse.error is CloudflareErrorResponse &&
-                (liveInputVideosResponse.error as CloudflareErrorResponse).messages.isNotEmpty) {
+                (liveInputVideosResponse.error as CloudflareErrorResponse)
+                    .messages
+                    .isNotEmpty) {
               errorMessage =
-                  (liveInputVideosResponse.error as CloudflareErrorResponse).messages.first;
+                  (liveInputVideosResponse.error as CloudflareErrorResponse)
+                      .messages
+                      .first;
             } else {
               errorMessage = liveInputVideosResponse.error?.toString();
             }
           }
         } else {
-          errorMessage = 'Live streaming not connected. Check you are already streaming and try to watch again.';
+          errorMessage =
+              'Live streaming not connected. Check you are already streaming and try to watch again.';
         }
       } else {
         if (response.error is CloudflareErrorResponse &&
@@ -633,7 +649,8 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
 
 class LiveStreamingView extends StatefulWidget {
   final CloudflareLiveInput cloudflareLiveInput;
-  const LiveStreamingView({Key? key, required this.cloudflareLiveInput}) : super(key: key);
+  const LiveStreamingView({Key? key, required this.cloudflareLiveInput})
+      : super(key: key);
 
   @override
   _LiveStreamingViewState createState() => _LiveStreamingViewState();
@@ -642,7 +659,7 @@ class LiveStreamingView extends StatefulWidget {
 class _LiveStreamingViewState extends State<LiveStreamingView>
     with WidgetsBindingObserver {
   final ButtonStyle buttonStyle =
-  ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
+      ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
   Params config = Params();
   late final LiveStreamController _controller;
   late final Future<int> textureId;
@@ -666,10 +683,13 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
     _controller = initLiveStreamController();
 
-    textureId = _controller.create(
-      initialAudioConfig: config.audio,
-      initialVideoConfig: config.video,
-    ).whenComplete(() => Future.delayed(const Duration(milliseconds: 500), onStartStreamingButtonPressed));
+    textureId = _controller
+        .create(
+          initialAudioConfig: config.audio,
+          initialVideoConfig: config.video,
+        )
+        .whenComplete(() => Future.delayed(
+            const Duration(milliseconds: 500), onStartStreamingButtonPressed));
     super.initState();
   }
 
@@ -739,7 +759,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
           icon: const Icon(Icons.cameraswitch),
           color: Colors.deepOrange,
           onPressed:
-          liveStreamController != null ? onSwitchCameraButtonPressed : null,
+              liveStreamController != null ? onSwitchCameraButtonPressed : null,
         ),
         IconButton(
           icon: const Icon(Icons.mic_off),
@@ -752,17 +772,17 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
           icon: const Icon(Icons.fiber_manual_record),
           color: Colors.red,
           onPressed:
-          liveStreamController != null && !liveStreamController.isStreaming
-              ? onStartStreamingButtonPressed
-              : null,
+              liveStreamController != null && !liveStreamController.isStreaming
+                  ? onStartStreamingButtonPressed
+                  : null,
         ),
         IconButton(
           icon: const Icon(Icons.stop),
           color: Colors.red,
           onPressed:
-          liveStreamController != null && liveStreamController.isStreaming
-              ? onStopStreamingButtonPressed
-              : null,
+              liveStreamController != null && liveStreamController.isStreaming
+                  ? onStopStreamingButtonPressed
+                  : null,
         ),
         IconButton(
           icon: const Icon(Icons.menu),
@@ -777,7 +797,8 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
   void showInSnackBar(String message) {
     // ignore: deprecated_member_use
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> switchCamera() async {

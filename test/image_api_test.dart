@@ -14,16 +14,22 @@ void main() async {
   await init();
   Set<String> cacheIds = {};
   void addId(String? id) {
-    if(id != null) cacheIds.add(id);
+    if (id != null) cacheIds.add(id);
   }
 
-  test('Handling image from url tests', (){
-    final image1 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/thumbnail');
-    final image2 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/public');
-    final image3 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/');
-    final image4 = CloudflareImage.fromUrl('https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
-    final image5 = CloudflareImage.fromUrl('https://upload.imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
-    final image6 = CloudflareImage(id: 'm3xgriuradsz3ed23', imageDeliveryId: '4m5x3gt2o5htuergn');
+  test('Handling image from url tests', () {
+    final image1 = CloudflareImage.fromUrl(
+        'https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/thumbnail');
+    final image2 = CloudflareImage.fromUrl(
+        'https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/public');
+    final image3 = CloudflareImage.fromUrl(
+        'https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00/');
+    final image4 = CloudflareImage.fromUrl(
+        'https://imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
+    final image5 = CloudflareImage.fromUrl(
+        'https://upload.imagedelivery.net/c3ymt7v4gt5cifhjdsf/af771366-b3bb-4570-8e33-e10c8544ce00');
+    final image6 = CloudflareImage(
+        id: 'm3xgriuradsz3ed23', imageDeliveryId: '4m5x3gt2o5htuergn');
     final image7 = CloudflareImage();
     expect(image1?.firstVariant, isNotEmpty);
     expect(image2?.firstVariant, isNotEmpty);
@@ -35,7 +41,6 @@ void main() async {
   });
 
   group('Upload image tests', () {
-
     test('Simple upload image from file with progress update', () async {
       if (!imageFile.existsSync()) {
         fail('No image file available to upload');
@@ -44,7 +49,8 @@ void main() async {
           contentFromFile: DataTransmit<File>(
               data: imageFile,
               progressCallback: (count, total) {
-                print('Simple upload image: ${p.basename(imageFile.path)} from file progress: $count/$total');
+                print(
+                    'Simple upload image: ${p.basename(imageFile.path)} from file progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -58,7 +64,8 @@ void main() async {
           contentFromPath: DataTransmit<String>(
               data: imageFile.path,
               progressCallback: (count, total) {
-                print('Simple upload image: ${p.basename(imageFile.path)} from path progress: $count/$total');
+                print(
+                    'Simple upload image: ${p.basename(imageFile.path)} from path progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -72,7 +79,8 @@ void main() async {
           contentFromBytes: DataTransmit<Uint8List>(
               data: imageFile.readAsBytesSync(),
               progressCallback: (count, total) {
-                print('Simple upload image: ${p.basename(imageFile.path)} from bytes progress: $count/$total');
+                print(
+                    'Simple upload image: ${p.basename(imageFile.path)} from bytes progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -86,7 +94,8 @@ void main() async {
           contentFromUrl: DataTransmit<String>(
               data: imageUrl,
               progressCallback: (count, total) {
-                print('Simple upload image from url: $imageUrl progress: $count/$total');
+                print(
+                    'Simple upload image from url: $imageUrl progress: $count/$total');
               }));
       expect(response, ImageMatcher());
       addId(response.body?.id);
@@ -242,13 +251,13 @@ void main() async {
           fail('No uploadURL available to upload to');
         }
         final response = await cloudflare.imageAPI.directUpload(
-          dataUploadDraft: dataUploadDraft!,
-          contentFromFile: DataTransmit<File>(
-            data: imageFile,
-            progressCallback: (count, total) {
-              print('Image upload to direct upload URL from file progress: $count/$total');
-            })
-        );
+            dataUploadDraft: dataUploadDraft!,
+            contentFromFile: DataTransmit<File>(
+                data: imageFile,
+                progressCallback: (count, total) {
+                  print(
+                      'Image upload to direct upload URL from file progress: $count/$total');
+                }));
         expect(response, ImageMatcher());
         addId(response.body?.id);
         expect(response.body?.id, dataUploadDraft?.id);
@@ -271,7 +280,8 @@ void main() async {
     });
 
     test('Get image list', () async {
-      expect(responseList, ResponseMatcher(), reason: responseList.error?.toString());
+      expect(responseList, ResponseMatcher(),
+          reason: responseList.error?.toString());
       expect(responseList.body, isNotNull);
       expect(responseList.body, isNotEmpty);
       imageId = responseList.body![0].id;
@@ -319,14 +329,13 @@ void main() async {
       metadata['system_id'] = '${metadata['system_id']}-updated';
       metadata['description'] = '${metadata['description']}-updated';
       final response = await cloudflare.imageAPI.update(
-        image: CloudflareImage(
-          id: imageId!,
-          requireSignedURLs: false,
-          meta: metadata,
-        )
-      );
+          image: CloudflareImage(
+        id: imageId!,
+        requireSignedURLs: false,
+        meta: metadata,
+      ));
       expect(response, ImageMatcher());
-      cacheIds.remove(imageId);//After image updated the imageId changes
+      cacheIds.remove(imageId); //After image updated the imageId changes
       addId(response.body?.id);
       expect(response.body!.requireSignedURLs, false);
       expect(response.body!.meta, metadata);
@@ -344,7 +353,7 @@ void main() async {
     expect(response, ResponseMatcher(), reason: response.error?.toString());
     cacheIds.remove(imageId);
   });
-  
+
   test('Delete multiple images', () async {
     /// This code below is not part of the tests and should remain commented, be careful.
     // final responseList = await cloudflare.imageAPI.getAll(page: 1, size: 20);

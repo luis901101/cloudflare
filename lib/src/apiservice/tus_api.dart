@@ -11,13 +11,14 @@ class TusAPI {
   static const tusVersion = '1.0.0';
 
   static String? generateMetadata(Map<String, dynamic>? map) {
-    map?.removeWhere((key, value) => value == null || (value is List && value.isEmpty));
-    if(map?.isEmpty ?? true) return null;
+    map?.removeWhere(
+        (key, value) => value == null || (value is List && value.isEmpty));
+    if (map?.isEmpty ?? true) return null;
     final metadata = MapUtils.parseMapDynamicHeaders(map!);
     return metadata?.entries
-      .map((entry) =>
-        '${entry.key} ${base64.encode(utf8.encode(entry.value))}')
-      .join(',');
+        .map((entry) =>
+            '${entry.key} ${base64.encode(utf8.encode(entry.value))}')
+        .join(',');
   }
 
   DataUploadDraft _dataUploadDraft;
@@ -73,15 +74,17 @@ class TusAPI {
         onProgress?.call(count, total);
       },
       onComplete: (response) {
-        if(onComplete != null) {
+        if (onComplete != null) {
           final streamMediaId = response.headers[Params.streamMediaIdKC] ?? '';
-          if(streamMediaId.isNotEmpty) {
+          if (streamMediaId.isNotEmpty) {
             _dataUploadDraft = _dataUploadDraft.copyWith(id: streamMediaId);
           }
-          final cloudflareStreamVideo = (_dataUploadDraft.id.isEmpty ?
-            CloudflareStreamVideo.fromUrl(_dataUploadDraft.uploadURL) :
-            CloudflareStreamVideo(id: _dataUploadDraft.id,))
-            ?.copyWith(readyToStream: true);
+          final cloudflareStreamVideo = (_dataUploadDraft.id.isEmpty
+                  ? CloudflareStreamVideo.fromUrl(_dataUploadDraft.uploadURL)
+                  : CloudflareStreamVideo(
+                      id: _dataUploadDraft.id,
+                    ))
+              ?.copyWith(readyToStream: true);
           onComplete(cloudflareStreamVideo);
         }
       },

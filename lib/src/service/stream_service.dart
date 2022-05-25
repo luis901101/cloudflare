@@ -33,7 +33,8 @@ abstract class StreamService {
   @MultiPart()
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> streamFromBytes({
-    @Part(name: Params.file, fileName: 'video-from-bytes') required List<int> bytes,
+    @Part(name: Params.file, fileName: 'video-from-bytes')
+        required List<int> bytes,
     @SendProgress() ProgressCallback? onUploadProgress,
   });
 
