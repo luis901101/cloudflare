@@ -270,6 +270,7 @@ void main() async {
           file: videoFile,
           name: 'test-video-upload-authenticated',
           cache: TusPersistentCache(''),
+          timeout: Duration(minutes: 5),
         );
         bool isComplete = false;
         onProgress(count, total) {
@@ -297,7 +298,7 @@ void main() async {
           print(e);
           rethrow;
         }
-      }, timeout: Timeout(Duration(minutes: 50)));
+      }, timeout: Timeout(Duration(minutes: 20)));
 
       test('Create authenticated direct stream video URL using tus protocol', () async {
         if (!videoFile.existsSync()) {
@@ -334,6 +335,7 @@ void main() async {
         final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: dataUploadDraft!,
           file: videoFile3,
+          timeout: Duration(minutes: 5),
         );
         bool isComplete = false;
         onProgress(count, total) {
@@ -366,7 +368,7 @@ void main() async {
           tusAPI.resumeUpload();
         });
 
-      }, timeout: Timeout(Duration(minutes: 5)));
+      }, timeout: Timeout(Duration(minutes: 20)));
   });
 
   group('Retrieve video tests', () {

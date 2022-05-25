@@ -44,6 +44,8 @@ class TusAPI {
     );
   }
 
+  TusClient get tusClient => _tusClient;
+
   /// Whether the client supports resuming
   bool get resumingEnabled => _tusClient.resumingEnabled;
 
