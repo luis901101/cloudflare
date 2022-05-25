@@ -14,6 +14,9 @@ Types of changes
 - StreamAPI implemented
 - LiveInputAPI implemented
 
+### Changed
+- ImageAPI updated
+
 ## 0.0.1+2
 ### Fixed
 - Readme description.

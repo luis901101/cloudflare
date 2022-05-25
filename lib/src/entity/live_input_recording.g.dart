@@ -63,7 +63,7 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
 }
 
 extension $LiveInputRecordingCopyWith on LiveInputRecording {
-  /// Returns a callable class that can be used as follows: `instanceOfclass LiveInputRecording extends Jsonable<LiveInputRecording>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfLiveInputRecording.copyWith(...)`.
   _$LiveInputRecordingCWProxy get copyWith =>
       _$LiveInputRecordingCWProxyImpl(this);
 }

@@ -1,6 +1,6 @@
 name: cloudflare
 description: This is a dart package for Cloudflare media API to allow easy Image and Streaming api management.
-version: 0.1.0+3
+version: 1.0.0+3
 homepage: https://github.com/luis901101/cloudflare
 
 environment:
@@ -23,5 +23,5 @@ dev_dependencies:
   test: ^1.21.1
   json_serializable: ^6.2.0
   retrofit_generator: ^4.0.1
-  copy_with_extension_gen: ^4.0.1
-  build_runner: ^2.1.10 #flutter pub run build_runner build
+  copy_with_extension_gen: ^4.0.2
+  build_runner: ^2.1.11 #flutter pub run build_runner build

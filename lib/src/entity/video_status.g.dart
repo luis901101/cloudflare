@@ -63,7 +63,7 @@ class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
 }
 
 extension $VideoStatusCopyWith on VideoStatus {
-  /// Returns a callable class that can be used as follows: `instanceOfclass VideoStatus extends Jsonable<VideoStatus>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfVideoStatus.copyWith(...)`.
   _$VideoStatusCWProxy get copyWith => _$VideoStatusCWProxyImpl(this);
 }
 

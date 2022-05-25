@@ -63,7 +63,7 @@ class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
 }
 
 extension $LiveInputStatusLogCopyWith on LiveInputStatusLog {
-  /// Returns a callable class that can be used as follows: `instanceOfclass LiveInputStatusLog extends Jsonable<LiveInputStatusLog>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfLiveInputStatusLog.copyWith(...)`.
   _$LiveInputStatusLogCWProxy get copyWith =>
       _$LiveInputStatusLogCWProxyImpl(this);
 }

@@ -57,7 +57,7 @@ class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
 }
 
 extension $LiveInputOutputCopyWith on LiveInputOutput {
-  /// Returns a callable class that can be used as follows: `instanceOfclass LiveInputOutput extends Jsonable<LiveInputOutput>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfLiveInputOutput.copyWith(...)`.
   _$LiveInputOutputCWProxy get copyWith => _$LiveInputOutputCWProxyImpl(this);
 }
 

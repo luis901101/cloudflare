@@ -105,7 +105,7 @@ class _$WatermarkCWProxyImpl implements _$WatermarkCWProxy {
 }
 
 extension $WatermarkCopyWith on Watermark {
-  /// Returns a callable class that can be used as follows: `instanceOfclass Watermark extends Jsonable<Watermark>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfWatermark.copyWith(...)`.
   _$WatermarkCWProxy get copyWith => _$WatermarkCWProxyImpl(this);
 }
 

@@ -15,6 +15,7 @@ abstract class _$CloudflareStreamVideoCWProxy {
   /// ````
   CloudflareStreamVideo call({
     List<String>? allowedOrigins,
+    String? animatedThumbnail,
     DateTime? created,
     double? duration,
     String? id,
@@ -55,6 +56,7 @@ class _$CloudflareStreamVideoCWProxyImpl
   /// ````
   CloudflareStreamVideo call({
     Object? allowedOrigins = const $CopyWithPlaceholder(),
+    Object? animatedThumbnail = const $CopyWithPlaceholder(),
     Object? created = const $CopyWithPlaceholder(),
     Object? duration = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
@@ -81,6 +83,10 @@ class _$CloudflareStreamVideoCWProxyImpl
           ? _value.allowedOrigins
           // ignore: cast_nullable_to_non_nullable
           : allowedOrigins as List<String>?,
+      animatedThumbnail: animatedThumbnail == const $CopyWithPlaceholder()
+          ? _value.animatedThumbnail
+          // ignore: cast_nullable_to_non_nullable
+          : animatedThumbnail as String?,
       created: created == const $CopyWithPlaceholder()
           ? _value.created
           // ignore: cast_nullable_to_non_nullable
@@ -167,7 +173,7 @@ class _$CloudflareStreamVideoCWProxyImpl
 }
 
 extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
-  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfCloudflareStreamVideo.copyWith(...)`.
   _$CloudflareStreamVideoCWProxy get copyWith =>
       _$CloudflareStreamVideoCWProxyImpl(this);
 }
@@ -204,6 +210,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
           ? null
           : VideoSize.fromJson(json['input'] as Map<String, dynamic>),
       thumbnail: json['thumbnail'] as String?,
+      animatedThumbnail: json['animatedThumbnail'] as String?,
       status: json['status'] == null
           ? null
           : VideoStatus.fromJson(json['status'] as Map<String, dynamic>),
@@ -248,6 +255,7 @@ Map<String, dynamic> _$CloudflareStreamVideoToJson(
   val['modified'] = instance.modified.toIso8601String();
   val['input'] = instance.input;
   val['thumbnail'] = instance.thumbnail;
+  val['animatedThumbnail'] = instance.animatedThumbnail;
   val['status'] = instance.status;
   val['duration'] = instance.duration;
   writeNotNull('uploadExpiry', instance.uploadExpiry?.toIso8601String());

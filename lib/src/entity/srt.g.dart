@@ -57,7 +57,7 @@ class _$SRTCWProxyImpl implements _$SRTCWProxy {
 }
 
 extension $SRTCopyWith on SRT {
-  /// Returns a callable class that can be used as follows: `instanceOfclass SRT extends Jsonable<SRT>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfSRT.copyWith(...)`.
   _$SRTCWProxy get copyWith => _$SRTCWProxyImpl(this);
 }
 

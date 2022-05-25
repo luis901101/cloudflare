@@ -51,7 +51,7 @@ class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
 }
 
 extension $RTMPSCopyWith on RTMPS {
-  /// Returns a callable class that can be used as follows: `instanceOfclass RTMPS extends Jsonable<RTMPS>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfRTMPS.copyWith(...)`.
   _$RTMPSCWProxy get copyWith => _$RTMPSCWProxyImpl(this);
 }
 

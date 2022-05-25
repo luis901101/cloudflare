@@ -51,7 +51,7 @@ class _$MediaNFTCWProxyImpl implements _$MediaNFTCWProxy {
 }
 
 extension $MediaNFTCopyWith on MediaNFT {
-  /// Returns a callable class that can be used as follows: `instanceOfclass MediaNFT extends Jsonable<MediaNFT>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfMediaNFT.copyWith(...)`.
   _$MediaNFTCWProxy get copyWith => _$MediaNFTCWProxyImpl(this);
 }
 

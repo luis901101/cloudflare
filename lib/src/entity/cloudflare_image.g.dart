@@ -87,7 +87,7 @@ class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
 }
 
 extension $CloudflareImageCopyWith on CloudflareImage {
-  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareImage extends Jsonable<CloudflareImage>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfCloudflareImage.copyWith(...)`.
   _$CloudflareImageCWProxy get copyWith => _$CloudflareImageCWProxyImpl(this);
 }
 

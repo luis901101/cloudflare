@@ -17,7 +17,7 @@ abstract class _$CloudflareResponseCWProxy {
     List<ErrorInfo>? errors,
     List<String>? messages,
     Pagination? paginationInfo,
-    dynamic result,
+    dynamic? result,
     bool? success,
   });
 }
@@ -69,7 +69,7 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
 }
 
 extension $CloudflareResponseCopyWith on CloudflareResponse {
-  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareResponse extends Jsonable<CloudflareResponse>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
   _$CloudflareResponseCWProxy get copyWith =>
       _$CloudflareResponseCWProxyImpl(this);
 }

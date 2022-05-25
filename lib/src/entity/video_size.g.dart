@@ -51,7 +51,7 @@ class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
 }
 
 extension $VideoSizeCopyWith on VideoSize {
-  /// Returns a callable class that can be used as follows: `instanceOfclass VideoSize extends Jsonable<VideoSize>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfVideoSize.copyWith(...)`.
   _$VideoSizeCWProxy get copyWith => _$VideoSizeCWProxyImpl(this);
 }
 

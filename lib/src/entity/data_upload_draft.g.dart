@@ -57,7 +57,7 @@ class _$DataUploadDraftCWProxyImpl implements _$DataUploadDraftCWProxy {
 }
 
 extension $DataUploadDraftCopyWith on DataUploadDraft {
-  /// Returns a callable class that can be used as follows: `instanceOfclass DataUploadDraft extends Jsonable<DataUploadDraft>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfDataUploadDraft.copyWith(...)`.
   _$DataUploadDraftCWProxy get copyWith => _$DataUploadDraftCWProxyImpl(this);
 }
 

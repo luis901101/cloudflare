@@ -99,7 +99,7 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
 }
 
 extension $CloudflareLiveInputCopyWith on CloudflareLiveInput {
-  /// Returns a callable class that can be used as follows: `instanceOfclass CloudflareLiveInput extends Jsonable<CloudflareLiveInput>.name.copyWith(...)`.
+  /// Returns a callable class that can be used as follows: `instanceOfCloudflareLiveInput.copyWith(...)`.
   _$CloudflareLiveInputCWProxy get copyWith =>
       _$CloudflareLiveInputCWProxyImpl(this);
 }
