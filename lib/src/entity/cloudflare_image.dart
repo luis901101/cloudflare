@@ -106,7 +106,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
         uploaded = uploaded ?? DateTime.now(),
         draft = draft ?? false;
 
-  static Map<String, dynamic> _dataFromImageDeliveryUrl(String url) {
+  static Map<String, dynamic> dataFromImageDeliveryUrl(String url) {
     final split = url
         .replaceAll('$uploadImageDeliveryUrl/', '')
         .replaceAll('$imageDeliveryUrl/', '')
@@ -134,7 +134,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
 
   /// Builds a CloudflareImage from an url if url is properly created
   static CloudflareImage? fromUrl(String url) {
-    final data = _dataFromImageDeliveryUrl(url);
+    final data = dataFromImageDeliveryUrl(url);
     return data.isEmpty
         ? null
         : CloudflareImage(
@@ -145,7 +145,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   }
 
   static String variantNameFromUrl(String url) {
-    final data = _dataFromImageDeliveryUrl(url);
+    final data = dataFromImageDeliveryUrl(url);
     return data[Params.variantName]!;
   }
 

@@ -9,6 +9,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.0.0+6
+### Changed
+- `dataFromImageDeliveryUrl` function from `CloudflareImage` made public
+- `dataFromVideoDeliveryUrl` function from `CloudflareStreamVideo` made public
+
 ## 1.0.0+5
 ### Fixed
 - Minor bugs fixed in flutter example project

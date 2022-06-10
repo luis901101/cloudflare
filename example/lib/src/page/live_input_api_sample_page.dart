@@ -15,6 +15,12 @@ import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:video_player/video_player.dart';
 
+/// This allows a value of type T or T? to be treated as a value of type T?.
+///
+/// We use this so that APIs that have become non-nullable can still be used
+/// with `!` and `?` on the stable branch.
+T? _ambiguate<T>(T? value) => value;
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key, required this.params}) : super(key: key);
   final Params params;
@@ -676,7 +682,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addObserver(this);
+    _ambiguate(WidgetsBinding.instance)?.addObserver(this);
 
     config.rtmpUrl = widget.cloudflareLiveInput.rtmps.url;
     config.streamKey = widget.cloudflareLiveInput.rtmps.streamKey;

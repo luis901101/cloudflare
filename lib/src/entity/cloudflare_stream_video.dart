@@ -372,7 +372,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         },
       ).toString();
 
-  static Map<String, dynamic> _dataFromVideoDeliveryUrl(String url) {
+  static Map<String, dynamic> dataFromVideoDeliveryUrl(String url) {
     final split = url
         .replaceAll('$uploadVideoDeliveryUrl/', '')
         .replaceAll('$watchVideoDeliveryUrl/', '')
@@ -396,7 +396,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
 
   /// Builds a CloudflareStreamVideo from an url if url is properly created
   static CloudflareStreamVideo? fromUrl(String url) {
-    final data = _dataFromVideoDeliveryUrl(url);
+    final data = dataFromVideoDeliveryUrl(url);
     return data.isEmpty
         ? null
         : CloudflareStreamVideo(
