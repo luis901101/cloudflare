@@ -81,6 +81,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
         onUploadProgress: contentFromFile.progressCallback,
+        cancelToken: contentFromFile.cancelToken,
       ));
     } else if (contentFromBytes != null) {
       response = await parseResponse(service.uploadFromBytes(
@@ -88,6 +89,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
         onUploadProgress: contentFromBytes.progressCallback,
+        cancelToken: contentFromBytes.cancelToken,
       ));
     } else {
       response = await parseResponse(service.uploadFromUrl(
@@ -95,6 +97,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
         onUploadProgress: contentFromUrl.progressCallback,
+        cancelToken: contentFromUrl.cancelToken,
       ));
     }
 
@@ -127,22 +130,28 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
+        data: File(contentFromPath.data),
+        progressCallback: contentFromPath.progressCallback,
+        cancelToken: contentFromPath.cancelToken,
+      );
     }
 
     /// Web support
     if (contentFromFile != null && PlatformUtils.isWeb) {
       contentFromBytes ??= DataTransmit<Uint8List>(
-          data: contentFromFile.data.readAsBytesSync(),
-          progressCallback: contentFromFile.progressCallback);
+        data: contentFromFile.data.readAsBytesSync(),
+        progressCallback: contentFromFile.progressCallback,
+        cancelToken: contentFromFile.cancelToken,
+      );
       contentFromFile = null;
     }
 
     final dio = restAPI.dio;
     final formData = FormData();
+    CancelToken? cancelToken;
     ProgressCallback? progressCallback;
     if (contentFromFile != null) {
+      cancelToken = contentFromFile.cancelToken;
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
       formData.files.add(MapEntry(
@@ -150,7 +159,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
           MultipartFile.fromFileSync(file.path,
               filename: file.path.split(Platform.pathSeparator).last)));
     } else {
-      final bytes = contentFromBytes!.data;
+      cancelToken = contentFromBytes!.cancelToken;
+      final bytes = contentFromBytes.data;
       progressCallback = contentFromBytes.progressCallback;
       formData.files.add(MapEntry(
           Params.file,
@@ -171,7 +181,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
             connectTimeout: restAPI.timeout?.inMilliseconds),
         '',
         data: formData,
-        onSendProgress: progressCallback));
+        onSendProgress: progressCallback,
+        cancelToken: cancelToken));
     final value = rawResponse.data == null
         ? null
         : CloudflareResponse.fromJson(rawResponse.data!);

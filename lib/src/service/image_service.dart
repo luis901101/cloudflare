@@ -23,6 +23,7 @@ abstract class ImageService {
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('/v1')
@@ -34,6 +35,7 @@ abstract class ImageService {
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('/v1')
@@ -44,6 +46,7 @@ abstract class ImageService {
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @PATCH('/v1/{id}')

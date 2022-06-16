@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.1.0+8
+### Added
+- `DataTransmit` adds a `CancelToken` property to allow to cancel requests on any request that uses a `DataTransmit` instance, like image upload or video stream upload.
+
 ## 1.0.1+7
 ### Fixed
 - Wrong assert validation removed from `tusDirectStreamUpload(...)` function that prevented from doing direct stream upload using tus protocol.

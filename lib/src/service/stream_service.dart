@@ -19,6 +19,7 @@ abstract class StreamService {
   Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
     @Body() required Map<String, dynamic> data,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('')
@@ -27,6 +28,7 @@ abstract class StreamService {
   Future<HttpResponse<CloudflareResponse?>> streamFromFile({
     @Part(name: Params.file) required File file,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('')
@@ -36,6 +38,7 @@ abstract class StreamService {
     @Part(name: Params.file, fileName: 'video-from-bytes')
         required List<int> bytes,
     @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('/direct_upload')

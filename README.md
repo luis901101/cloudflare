@@ -2,6 +2,7 @@
 
 ## Description
 This package aims to be a dart SDK for the [Cloudflare API](https://api.cloudflare.com/).
+It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tusc](https://pub.dev/packages/tusc) for pause/resume uploads using [tus](https://tus.io) protocol.
 
 ## Available APIs
 
@@ -152,6 +153,7 @@ Done, you can now access Cloudflare API.
 - `CloudflareImage`: It's the representation of  Cloudflare Image data. [Check here](https://api.cloudflare.com/#cloudflare-images-properties) and [here](https://developers.cloudflare.com/images/cloudflare-images)
 - `CloudflareStreamVideo`: It's the representation of Stream Video data. [Check here](https://api.cloudflare.com/#stream-videos-properties) and [here](https://developers.cloudflare.com/stream)
 - `CloudflareLiveInput`: It's the representation of Stream Live Input data. [Check here](https://api.cloudflare.com/#stream-live-inputs-properties) and [here](https://developers.cloudflare.com/stream/stream-live/)
+- `DataTransmit`: It's the representation of the data that will be uploaded to Cloudflare, data could be a `File`, a `String` file path, or a byte array `List<Uint8List>`. This class allows you to listen for data transmit progress, by using its `progressCallback` and also allows you to cancel a data transmit ongoing request by using the `cancelToken`.
 
 ## How to use ImageAPI
 

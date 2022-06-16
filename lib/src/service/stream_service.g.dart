@@ -17,7 +17,7 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromUrl(
-      {required data, onUploadProgress}) async {
+      {required data, onUploadProgress, cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -30,6 +30,7 @@ class _StreamService implements StreamService {
                 .compose(_dio.options, '/copy',
                     queryParameters: queryParameters,
                     data: _data,
+                    cancelToken: cancelToken,
                     onSendProgress: onUploadProgress)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -41,7 +42,7 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromFile(
-      {required file, onUploadProgress}) async {
+      {required file, onUploadProgress, cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -60,6 +61,7 @@ class _StreamService implements StreamService {
             .compose(_dio.options, '',
                 queryParameters: queryParameters,
                 data: _data,
+                cancelToken: cancelToken,
                 onSendProgress: onUploadProgress)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -71,7 +73,7 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromBytes(
-      {required bytes, onUploadProgress}) async {
+      {required bytes, onUploadProgress, cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -92,6 +94,7 @@ class _StreamService implements StreamService {
             .compose(_dio.options, '',
                 queryParameters: queryParameters,
                 data: _data,
+                cancelToken: cancelToken,
                 onSendProgress: onUploadProgress)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null

@@ -17,7 +17,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromFile(
-      {required file, requireSignedURLs, metadata, onUploadProgress}) async {
+      {required file,
+      requireSignedURLs,
+      metadata,
+      onUploadProgress,
+      cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -41,6 +45,7 @@ class _ImageService implements ImageService {
             .compose(_dio.options, '/v1',
                 queryParameters: queryParameters,
                 data: _data,
+                cancelToken: cancelToken,
                 onSendProgress: onUploadProgress)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -52,7 +57,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes(
-      {required bytes, requireSignedURLs, metadata, onUploadProgress}) async {
+      {required bytes,
+      requireSignedURLs,
+      metadata,
+      onUploadProgress,
+      cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -78,6 +87,7 @@ class _ImageService implements ImageService {
             .compose(_dio.options, '/v1',
                 queryParameters: queryParameters,
                 data: _data,
+                cancelToken: cancelToken,
                 onSendProgress: onUploadProgress)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
@@ -89,7 +99,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromUrl(
-      {required url, requireSignedURLs, metadata, onUploadProgress}) async {
+      {required url,
+      requireSignedURLs,
+      metadata,
+      onUploadProgress,
+      cancelToken}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -110,6 +124,7 @@ class _ImageService implements ImageService {
             .compose(_dio.options, '/v1',
                 queryParameters: queryParameters,
                 data: _data,
+                cancelToken: cancelToken,
                 onSendProgress: onUploadProgress)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = _result.data == null
