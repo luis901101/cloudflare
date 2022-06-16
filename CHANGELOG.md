@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.0.1+7
+### Fixed
+- Wrong assert validation removed from `tusDirectStreamUpload(...)` function that prevented from doing direct stream upload using tus protocol.
+
 ## 1.0.0+6
 ### Changed
 - `dataFromImageDeliveryUrl` function from `CloudflareImage` made public

@@ -417,7 +417,6 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// Defaults to Cloudflare timeout
     Duration? timeout,
   }) async {
-    assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(file != null || path != null || bytes != null,
         'One of the content must be specified.');
 
