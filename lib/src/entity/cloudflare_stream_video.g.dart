@@ -17,6 +17,7 @@ abstract class _$CloudflareStreamVideoCWProxy {
     List<String>? allowedOrigins,
     String? animatedThumbnail,
     DateTime? created,
+    String? customAccountSubdomainUrl,
     double? duration,
     String? id,
     VideoSize? input,
@@ -58,6 +59,7 @@ class _$CloudflareStreamVideoCWProxyImpl
     Object? allowedOrigins = const $CopyWithPlaceholder(),
     Object? animatedThumbnail = const $CopyWithPlaceholder(),
     Object? created = const $CopyWithPlaceholder(),
+    Object? customAccountSubdomainUrl = const $CopyWithPlaceholder(),
     Object? duration = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
     Object? input = const $CopyWithPlaceholder(),
@@ -174,6 +176,7 @@ class _$CloudflareStreamVideoCWProxyImpl
 
 extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
   /// Returns a callable class that can be used as follows: `instanceOfCloudflareStreamVideo.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$CloudflareStreamVideoCWProxy get copyWith =>
       _$CloudflareStreamVideoCWProxyImpl(this);
 }

@@ -6,7 +6,7 @@ part of 'stream_service.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
 class _StreamService implements StreamService {
   _StreamService(this._dio, {this.baseUrl});

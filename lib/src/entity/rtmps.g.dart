@@ -52,6 +52,7 @@ class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
 
 extension $RTMPSCopyWith on RTMPS {
   /// Returns a callable class that can be used as follows: `instanceOfRTMPS.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$RTMPSCWProxy get copyWith => _$RTMPSCWProxyImpl(this);
 }
 

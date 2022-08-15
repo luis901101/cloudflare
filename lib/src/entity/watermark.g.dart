@@ -106,6 +106,7 @@ class _$WatermarkCWProxyImpl implements _$WatermarkCWProxy {
 
 extension $WatermarkCopyWith on Watermark {
   /// Returns a callable class that can be used as follows: `instanceOfWatermark.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$WatermarkCWProxy get copyWith => _$WatermarkCWProxyImpl(this);
 }
 
@@ -137,7 +138,7 @@ Map<String, dynamic> _$WatermarkToJson(Watermark instance) => <String, dynamic>{
       'width': instance.width,
       'height': instance.height,
       'created': instance.created.toIso8601String(),
-      'position': _$WatermarkPositionEnumMap[instance.position],
+      'position': _$WatermarkPositionEnumMap[instance.position]!,
       'scale': instance.scale,
       'opacity': instance.opacity,
       'padding': instance.padding,

@@ -21,6 +21,8 @@ void main() async {
   }
 
   test('Handling video from url tests', () {
+    final video0 = CloudflareStreamVideo.fromUrl(
+        'https://customer-6sdf6as5fdasd3zo.cloudflarestream.com/e8c4fb942c9e9d287451169a08107cf8/manifest/video.m3u8');
     final video1 = CloudflareStreamVideo.fromUrl(
         'https://videodelivery.net/2dee576797b5448fb3fb32f09f6a607c/thumbnails/thumbnail.jpg');
     final video2 = CloudflareStreamVideo.fromUrl(
@@ -35,14 +37,25 @@ void main() async {
         'https://upload.videodelivery.net/2dee576797b5448fb3fb32f09f6a607c');
     final video7 = CloudflareStreamVideo(id: 'c5n485g8q34hrxi2uehdjsnkd');
     final video8 = CloudflareStreamVideo();
-    expect(video1?.playback, isNotNull);
-    expect(video2?.playback, isNotNull);
-    expect(video3?.playback, isNotNull);
-    expect(video4?.playback, isNotNull);
-    expect(video5?.playback, isNotNull);
-    expect(video6?.playback, isNotNull);
-    expect(video7.playback, isNotNull);
-    expect(video8.playback, isNull);
+    expect(video0?.playback, isNotNull, reason: video0?.playback?.hls);
+    expect(video1?.playback, isNotNull, reason: video1?.playback?.hls);
+    expect(video2?.playback, isNotNull, reason: video2?.playback?.hls);
+    expect(video3?.playback, isNotNull, reason: video3?.playback?.hls);
+    expect(video4?.playback, isNotNull, reason: video4?.playback?.hls);
+    expect(video5?.playback, isNotNull, reason: video5?.playback?.hls);
+    expect(video6?.playback, isNotNull, reason: video6?.playback?.hls);
+    expect(video7.playback, isNotNull, reason: video7.playback?.hls);
+    expect(video8.playback, isNull, reason: video8.playback?.hls);
+
+    print('video0-> id:${video0?.id}  hls: ${video0?.playback?.hls}');
+    print('video1-> id:${video1?.id}  hls: ${video1?.playback?.hls}');
+    print('video2-> id:${video2?.id}  hls: ${video2?.playback?.hls}');
+    print('video3-> id:${video3?.id}  hls: ${video3?.playback?.hls}');
+    print('video4-> id:${video4?.id}  hls: ${video4?.playback?.hls}');
+    print('video5-> id:${video5?.id}  hls: ${video5?.playback?.hls}');
+    print('video6-> id:${video6?.id}  hls: ${video6?.playback?.hls}');
+    print('video7-> id:${video7.id}  hls: ${video7.playback?.hls}');
+    print('video8-> id:${video8.id}  hls: ${video8.playback?.hls}');
   });
 
   group('Stream video tests', () {

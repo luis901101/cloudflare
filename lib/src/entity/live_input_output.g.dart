@@ -58,6 +58,7 @@ class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
 
 extension $LiveInputOutputCopyWith on LiveInputOutput {
   /// Returns a callable class that can be used as follows: `instanceOfLiveInputOutput.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$LiveInputOutputCWProxy get copyWith => _$LiveInputOutputCWProxyImpl(this);
 }
 

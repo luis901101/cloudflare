@@ -52,6 +52,7 @@ class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
 
 extension $VideoSizeCopyWith on VideoSize {
   /// Returns a callable class that can be used as follows: `instanceOfVideoSize.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$VideoSizeCWProxy get copyWith => _$VideoSizeCWProxyImpl(this);
 }
 

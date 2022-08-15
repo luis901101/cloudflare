@@ -52,6 +52,7 @@ class _$LiveInputStatusCWProxyImpl implements _$LiveInputStatusCWProxy {
 
 extension $LiveInputStatusCopyWith on LiveInputStatus {
   /// Returns a callable class that can be used as follows: `instanceOfLiveInputStatus.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$LiveInputStatusCWProxy get copyWith => _$LiveInputStatusCWProxyImpl(this);
 }
 

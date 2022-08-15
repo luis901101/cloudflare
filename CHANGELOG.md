@@ -9,6 +9,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.2.0+9
+### Added
+- Support for specific account subdomain streaming url. 
+- `CloudflareStreamVideo.fromUrl(...)` accepts urls like `https://customer-{CODE}.cloudflarestream.com` 
+
 ## 1.1.0+8
 ### Added
 - `DataTransmit` adds a `CancelToken` property to allow to cancel requests on any request that uses a `DataTransmit` instance, like image upload or video stream upload.

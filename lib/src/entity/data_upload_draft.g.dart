@@ -58,6 +58,7 @@ class _$DataUploadDraftCWProxyImpl implements _$DataUploadDraftCWProxy {
 
 extension $DataUploadDraftCopyWith on DataUploadDraft {
   /// Returns a callable class that can be used as follows: `instanceOfDataUploadDraft.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$DataUploadDraftCWProxy get copyWith => _$DataUploadDraftCWProxyImpl(this);
 }
 

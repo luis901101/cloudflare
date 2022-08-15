@@ -37,4 +37,5 @@ class Params {
   static const String fit = 'fit';
   static const String duration = 'duration';
   static const String fps = 'fps';
+  static const String subdomainAccountCode = 'subdomainAccountCode';
 }

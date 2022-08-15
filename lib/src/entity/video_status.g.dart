@@ -64,6 +64,7 @@ class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
 
 extension $VideoStatusCopyWith on VideoStatus {
   /// Returns a callable class that can be used as follows: `instanceOfVideoStatus.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$VideoStatusCWProxy get copyWith => _$VideoStatusCWProxyImpl(this);
 }
 
@@ -81,7 +82,7 @@ VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
 
 Map<String, dynamic> _$VideoStatusToJson(VideoStatus instance) =>
     <String, dynamic>{
-      'state': _$MediaProcessingStateEnumMap[instance.state],
+      'state': _$MediaProcessingStateEnumMap[instance.state]!,
       'pctComplete': instance.pctComplete,
       'errorReasonCode': instance.errorReasonCode,
       'errorReasonText': instance.errorReasonText,

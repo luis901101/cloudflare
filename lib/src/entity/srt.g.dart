@@ -58,6 +58,7 @@ class _$SRTCWProxyImpl implements _$SRTCWProxy {
 
 extension $SRTCopyWith on SRT {
   /// Returns a callable class that can be used as follows: `instanceOfSRT.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$SRTCWProxy get copyWith => _$SRTCWProxyImpl(this);
 }
 

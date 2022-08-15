@@ -64,6 +64,7 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
 
 extension $LiveInputRecordingCopyWith on LiveInputRecording {
   /// Returns a callable class that can be used as follows: `instanceOfLiveInputRecording.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$LiveInputRecordingCWProxy get copyWith =>
       _$LiveInputRecordingCWProxyImpl(this);
 }
@@ -84,7 +85,7 @@ LiveInputRecording _$LiveInputRecordingFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputRecordingToJson(LiveInputRecording instance) =>
     <String, dynamic>{
-      'mode': _$LiveInputRecordingModeEnumMap[instance.mode],
+      'mode': _$LiveInputRecordingModeEnumMap[instance.mode]!,
       'requireSignedURLs': instance.requireSignedURLs,
       'allowedOrigins': instance.allowedOrigins,
       'timeoutSeconds': instance.timeoutSeconds,

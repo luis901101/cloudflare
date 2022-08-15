@@ -52,6 +52,7 @@ class _$VideoPlaybackInfoCWProxyImpl implements _$VideoPlaybackInfoCWProxy {
 
 extension $VideoPlaybackInfoCopyWith on VideoPlaybackInfo {
   /// Returns a callable class that can be used as follows: `instanceOfVideoPlaybackInfo.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$VideoPlaybackInfoCWProxy get copyWith =>
       _$VideoPlaybackInfoCWProxyImpl(this);
 }

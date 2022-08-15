@@ -70,6 +70,7 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
 
 extension $CloudflareResponseCopyWith on CloudflareResponse {
   /// Returns a callable class that can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
+  // ignore: library_private_types_in_public_api
   _$CloudflareResponseCWProxy get copyWith =>
       _$CloudflareResponseCWProxyImpl(this);
 }
