@@ -8,17 +8,23 @@ class RestAPI {
 
   HttpClient? httpClient;
 
-  Duration? timeout;
+  Duration? connectTimeout;
+  Duration? receiveTimeout;
+  Duration? sendTimeout;
   String apiUrl = '';
   Map<String, dynamic>? headers;
 
   void init(
       {String? apiUrl,
-      Duration? timeout,
+      Duration? connectTimeout,
+      Duration? receiveTimeout,
+      Duration? sendTimeout,
       HttpClient? httpClient,
       Map<String, dynamic>? headers}) {
     if ((apiUrl?.isNotEmpty ?? true)) this.apiUrl = apiUrl!;
-    if (timeout != null) this.timeout = timeout;
+    if (connectTimeout != null) this.connectTimeout = connectTimeout;
+    if (receiveTimeout != null) this.receiveTimeout = receiveTimeout;
+    if (sendTimeout != null) this.sendTimeout = sendTimeout;
     if (httpClient != null) this.httpClient = httpClient;
     if (headers != null) this.headers = headers;
     _initDio();
@@ -29,8 +35,12 @@ class RestAPI {
   void _initDio() {
     dispose();
 
-    dio = Dio(
-        BaseOptions(baseUrl: apiUrl, connectTimeout: timeout?.inMilliseconds));
+    dio = Dio(BaseOptions(
+      baseUrl: apiUrl,
+      connectTimeout: connectTimeout?.inMilliseconds,
+      receiveTimeout: receiveTimeout?.inMilliseconds,
+      sendTimeout: sendTimeout?.inMilliseconds,
+    ));
 
     // Adding auth token to each request
     dio.interceptors

@@ -250,7 +250,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
           Params.requireSignedURLs: requireSignedURLs,
           Params.watermark: watermark?.id,
         },
-        timeout: timeout ?? restAPI.timeout);
+        timeout: timeout ?? restAPI.sendTimeout);
     return tusAPI;
   }
 
@@ -329,11 +329,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       // headers: _headers,
       // responseType: ResponseType.plain,
       contentType: 'multipart/form-data',
-    ).compose(
-        BaseOptions(
-            baseUrl: dataUploadDraft.uploadURL,
-            connectTimeout: restAPI.timeout?.inMilliseconds),
-        '',
+    ).compose(BaseOptions(baseUrl: dataUploadDraft.uploadURL), '',
         data: formData,
         onSendProgress: progressCallback,
         cancelToken: cancelToken));
@@ -456,7 +452,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
         Params.requireSignedURLs: requireSignedURLs,
         Params.watermark: watermark?.id,
       },
-      timeout: timeout ?? restAPI.timeout,
+      timeout: timeout ?? restAPI.sendTimeout,
     );
     return tusAPI;
   }

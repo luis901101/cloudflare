@@ -90,8 +90,14 @@ class Cloudflare {
   /// for a restricted set of endpoints. Always begins with "v1.0-", may vary in length.
   final String? userServiceKey;
 
-  /// API requests duration timeout
-  final Duration? timeout;
+  /// Timeout for requests.
+  final Duration? connectTimeout;
+
+  /// Timeout for receiving data.
+  final Duration? receiveTimeout;
+
+  /// Timeout for sending data, like when using stream upload or Tus protocol.
+  final Duration? sendTimeout;
 
   final RestAPI restAPI = RestAPI();
 
@@ -121,7 +127,11 @@ class Cloudflare {
     this.apiKey,
     this.accountEmail,
     this.userServiceKey,
-    this.timeout,
+    @Deprecated('Use connectTimeout instead')
+    Duration? timeout,
+    Duration? connectTimeout,
+    this.receiveTimeout,
+    this.sendTimeout,
     this.httpClient,
   })  : assert(
             (((token?.isNotEmpty ?? false) && tokenCallback == null) ||
@@ -133,13 +143,24 @@ class Cloudflare {
             '\nOtherwise an apiKey and accountEmail must be specified. '
             '\nOtherwise a userServiceKey must be specified.'),
         apiUrl = apiUrl ?? defaultApiUrl,
-        tokenCallback = tokenCallback ?? (() async => token);
+        tokenCallback = tokenCallback ?? (() async => token),
+        connectTimeout = connectTimeout ?? timeout;
 
   /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
-  factory Cloudflare.basic({String? apiUrl}) =>
-      Cloudflare(apiUrl: apiUrl, accountId: '', tokenCallback: () async => '');
+  factory Cloudflare.basic(
+          {String? apiUrl,
+          Duration? connectTimeout,
+          Duration? receiveTimeout,
+          Duration? sendTimeout}) =>
+      Cloudflare(
+          apiUrl: apiUrl,
+          connectTimeout: connectTimeout,
+          receiveTimeout: receiveTimeout,
+          sendTimeout: sendTimeout,
+          accountId: '',
+          tokenCallback: () async => '');
 
   bool get isInitialized => _initialized;
 
@@ -157,7 +178,9 @@ class Cloudflare {
     restAPI.init(
       httpClient: httpClient,
       apiUrl: apiUrl,
-      timeout: timeout,
+      connectTimeout: connectTimeout,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
       headers: headers,
     );
 

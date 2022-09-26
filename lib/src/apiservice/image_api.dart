@@ -177,8 +177,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       contentType: 'multipart/form-data',
     ).compose(
         BaseOptions(
-            baseUrl: dataUploadDraft.uploadURL,
-            connectTimeout: restAPI.timeout?.inMilliseconds),
+          baseUrl: dataUploadDraft.uploadURL,
+        ),
         '',
         data: formData,
         onSendProgress: progressCallback,

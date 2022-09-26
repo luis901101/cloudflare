@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.3.0+11
+### Added
+- `connectTimeout`, `receiveTimeout` and `sendTimeout` added to support different Dio timeouts.
+
 ## 1.2.0+9
 ### Added
 - Support for specific account subdomain streaming url. 
