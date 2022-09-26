@@ -453,7 +453,7 @@ void main() async {
 
   test('Delete multiple videos', () async {
     /// This code below is not part of the tests and should remain commented, be careful.
-    // final responseList = await cloudflare.streamAPI.getAll();
+    // final responseList = await cloudflare.streamAPI.getAll(status: [MediaProcessingState.pendingUpload]);
     // if(responseList.isSuccessful && (responseList.body?.isNotEmpty ?? false)) {
     //   cacheIds = responseList.body!.map((e) => e.id).toSet();
     // }
