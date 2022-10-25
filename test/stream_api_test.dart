@@ -335,10 +335,10 @@ void main() async {
 
     test('Create authenticated direct stream video URL using tus protocol',
         () async {
-      if (!videoFile.existsSync()) {
+      if (!videoFile3.existsSync()) {
         fail('No video file available to get its file size');
       }
-      final fileSize = videoFile.lengthSync();
+      final fileSize = videoFile3.lengthSync();
       final response = await cloudflare.streamAPI.createTusDirectStreamUpload(
         size: fileSize,
         name: 'test-video-direct-upload',
