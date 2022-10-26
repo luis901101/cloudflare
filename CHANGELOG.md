@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 1.3.1+12
+### Fixed
+- Fixed a bug with status query param in getting all stream videos request. 
+
 ## 1.3.0+11
 ### Added
 - `connectTimeout`, `receiveTimeout` and `sendTimeout` added to support different Dio timeouts.

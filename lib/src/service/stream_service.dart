@@ -66,7 +66,7 @@ abstract class StreamService {
     @Query(Params.search) String? search,
     @Query(Params.limit) int? limit,
     @Query(Params.asc) bool? asc,
-    @Query(Params.status) String? status,
+    @Query(Params.status) List<String>? status,
   });
 
   @GET('/{id}')

@@ -829,7 +829,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       search: search,
       limit: limit,
       asc: asc,
-      status: status?.map((e) => e.name).join(','),
+      status: status?.map((e) => e.name).toList(),
     ));
 
     return response;

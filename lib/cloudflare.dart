@@ -127,8 +127,7 @@ class Cloudflare {
     this.apiKey,
     this.accountEmail,
     this.userServiceKey,
-    @Deprecated('Use connectTimeout instead')
-    Duration? timeout,
+    @Deprecated('Use connectTimeout instead') Duration? timeout,
     Duration? connectTimeout,
     this.receiveTimeout,
     this.sendTimeout,
