@@ -14,18 +14,18 @@ abstract class _$VideoStatusCWProxy {
   /// VideoStatus(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoStatus call({
+    MediaProcessingState? state,
+    int? pctComplete,
     String? errorReasonCode,
     String? errorReasonText,
-    int? pctComplete,
-    MediaProcessingState? state,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoStatus.copyWith(...)`.
 class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
-  final VideoStatus _value;
-
   const _$VideoStatusCWProxyImpl(this._value);
+
+  final VideoStatus _value;
 
   @override
 
@@ -36,12 +36,20 @@ class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
   /// VideoStatus(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoStatus call({
+    Object? state = const $CopyWithPlaceholder(),
+    Object? pctComplete = const $CopyWithPlaceholder(),
     Object? errorReasonCode = const $CopyWithPlaceholder(),
     Object? errorReasonText = const $CopyWithPlaceholder(),
-    Object? pctComplete = const $CopyWithPlaceholder(),
-    Object? state = const $CopyWithPlaceholder(),
   }) {
     return VideoStatus(
+      state: state == const $CopyWithPlaceholder()
+          ? _value.state
+          // ignore: cast_nullable_to_non_nullable
+          : state as MediaProcessingState?,
+      pctComplete: pctComplete == const $CopyWithPlaceholder()
+          ? _value.pctComplete
+          // ignore: cast_nullable_to_non_nullable
+          : pctComplete as int?,
       errorReasonCode: errorReasonCode == const $CopyWithPlaceholder()
           ? _value.errorReasonCode
           // ignore: cast_nullable_to_non_nullable
@@ -50,14 +58,6 @@ class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
           ? _value.errorReasonText
           // ignore: cast_nullable_to_non_nullable
           : errorReasonText as String?,
-      pctComplete: pctComplete == const $CopyWithPlaceholder()
-          ? _value.pctComplete
-          // ignore: cast_nullable_to_non_nullable
-          : pctComplete as int?,
-      state: state == const $CopyWithPlaceholder()
-          ? _value.state
-          // ignore: cast_nullable_to_non_nullable
-          : state as MediaProcessingState?,
     );
   }
 }

@@ -21,9 +21,9 @@ abstract class _$LiveInputStatusCWProxy {
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputStatus.copyWith(...)`.
 class _$LiveInputStatusCWProxyImpl implements _$LiveInputStatusCWProxy {
-  final LiveInputStatus _value;
-
   const _$LiveInputStatusCWProxyImpl(this._value);
+
+  final LiveInputStatus _value;
 
   @override
 

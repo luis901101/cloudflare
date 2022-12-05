@@ -14,24 +14,24 @@ abstract class _$CloudflareLiveInputCWProxy {
   /// CloudflareLiveInput(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareLiveInput call({
-    DateTime? created,
     String? id,
     Map<dynamic, dynamic>? meta,
+    DateTime? created,
     DateTime? modified,
-    LiveInputRecording? recording,
     RTMPS? rtmps,
     RTMPS? rtmpsPlayback,
     SRT? srt,
     SRT? srtPlayback,
+    LiveInputRecording? recording,
     LiveInputStatus? status,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareLiveInput.copyWith(...)`.
 class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
-  final CloudflareLiveInput _value;
-
   const _$CloudflareLiveInputCWProxyImpl(this._value);
+
+  final CloudflareLiveInput _value;
 
   @override
 
@@ -42,22 +42,18 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
   /// CloudflareLiveInput(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareLiveInput call({
-    Object? created = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
     Object? meta = const $CopyWithPlaceholder(),
+    Object? created = const $CopyWithPlaceholder(),
     Object? modified = const $CopyWithPlaceholder(),
-    Object? recording = const $CopyWithPlaceholder(),
     Object? rtmps = const $CopyWithPlaceholder(),
     Object? rtmpsPlayback = const $CopyWithPlaceholder(),
     Object? srt = const $CopyWithPlaceholder(),
     Object? srtPlayback = const $CopyWithPlaceholder(),
+    Object? recording = const $CopyWithPlaceholder(),
     Object? status = const $CopyWithPlaceholder(),
   }) {
     return CloudflareLiveInput(
-      created: created == const $CopyWithPlaceholder()
-          ? _value.created
-          // ignore: cast_nullable_to_non_nullable
-          : created as DateTime?,
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
@@ -66,14 +62,14 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
           ? _value.meta
           // ignore: cast_nullable_to_non_nullable
           : meta as Map<dynamic, dynamic>?,
+      created: created == const $CopyWithPlaceholder()
+          ? _value.created
+          // ignore: cast_nullable_to_non_nullable
+          : created as DateTime?,
       modified: modified == const $CopyWithPlaceholder()
           ? _value.modified
           // ignore: cast_nullable_to_non_nullable
           : modified as DateTime?,
-      recording: recording == const $CopyWithPlaceholder()
-          ? _value.recording
-          // ignore: cast_nullable_to_non_nullable
-          : recording as LiveInputRecording?,
       rtmps: rtmps == const $CopyWithPlaceholder()
           ? _value.rtmps
           // ignore: cast_nullable_to_non_nullable
@@ -90,6 +86,10 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
           ? _value.srtPlayback
           // ignore: cast_nullable_to_non_nullable
           : srtPlayback as SRT?,
+      recording: recording == const $CopyWithPlaceholder()
+          ? _value.recording
+          // ignore: cast_nullable_to_non_nullable
+          : recording as LiveInputRecording?,
       status: status == const $CopyWithPlaceholder()
           ? _value.status
           // ignore: cast_nullable_to_non_nullable

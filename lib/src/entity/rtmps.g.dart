@@ -14,16 +14,16 @@ abstract class _$RTMPSCWProxy {
   /// RTMPS(...).copyWith(id: 12, name: "My name")
   /// ````
   RTMPS call({
-    String? streamKey,
     String? url,
+    String? streamKey,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfRTMPS.copyWith(...)`.
 class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
-  final RTMPS _value;
-
   const _$RTMPSCWProxyImpl(this._value);
+
+  final RTMPS _value;
 
   @override
 
@@ -34,18 +34,18 @@ class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
   /// RTMPS(...).copyWith(id: 12, name: "My name")
   /// ````
   RTMPS call({
-    Object? streamKey = const $CopyWithPlaceholder(),
     Object? url = const $CopyWithPlaceholder(),
+    Object? streamKey = const $CopyWithPlaceholder(),
   }) {
     return RTMPS(
-      streamKey: streamKey == const $CopyWithPlaceholder()
-          ? _value.streamKey
-          // ignore: cast_nullable_to_non_nullable
-          : streamKey as String?,
       url: url == const $CopyWithPlaceholder()
           ? _value.url
           // ignore: cast_nullable_to_non_nullable
           : url as String?,
+      streamKey: streamKey == const $CopyWithPlaceholder()
+          ? _value.streamKey
+          // ignore: cast_nullable_to_non_nullable
+          : streamKey as String?,
     );
   }
 }

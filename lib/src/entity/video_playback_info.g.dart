@@ -14,16 +14,16 @@ abstract class _$VideoPlaybackInfoCWProxy {
   /// VideoPlaybackInfo(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoPlaybackInfo call({
-    String? dash,
     String? hls,
+    String? dash,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoPlaybackInfo.copyWith(...)`.
 class _$VideoPlaybackInfoCWProxyImpl implements _$VideoPlaybackInfoCWProxy {
-  final VideoPlaybackInfo _value;
-
   const _$VideoPlaybackInfoCWProxyImpl(this._value);
+
+  final VideoPlaybackInfo _value;
 
   @override
 
@@ -34,18 +34,18 @@ class _$VideoPlaybackInfoCWProxyImpl implements _$VideoPlaybackInfoCWProxy {
   /// VideoPlaybackInfo(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoPlaybackInfo call({
-    Object? dash = const $CopyWithPlaceholder(),
     Object? hls = const $CopyWithPlaceholder(),
+    Object? dash = const $CopyWithPlaceholder(),
   }) {
     return VideoPlaybackInfo(
-      dash: dash == const $CopyWithPlaceholder()
-          ? _value.dash
-          // ignore: cast_nullable_to_non_nullable
-          : dash as String?,
       hls: hls == const $CopyWithPlaceholder()
           ? _value.hls
           // ignore: cast_nullable_to_non_nullable
           : hls as String?,
+      dash: dash == const $CopyWithPlaceholder()
+          ? _value.dash
+          // ignore: cast_nullable_to_non_nullable
+          : dash as String?,
     );
   }
 }

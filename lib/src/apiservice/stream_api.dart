@@ -567,7 +567,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   /// place to use direct uploads is on web apps, client side applications,
   /// or on mobile devices where users upload content directly to Stream.
   ///
-  /// Documentation: https://api.cloudflare.com/#stream-videos-create-a-video-and-get-authenticated-direct-upload-url
+  /// Documentation: https://api.cloudflare.com/#stream-videos-upload-videos-via-direct-upload-urls
   Future<CloudflareHTTPResponse<DataUploadDraft?>> createDirectStreamUpload({
     /// Direct uploads occupy minutes of videos on your Stream account until
     /// they are expired. This value will be used to calculate the duration the

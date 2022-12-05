@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/main.dart';

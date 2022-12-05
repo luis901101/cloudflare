@@ -15,16 +15,16 @@ abstract class _$LiveInputOutputCWProxy {
   /// ````
   LiveInputOutput call({
     String? id,
-    String? streamKey,
     String? url,
+    String? streamKey,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputOutput.copyWith(...)`.
 class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
-  final LiveInputOutput _value;
-
   const _$LiveInputOutputCWProxyImpl(this._value);
+
+  final LiveInputOutput _value;
 
   @override
 
@@ -36,22 +36,22 @@ class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
   /// ````
   LiveInputOutput call({
     Object? id = const $CopyWithPlaceholder(),
-    Object? streamKey = const $CopyWithPlaceholder(),
     Object? url = const $CopyWithPlaceholder(),
+    Object? streamKey = const $CopyWithPlaceholder(),
   }) {
     return LiveInputOutput(
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
-      streamKey: streamKey == const $CopyWithPlaceholder()
-          ? _value.streamKey
-          // ignore: cast_nullable_to_non_nullable
-          : streamKey as String?,
       url: url == const $CopyWithPlaceholder()
           ? _value.url
           // ignore: cast_nullable_to_non_nullable
           : url as String?,
+      streamKey: streamKey == const $CopyWithPlaceholder()
+          ? _value.streamKey
+          // ignore: cast_nullable_to_non_nullable
+          : streamKey as String?,
     );
   }
 }

@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 2.0.0+13
+### Changed
+- Dependency breaking change version updated to `copy_with_extension: ^5.0.0`.
+
 ## 1.3.1+12
 ### Fixed
 - Fixed a bug with status query param in getting all stream videos request. 

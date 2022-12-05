@@ -14,17 +14,17 @@ abstract class _$SRTCWProxy {
   /// SRT(...).copyWith(id: 12, name: "My name")
   /// ````
   SRT call({
-    String? passphrase,
-    String? streamId,
     String? url,
+    String? streamId,
+    String? passphrase,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfSRT.copyWith(...)`.
 class _$SRTCWProxyImpl implements _$SRTCWProxy {
-  final SRT _value;
-
   const _$SRTCWProxyImpl(this._value);
+
+  final SRT _value;
 
   @override
 
@@ -35,23 +35,23 @@ class _$SRTCWProxyImpl implements _$SRTCWProxy {
   /// SRT(...).copyWith(id: 12, name: "My name")
   /// ````
   SRT call({
-    Object? passphrase = const $CopyWithPlaceholder(),
-    Object? streamId = const $CopyWithPlaceholder(),
     Object? url = const $CopyWithPlaceholder(),
+    Object? streamId = const $CopyWithPlaceholder(),
+    Object? passphrase = const $CopyWithPlaceholder(),
   }) {
     return SRT(
-      passphrase: passphrase == const $CopyWithPlaceholder()
-          ? _value.passphrase
-          // ignore: cast_nullable_to_non_nullable
-          : passphrase as String?,
-      streamId: streamId == const $CopyWithPlaceholder()
-          ? _value.streamId
-          // ignore: cast_nullable_to_non_nullable
-          : streamId as String?,
       url: url == const $CopyWithPlaceholder()
           ? _value.url
           // ignore: cast_nullable_to_non_nullable
           : url as String?,
+      streamId: streamId == const $CopyWithPlaceholder()
+          ? _value.streamId
+          // ignore: cast_nullable_to_non_nullable
+          : streamId as String?,
+      passphrase: passphrase == const $CopyWithPlaceholder()
+          ? _value.passphrase
+          // ignore: cast_nullable_to_non_nullable
+          : passphrase as String?,
     );
   }
 }

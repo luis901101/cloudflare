@@ -22,9 +22,9 @@ abstract class _$DataUploadDraftCWProxy {
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfDataUploadDraft.copyWith(...)`.
 class _$DataUploadDraftCWProxyImpl implements _$DataUploadDraftCWProxy {
-  final DataUploadDraft _value;
-
   const _$DataUploadDraftCWProxyImpl(this._value);
+
+  final DataUploadDraft _value;
 
   @override
 

@@ -14,8 +14,8 @@ abstract class _$LiveInputStatusLogCWProxy {
   /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
   /// ````
   LiveInputStatusLog call({
-    String? reason,
     String? state,
+    String? reason,
     DateTime? statusEnteredAt,
     DateTime? statusLastSeen,
   });
@@ -23,9 +23,9 @@ abstract class _$LiveInputStatusLogCWProxy {
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputStatusLog.copyWith(...)`.
 class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
-  final LiveInputStatusLog _value;
-
   const _$LiveInputStatusLogCWProxyImpl(this._value);
+
+  final LiveInputStatusLog _value;
 
   @override
 
@@ -36,20 +36,20 @@ class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
   /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
   /// ````
   LiveInputStatusLog call({
-    Object? reason = const $CopyWithPlaceholder(),
     Object? state = const $CopyWithPlaceholder(),
+    Object? reason = const $CopyWithPlaceholder(),
     Object? statusEnteredAt = const $CopyWithPlaceholder(),
     Object? statusLastSeen = const $CopyWithPlaceholder(),
   }) {
     return LiveInputStatusLog(
-      reason: reason == const $CopyWithPlaceholder()
-          ? _value.reason
-          // ignore: cast_nullable_to_non_nullable
-          : reason as String?,
       state: state == const $CopyWithPlaceholder()
           ? _value.state
           // ignore: cast_nullable_to_non_nullable
           : state as String?,
+      reason: reason == const $CopyWithPlaceholder()
+          ? _value.reason
+          // ignore: cast_nullable_to_non_nullable
+          : reason as String?,
       statusEnteredAt: statusEnteredAt == const $CopyWithPlaceholder()
           ? _value.statusEnteredAt
           // ignore: cast_nullable_to_non_nullable

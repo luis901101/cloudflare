@@ -14,18 +14,18 @@ abstract class _$LiveInputRecordingCWProxy {
   /// LiveInputRecording(...).copyWith(id: 12, name: "My name")
   /// ````
   LiveInputRecording call({
-    List<String>? allowedOrigins,
     LiveInputRecordingMode? mode,
     bool? requireSignedURLs,
+    List<String>? allowedOrigins,
     int? timeoutSeconds,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputRecording.copyWith(...)`.
 class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
-  final LiveInputRecording _value;
-
   const _$LiveInputRecordingCWProxyImpl(this._value);
+
+  final LiveInputRecording _value;
 
   @override
 
@@ -36,16 +36,12 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
   /// LiveInputRecording(...).copyWith(id: 12, name: "My name")
   /// ````
   LiveInputRecording call({
-    Object? allowedOrigins = const $CopyWithPlaceholder(),
     Object? mode = const $CopyWithPlaceholder(),
     Object? requireSignedURLs = const $CopyWithPlaceholder(),
+    Object? allowedOrigins = const $CopyWithPlaceholder(),
     Object? timeoutSeconds = const $CopyWithPlaceholder(),
   }) {
     return LiveInputRecording(
-      allowedOrigins: allowedOrigins == const $CopyWithPlaceholder()
-          ? _value.allowedOrigins
-          // ignore: cast_nullable_to_non_nullable
-          : allowedOrigins as List<String>?,
       mode: mode == const $CopyWithPlaceholder()
           ? _value.mode
           // ignore: cast_nullable_to_non_nullable
@@ -54,6 +50,10 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
           ? _value.requireSignedURLs
           // ignore: cast_nullable_to_non_nullable
           : requireSignedURLs as bool?,
+      allowedOrigins: allowedOrigins == const $CopyWithPlaceholder()
+          ? _value.allowedOrigins
+          // ignore: cast_nullable_to_non_nullable
+          : allowedOrigins as List<String>?,
       timeoutSeconds: timeoutSeconds == const $CopyWithPlaceholder()
           ? _value.timeoutSeconds
           // ignore: cast_nullable_to_non_nullable

@@ -14,22 +14,22 @@ abstract class _$CloudflareImageCWProxy {
   /// CloudflareImage(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareImage call({
-    bool? draft,
-    String? filename,
     String? id,
     String? imageDeliveryId,
+    String? filename,
     Map<dynamic, dynamic>? meta,
     bool? requireSignedURLs,
-    DateTime? uploaded,
     List<String>? variants,
+    DateTime? uploaded,
+    bool? draft,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareImage.copyWith(...)`.
 class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
-  final CloudflareImage _value;
-
   const _$CloudflareImageCWProxyImpl(this._value);
+
+  final CloudflareImage _value;
 
   @override
 
@@ -40,24 +40,16 @@ class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
   /// CloudflareImage(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareImage call({
-    Object? draft = const $CopyWithPlaceholder(),
-    Object? filename = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
     Object? imageDeliveryId = const $CopyWithPlaceholder(),
+    Object? filename = const $CopyWithPlaceholder(),
     Object? meta = const $CopyWithPlaceholder(),
     Object? requireSignedURLs = const $CopyWithPlaceholder(),
-    Object? uploaded = const $CopyWithPlaceholder(),
     Object? variants = const $CopyWithPlaceholder(),
+    Object? uploaded = const $CopyWithPlaceholder(),
+    Object? draft = const $CopyWithPlaceholder(),
   }) {
     return CloudflareImage(
-      draft: draft == const $CopyWithPlaceholder()
-          ? _value.draft
-          // ignore: cast_nullable_to_non_nullable
-          : draft as bool?,
-      filename: filename == const $CopyWithPlaceholder()
-          ? _value.filename
-          // ignore: cast_nullable_to_non_nullable
-          : filename as String?,
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
@@ -66,6 +58,10 @@ class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
           ? _value.imageDeliveryId
           // ignore: cast_nullable_to_non_nullable
           : imageDeliveryId as String?,
+      filename: filename == const $CopyWithPlaceholder()
+          ? _value.filename
+          // ignore: cast_nullable_to_non_nullable
+          : filename as String?,
       meta: meta == const $CopyWithPlaceholder()
           ? _value.meta
           // ignore: cast_nullable_to_non_nullable
@@ -74,14 +70,18 @@ class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
           ? _value.requireSignedURLs
           // ignore: cast_nullable_to_non_nullable
           : requireSignedURLs as bool?,
-      uploaded: uploaded == const $CopyWithPlaceholder()
-          ? _value.uploaded
-          // ignore: cast_nullable_to_non_nullable
-          : uploaded as DateTime?,
       variants: variants == const $CopyWithPlaceholder()
           ? _value.variants
           // ignore: cast_nullable_to_non_nullable
           : variants as List<String>?,
+      uploaded: uploaded == const $CopyWithPlaceholder()
+          ? _value.uploaded
+          // ignore: cast_nullable_to_non_nullable
+          : uploaded as DateTime?,
+      draft: draft == const $CopyWithPlaceholder()
+          ? _value.draft
+          // ignore: cast_nullable_to_non_nullable
+          : draft as bool?,
     );
   }
 }

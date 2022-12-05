@@ -14,16 +14,16 @@ abstract class _$VideoSizeCWProxy {
   /// VideoSize(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoSize call({
-    int? height,
     int? width,
+    int? height,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoSize.copyWith(...)`.
 class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
-  final VideoSize _value;
-
   const _$VideoSizeCWProxyImpl(this._value);
+
+  final VideoSize _value;
 
   @override
 
@@ -34,18 +34,18 @@ class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
   /// VideoSize(...).copyWith(id: 12, name: "My name")
   /// ````
   VideoSize call({
-    Object? height = const $CopyWithPlaceholder(),
     Object? width = const $CopyWithPlaceholder(),
+    Object? height = const $CopyWithPlaceholder(),
   }) {
     return VideoSize(
-      height: height == const $CopyWithPlaceholder()
-          ? _value.height
-          // ignore: cast_nullable_to_non_nullable
-          : height as int?,
       width: width == const $CopyWithPlaceholder()
           ? _value.width
           // ignore: cast_nullable_to_non_nullable
           : width as int?,
+      height: height == const $CopyWithPlaceholder()
+          ? _value.height
+          // ignore: cast_nullable_to_non_nullable
+          : height as int?,
     );
   }
 }

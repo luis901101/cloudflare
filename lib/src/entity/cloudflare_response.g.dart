@@ -14,19 +14,19 @@ abstract class _$CloudflareResponseCWProxy {
   /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareResponse call({
+    dynamic result,
+    bool? success,
     List<ErrorInfo>? errors,
     List<String>? messages,
     Pagination? paginationInfo,
-    dynamic result,
-    bool? success,
   });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
 class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
-  final CloudflareResponse _value;
-
   const _$CloudflareResponseCWProxyImpl(this._value);
+
+  final CloudflareResponse _value;
 
   @override
 
@@ -37,13 +37,22 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
   /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareResponse call({
+    Object? result = const $CopyWithPlaceholder(),
+    Object? success = const $CopyWithPlaceholder(),
     Object? errors = const $CopyWithPlaceholder(),
     Object? messages = const $CopyWithPlaceholder(),
     Object? paginationInfo = const $CopyWithPlaceholder(),
-    Object? result = const $CopyWithPlaceholder(),
-    Object? success = const $CopyWithPlaceholder(),
   }) {
     return CloudflareResponse(
+      result: result == const $CopyWithPlaceholder() || result == null
+          // ignore: unnecessary_non_null_assertion
+          ? _value.result!
+          // ignore: cast_nullable_to_non_nullable
+          : result as dynamic,
+      success: success == const $CopyWithPlaceholder()
+          ? _value.success
+          // ignore: cast_nullable_to_non_nullable
+          : success as bool?,
       errors: errors == const $CopyWithPlaceholder()
           ? _value.errors
           // ignore: cast_nullable_to_non_nullable
@@ -56,14 +65,6 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
           ? _value.paginationInfo
           // ignore: cast_nullable_to_non_nullable
           : paginationInfo as Pagination?,
-      result: result == const $CopyWithPlaceholder() || result == null
-          ? _value.result
-          // ignore: cast_nullable_to_non_nullable
-          : result as dynamic,
-      success: success == const $CopyWithPlaceholder()
-          ? _value.success
-          // ignore: cast_nullable_to_non_nullable
-          : success as bool?,
     );
   }
 }

@@ -21,9 +21,9 @@ abstract class _$MediaNFTCWProxy {
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfMediaNFT.copyWith(...)`.
 class _$MediaNFTCWProxyImpl implements _$MediaNFTCWProxy {
-  final MediaNFT _value;
-
   const _$MediaNFTCWProxyImpl(this._value);
+
+  final MediaNFT _value;
 
   @override
 
