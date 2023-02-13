@@ -12,7 +12,7 @@ part 'cloudflare_response.g.dart';
 @CopyWith(skipFields: true)
 @JsonSerializable(includeIfNull: false)
 class CloudflareResponse extends Jsonable<CloudflareResponse> {
-  dynamic result;
+  Object? result;
   bool success;
   List<ErrorInfo> errors;
   List<String> messages;

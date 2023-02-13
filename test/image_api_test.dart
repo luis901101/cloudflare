@@ -46,6 +46,7 @@ void main() async {
         fail('No image file available to upload');
       }
       final response = await cloudflare.imageAPI.upload(
+          fileName: 'image-from-file',
           contentFromFile: DataTransmit<File>(
               data: imageFile,
               progressCallback: (count, total) {
@@ -61,6 +62,7 @@ void main() async {
         fail('No image path available to upload');
       }
       final response = await cloudflare.imageAPI.upload(
+          fileName: 'image-from-path',
           contentFromPath: DataTransmit<String>(
               data: imageFile.path,
               progressCallback: (count, total) {
@@ -76,6 +78,7 @@ void main() async {
         fail('No image bytes available to upload');
       }
       final response = await cloudflare.imageAPI.upload(
+          fileName: 'image-from-bytes',
           contentFromBytes: DataTransmit<Uint8List>(
               data: imageFile.readAsBytesSync(),
               progressCallback: (count, total) {
@@ -251,6 +254,7 @@ void main() async {
           fail('No uploadURL available to upload to');
         }
         final response = await cloudflare.imageAPI.directUpload(
+            fileName: 'direct-upload-image',
             dataUploadDraft: dataUploadDraft!,
             contentFromFile: DataTransmit<File>(
                 data: imageFile,

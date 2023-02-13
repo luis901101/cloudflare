@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
@@ -45,11 +46,14 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// valid values: (true,false)
     bool? requireSignedURLs,
 
-    /// User modifiable key-value store. Can use used for keeping references to
+    /// User modifiable key-value store. Can be used for keeping references to
     /// another system of record for managing images.
     ///
     /// e.g: "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
+
+    /// To specify a filename for the content to be uploaded.
+    String? fileName,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -76,32 +80,135 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     }
 
     if (contentFromFile != null) {
-      response = await parseResponse(service.uploadFromFile(
-        file: contentFromFile.data,
-        requireSignedURLs: requireSignedURLs,
-        metadata: metadata,
-        onUploadProgress: contentFromFile.progressCallback,
-        cancelToken: contentFromFile.cancelToken,
-      ));
+      response = await ((fileName?.isEmpty ?? true)
+          ? parseResponse(service.uploadFromFile(
+              file: contentFromFile.data,
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromFile.progressCallback,
+              cancelToken: contentFromFile.cancelToken,
+            ))
+          : parseResponse(uploadGeneric(
+              multipartFile: MultipartFile.fromFileSync(
+                contentFromFile.data.path,
+                filename: fileName,
+              ),
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromFile.progressCallback,
+              cancelToken: contentFromFile.cancelToken,
+            )));
     } else if (contentFromBytes != null) {
-      response = await parseResponse(service.uploadFromBytes(
-        bytes: contentFromBytes.data,
-        requireSignedURLs: requireSignedURLs,
-        metadata: metadata,
-        onUploadProgress: contentFromBytes.progressCallback,
-        cancelToken: contentFromBytes.cancelToken,
-      ));
+      response = await ((fileName?.isEmpty ?? true)
+          ? parseResponse(service.uploadFromBytes(
+              bytes: contentFromBytes.data,
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromBytes.progressCallback,
+              cancelToken: contentFromBytes.cancelToken,
+            ))
+          : parseResponse(uploadGeneric(
+              multipartFile: MultipartFile.fromBytes(
+                contentFromBytes.data,
+                filename: fileName,
+              ),
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromBytes.progressCallback,
+              cancelToken: contentFromBytes.cancelToken,
+            )));
     } else {
-      response = await parseResponse(service.uploadFromUrl(
-        url: contentFromUrl!.data,
-        requireSignedURLs: requireSignedURLs,
-        metadata: metadata,
-        onUploadProgress: contentFromUrl.progressCallback,
-        cancelToken: contentFromUrl.cancelToken,
-      ));
+      response = await ((fileName?.isEmpty ?? true)
+          ? parseResponse(service.uploadFromUrl(
+              url: contentFromUrl!.data,
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromUrl.progressCallback,
+              cancelToken: contentFromUrl.cancelToken,
+            ))
+          : parseResponse(uploadGeneric(
+              url: contentFromUrl!.data,
+              requireSignedURLs: requireSignedURLs,
+              metadata: metadata,
+              onUploadProgress: contentFromUrl.progressCallback,
+              cancelToken: contentFromUrl.cancelToken,
+            )));
     }
 
     return response;
+  }
+
+  Future<HttpResponse<CloudflareResponse?>> uploadGeneric({
+    MultipartFile? multipartFile,
+    String? url,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
+    ProgressCallback? onUploadProgress,
+    CancelToken? cancelToken,
+  }) async {
+    assert(multipartFile != null || url != null);
+    final dio = restAPI.dio;
+    String baseUrl = '${dio.options.baseUrl}/accounts/$accountId/images';
+    RequestOptions setStreamType<T>(RequestOptions requestOptions) {
+      if (T != dynamic &&
+          !(requestOptions.responseType == ResponseType.bytes ||
+              requestOptions.responseType == ResponseType.stream)) {
+        if (T == String) {
+          requestOptions.responseType = ResponseType.plain;
+        } else {
+          requestOptions.responseType = ResponseType.json;
+        }
+      }
+      return requestOptions;
+    }
+
+    const extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final headers = <String, dynamic>{};
+    final data = FormData();
+    if (multipartFile != null) {
+      data.files.add(MapEntry(
+        'file',
+        multipartFile,
+      ));
+    }
+    if (url != null) {
+      data.fields.add(MapEntry(
+        'url',
+        url,
+      ));
+    }
+    if (requireSignedURLs != null) {
+      data.fields.add(MapEntry(
+        'requireSignedURLs',
+        requireSignedURLs.toString(),
+      ));
+    }
+    data.fields.add(MapEntry(
+      'metadata',
+      jsonEncode(metadata),
+    ));
+    final result = await dio.fetch<Map<String, dynamic>?>(
+        setStreamType<HttpResponse<CloudflareResponse>>(Options(
+      method: 'POST',
+      headers: headers,
+      extra: extra,
+      contentType: 'multipart/form-data',
+    )
+            .compose(
+              dio.options,
+              '/v1',
+              queryParameters: queryParameters,
+              data: data,
+              cancelToken: cancelToken,
+              onSendProgress: onUploadProgress,
+            )
+            .copyWith(baseUrl: baseUrl)));
+    final value =
+        result.data == null ? null : CloudflareResponse.fromJson(result.data!);
+    final httpResponse = HttpResponse(value, result);
+    return httpResponse;
   }
 
   /// For image direct upload without API key or token.
@@ -121,6 +228,9 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
     /// Image byte array representation to upload
     DataTransmit<Uint8List>? contentFromBytes,
+
+    /// To specify a filename for the content to be uploaded.
+    String? fileName,
   }) async {
     assert(
         contentFromFile != null ||
@@ -157,7 +267,8 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       formData.files.add(MapEntry(
           Params.file,
           MultipartFile.fromFileSync(file.path,
-              filename: file.path.split(Platform.pathSeparator).last)));
+              filename:
+                  fileName ?? file.path.split(Platform.pathSeparator).last)));
     } else {
       cancelToken = contentFromBytes!.cancelToken;
       final bytes = contentFromBytes.data;
@@ -166,7 +277,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
           Params.file,
           MultipartFile.fromBytes(
             bytes,
-            filename: null,
+            filename: fileName,
           )));
     }
 
@@ -211,7 +322,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// valid values: (true,false)
     bool? requireSignedURLs,
 
-    /// User modifiable key-value store. Can use used for keeping references to
+    /// User modifiable key-value store. Can be used for keeping references to
     /// another system of record for managing images.
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
@@ -301,7 +412,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     /// e.g: true
     bool? requireSignedURLs,
 
-    /// User modifiable key-value store. Can use used for keeping references to
+    /// User modifiable key-value store. Can be used for keeping references to
     /// another system of record for managing images.
     ///
     /// e.g: "{\"meta\": \"metaID\"}"

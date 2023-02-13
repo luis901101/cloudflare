@@ -14,7 +14,7 @@ abstract class _$CloudflareResponseCWProxy {
   /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
   /// ````
   CloudflareResponse call({
-    dynamic result,
+    Object? result,
     bool? success,
     List<ErrorInfo>? errors,
     List<String>? messages,
@@ -44,11 +44,10 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
     Object? paginationInfo = const $CopyWithPlaceholder(),
   }) {
     return CloudflareResponse(
-      result: result == const $CopyWithPlaceholder() || result == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.result!
+      result: result == const $CopyWithPlaceholder()
+          ? _value.result
           // ignore: cast_nullable_to_non_nullable
-          : result as dynamic,
+          : result,
       success: success == const $CopyWithPlaceholder()
           ? _value.success
           // ignore: cast_nullable_to_non_nullable

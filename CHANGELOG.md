@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 2.1.0+14
+### Added
+- Custom `fileName` can be specified for image upload from file, path and bytes.
+
 ## 2.0.0+13
 ### Changed
 - Dependency breaking change version updated to `copy_with_extension: ^5.0.0`.
