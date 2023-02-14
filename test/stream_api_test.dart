@@ -64,6 +64,7 @@ void main() async {
         fail('No video file available to stream');
       }
       final response = await cloudflare.streamAPI.stream(
+          fileName: 'stream-from-file',
           contentFromFile: DataTransmit<File>(
               data: videoFile,
               progressCallback: (count, total) {
@@ -79,6 +80,7 @@ void main() async {
         fail('No video path available to stream');
       }
       final response = await cloudflare.streamAPI.stream(
+          fileName: 'stream-from-path',
           contentFromPath: DataTransmit<String>(
               data: videoFile.path,
               progressCallback: (count, total) {
@@ -94,6 +96,7 @@ void main() async {
         fail('No video bytes available to stream');
       }
       final response = await cloudflare.streamAPI.stream(
+          fileName: 'stream-from-bytes',
           contentFromBytes: DataTransmit<Uint8List>(
               data: videoFile.readAsBytesSync(),
               progressCallback: (count, total) {
@@ -272,6 +275,7 @@ void main() async {
           fail('No video file available to stream');
         }
         final response = await cloudflare.streamAPI.directStreamUpload(
+            fileName: 'direct-stream-upload',
             dataUploadDraft: dataUploadDraft!,
             contentFromFile: DataTransmit<File>(
                 data: videoFile,

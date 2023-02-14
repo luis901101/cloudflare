@@ -89,6 +89,9 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// A Watermark object with the id of an existing watermark profile
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
+
+    /// To specify a filename for the content to be uploaded.
+    String? fileName,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -115,17 +118,35 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     }
 
     if (contentFromFile != null) {
-      response = await parseResponse(service.streamFromFile(
-        file: contentFromFile.data,
-        onUploadProgress: contentFromFile.progressCallback,
-        cancelToken: contentFromFile.cancelToken,
-      ));
+      response = await ((fileName?.isEmpty ?? true)
+          ? parseResponse(service.streamFromFile(
+              file: contentFromFile.data,
+              onUploadProgress: contentFromFile.progressCallback,
+              cancelToken: contentFromFile.cancelToken,
+            ))
+          : parseResponse(streamGeneric(
+              multipartFile: MultipartFile.fromFileSync(
+                contentFromFile.data.path,
+                filename: fileName,
+              ),
+              onUploadProgress: contentFromFile.progressCallback,
+              cancelToken: contentFromFile.cancelToken,
+            )));
     } else if (contentFromBytes != null) {
-      response = await parseResponse(service.streamFromBytes(
-        bytes: contentFromBytes.data,
-        onUploadProgress: contentFromBytes.progressCallback,
-        cancelToken: contentFromBytes.cancelToken,
-      ));
+      response = await ((fileName?.isEmpty ?? true)
+          ? parseResponse(service.streamFromBytes(
+              bytes: contentFromBytes.data,
+              onUploadProgress: contentFromBytes.progressCallback,
+              cancelToken: contentFromBytes.cancelToken,
+            ))
+          : parseResponse(streamGeneric(
+              multipartFile: MultipartFile.fromBytes(
+                contentFromBytes.data,
+                filename: fileName,
+              ),
+              onUploadProgress: contentFromBytes.progressCallback,
+              cancelToken: contentFromBytes.cancelToken,
+            )));
     } else {
       response = await parseResponse(service.streamFromUrl(
         data: {
@@ -141,6 +162,67 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       ));
     }
     return response;
+  }
+
+  Future<HttpResponse<CloudflareResponse?>> streamGeneric({
+    MultipartFile? multipartFile,
+    String? url,
+    ProgressCallback? onUploadProgress,
+    CancelToken? cancelToken,
+  }) async {
+    assert(multipartFile != null || url != null);
+    final dio = restAPI.dio;
+    final baseUrl = '${dio.options.baseUrl}/accounts/$accountId/stream';
+    RequestOptions setStreamType<T>(RequestOptions requestOptions) {
+      if (T != dynamic &&
+          !(requestOptions.responseType == ResponseType.bytes ||
+              requestOptions.responseType == ResponseType.stream)) {
+        if (T == String) {
+          requestOptions.responseType = ResponseType.plain;
+        } else {
+          requestOptions.responseType = ResponseType.json;
+        }
+      }
+      return requestOptions;
+    }
+
+    const extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final headers = <String, dynamic>{};
+    final data = FormData();
+    if (multipartFile != null) {
+      data.files.add(MapEntry(
+        'file',
+        multipartFile,
+      ));
+    }
+    if (url != null) {
+      data.fields.add(MapEntry(
+        'url',
+        url,
+      ));
+    }
+    final result = await dio.fetch<Map<String, dynamic>?>(
+        setStreamType<HttpResponse<CloudflareResponse>>(Options(
+      method: 'POST',
+      headers: headers,
+      extra: extra,
+      contentType: 'multipart/form-data',
+    )
+            .compose(
+              dio.options,
+              '',
+              queryParameters: queryParameters,
+              data: data,
+              cancelToken: cancelToken,
+              onSendProgress: onUploadProgress,
+            )
+            .copyWith(baseUrl: baseUrl)));
+    final value =
+        result.data == null ? null : CloudflareResponse.fromJson(result.data!);
+    final httpResponse = HttpResponse(value, result);
+    return httpResponse;
   }
 
   /// For videos larger than 200 MegaBytes tus(https://tus.io) protocol is used
@@ -275,6 +357,9 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
 
     /// Image byte array representation to upload
     DataTransmit<Uint8List>? contentFromBytes,
+
+    /// To specify a filename for the content to be uploaded.
+    String? fileName,
   }) async {
     assert(
         contentFromFile != null ||
@@ -311,7 +396,8 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       formData.files.add(MapEntry(
           Params.file,
           MultipartFile.fromFileSync(file.path,
-              filename: file.path.split(Platform.pathSeparator).last)));
+              filename:
+                  fileName ?? file.path.split(Platform.pathSeparator).last)));
     } else {
       cancelToken = contentFromBytes!.cancelToken;
       final bytes = contentFromBytes.data;
@@ -320,7 +406,7 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
           Params.file,
           MultipartFile.fromBytes(
             bytes,
-            filename: null,
+            filename: fileName,
           )));
     }
 

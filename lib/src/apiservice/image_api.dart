@@ -148,7 +148,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }) async {
     assert(multipartFile != null || url != null);
     final dio = restAPI.dio;
-    String baseUrl = '${dio.options.baseUrl}/accounts/$accountId/images';
+    final baseUrl = '${dio.options.baseUrl}/accounts/$accountId/images';
     RequestOptions setStreamType<T>(RequestOptions requestOptions) {
       if (T != dynamic &&
           !(requestOptions.responseType == ResponseType.bytes ||

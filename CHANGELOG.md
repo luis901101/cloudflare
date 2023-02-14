@@ -11,7 +11,8 @@ Types of changes
 
 ## 2.1.0+14
 ### Added
-- Custom `fileName` can be specified for image upload from file, path and bytes.
+- Custom `fileName` can be specified for image upload from file, path and bytes, whether signed upload or direct upload.
+- Custom `fileName` can be specified for stream upload from file, path and bytes, whether signed upload or direct upload.
 
 ## 2.0.0+13
 ### Changed
