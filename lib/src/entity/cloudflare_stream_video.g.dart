@@ -170,7 +170,9 @@ class _$CloudflareStreamVideoCWProxyImpl
           ? _value.liveInput
           // ignore: cast_nullable_to_non_nullable
           : liveInput as String?,
-      customAccountSubdomainUrl: customAccountSubdomainUrl as String?,
+      customAccountSubdomainUrl: customAccountSubdomainUrl is String
+          ? customAccountSubdomainUrl
+          : null,
     );
   }
 }

@@ -38,4 +38,5 @@ class Params {
   static const String duration = 'duration';
   static const String fps = 'fps';
   static const String subdomainAccountCode = 'subdomainAccountCode';
+  static const String metadata = 'metadata';
 }

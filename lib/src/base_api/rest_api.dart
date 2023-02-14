@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 class RestAPI {
   Dio dio = Dio();
@@ -37,9 +37,11 @@ class RestAPI {
 
     dio = Dio(BaseOptions(
       baseUrl: apiUrl,
-      connectTimeout: connectTimeout?.inMilliseconds,
-      receiveTimeout: receiveTimeout?.inMilliseconds,
-      sendTimeout: sendTimeout?.inMilliseconds,
+      connectTimeout: connectTimeout,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      // headers: RestAPIService.contentTypeJson,
+      contentType: Headers.jsonContentType,
     ));
 
     // Adding auth token to each request
@@ -53,7 +55,7 @@ class RestAPI {
 
     // Adding custom httpClient
     if (httpClient != null) {
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
           (client) {
         return httpClient;
       };

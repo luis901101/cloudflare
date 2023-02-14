@@ -211,7 +211,7 @@ void main() async {
         fail('No image file available to upload');
       }
       final metadata = {
-        'system_id': "image-test-system-id'",
+        'system_id': 'image-test-system-id',
         'description': 'This is an image test',
       };
       final response = await cloudflare.imageAPI.upload(
@@ -313,7 +313,7 @@ void main() async {
   group('Update image tests', () {
     String? imageId;
     final metadata = {
-      'system_id': "image-test-system-id'",
+      'system_id': 'image-test-system-id',
       'description': 'This is an image test',
     };
     setUpAll(() async {

@@ -5,6 +5,7 @@ import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/model/cloudflare_error_response.dart';
 import 'package:cloudflare/src/model/pagination.dart';
 import 'package:cloudflare/src/utils/map_utils.dart';
+import 'package:cloudflare/src/utils/params.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:cloudflare/src/model/cloudflare_http_response.dart';
@@ -23,7 +24,10 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
       'make sure you are using a valid `accountId` and `token`';
   static String bearer(String token) => 'Bearer $token';
 
-  static const Map<String, String> defaultHeaders = {};
+  static const Map<String, dynamic> defaultHeaders = {};
+  static const Map<String, dynamic> contentTypeJson = {
+    Params.contentType: 'application/json'
+  };
 
   I service;
   final String accountId;
@@ -71,7 +75,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
             '',
             response.response.statusCode ?? HttpStatus.notFound,
             headers: MapUtils.parseHeaders(response.response.headers) ?? {},
-            isRedirect: response.response.isRedirect ?? false,
+            isRedirect: response.response.isRedirect,
             request: http.Request(
               response.response.requestOptions.method,
               response.response.requestOptions.uri,
@@ -110,13 +114,13 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
         response = httpResponseToCustomHttpResponse(e);
       } else if (e is dio.DioError) {
         switch (e.type) {
-          case dio.DioErrorType.connectTimeout:
+          case dio.DioErrorType.connectionTimeout:
           case dio.DioErrorType.receiveTimeout:
           case dio.DioErrorType.sendTimeout:
             throw TimeoutException(e.message);
           default:
         }
-        if (e.error is Exception) throw e.error;
+        if (e.error is Exception) throw e.error as Exception;
         response = dioErrorToCustomHttpResponse(e);
       } else {
         rethrow;

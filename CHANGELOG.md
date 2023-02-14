@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 3.0.0+15
+### Changed
+- Dio and Retrofit dependencies updated to new breaking change versions.
+
 ## 2.1.0+14
 ### Added
 - Custom `fileName` can be specified for image upload from file, path and bytes, whether signed upload or direct upload.
