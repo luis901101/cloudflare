@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 3.1.0+16
+### Added
+- `httpClient` param added to `Cloudflare.basic(...)` factory constructor.
+
 ## 3.0.0+15
 ### Changed
 - Dio and Retrofit dependencies updated to new breaking change versions.

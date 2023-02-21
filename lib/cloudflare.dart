@@ -152,14 +152,16 @@ class Cloudflare {
           {String? apiUrl,
           Duration? connectTimeout,
           Duration? receiveTimeout,
-          Duration? sendTimeout}) =>
+          Duration? sendTimeout,
+          HttpClient? httpClient}) =>
       Cloudflare(
           apiUrl: apiUrl,
           connectTimeout: connectTimeout,
           receiveTimeout: receiveTimeout,
           sendTimeout: sendTimeout,
           accountId: '',
-          tokenCallback: () async => '');
+          tokenCallback: () async => '',
+          httpClient: httpClient);
 
   bool get isInitialized => _initialized;
 
