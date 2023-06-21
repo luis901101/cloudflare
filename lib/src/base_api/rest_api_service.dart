@@ -87,7 +87,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     }
 
     CloudflareHTTPResponse<CloudflareResponse> dioErrorToCustomHttpResponse(
-            dio.DioError error) =>
+            dio.DioException error) =>
         CloudflareHTTPResponse(
             http.Response(
               '',
@@ -112,11 +112,11 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     } catch (e) {
       if (e is HttpResponse) {
         response = httpResponseToCustomHttpResponse(e);
-      } else if (e is dio.DioError) {
+      } else if (e is dio.DioException) {
         switch (e.type) {
-          case dio.DioErrorType.connectionTimeout:
-          case dio.DioErrorType.receiveTimeout:
-          case dio.DioErrorType.sendTimeout:
+          case dio.DioExceptionType.connectionTimeout:
+          case dio.DioExceptionType.receiveTimeout:
+          case dio.DioExceptionType.sendTimeout:
             throw TimeoutException(e.message);
           default:
         }

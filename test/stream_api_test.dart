@@ -21,6 +21,12 @@ void main() async {
   }
 
   test('Handling video from url tests', () {
+    final accountSubdomainExtraction =
+        CloudflareStreamVideo.customAccountSubdomainFromUrl(
+            'https://customer-6sdf6as5fdasd3zo.cloudflarestream.com/e8c4fb942c9e9d287451169a08107cf8/manifest/video.m3u8');
+    expect(accountSubdomainExtraction,
+        'https://customer-6sdf6as5fdasd3zo.cloudflarestream.com');
+
     final video0 = CloudflareStreamVideo.fromUrl(
         'https://customer-6sdf6as5fdasd3zo.cloudflarestream.com/e8c4fb942c9e9d287451169a08107cf8/manifest/video.m3u8');
     final video1 = CloudflareStreamVideo.fromUrl(
@@ -47,6 +53,7 @@ void main() async {
     expect(video7.playback, isNotNull, reason: video7.playback?.hls);
     expect(video8.playback, isNull, reason: video8.playback?.hls);
 
+    print('accountSubdomainExtraction-> $accountSubdomainExtraction');
     print('video0-> id:${video0?.id}  hls: ${video0?.playback?.hls}');
     print('video1-> id:${video1?.id}  hls: ${video1?.playback?.hls}');
     print('video2-> id:${video2?.id}  hls: ${video2?.playback?.hls}');
@@ -391,7 +398,7 @@ void main() async {
           onComplete: (cloudflareStreamVideo) {
             addId(cloudflareStreamVideo?.id);
             print(
-                'tus authenticated video stream completed videoId: ${cloudflareStreamVideo?.id}');
+                'tus direct video stream completed videoId: ${cloudflareStreamVideo?.id}');
             isComplete = true;
             testProgressCallback(0, 0);
             expect(cloudflareStreamVideo, isNotNull,

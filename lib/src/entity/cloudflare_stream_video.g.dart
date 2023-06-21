@@ -170,9 +170,11 @@ class _$CloudflareStreamVideoCWProxyImpl
           ? _value.liveInput
           // ignore: cast_nullable_to_non_nullable
           : liveInput as String?,
-      customAccountSubdomainUrl: customAccountSubdomainUrl is String
-          ? customAccountSubdomainUrl
-          : null,
+      customAccountSubdomainUrl:
+          customAccountSubdomainUrl == const $CopyWithPlaceholder()
+              ? _value.customAccountSubdomainUrl
+              // ignore: cast_nullable_to_non_nullable
+              : customAccountSubdomainUrl as String?,
     );
   }
 }
@@ -235,6 +237,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
           : MediaNFT.fromJson(json['nft'] as Map<String, dynamic>),
       readyToStream: json['readyToStream'] as bool?,
       liveInput: json['liveInput'] as String?,
+      customAccountSubdomainUrl: json['customAccountSubdomainUrl'] as String?,
     );
 
 Map<String, dynamic> _$CloudflareStreamVideoToJson(
@@ -270,5 +273,6 @@ Map<String, dynamic> _$CloudflareStreamVideoToJson(
   writeNotNull('nft', instance.nft);
   val['readyToStream'] = instance.readyToStream;
   writeNotNull('liveInput', instance.liveInput);
+  writeNotNull('customAccountSubdomainUrl', instance.customAccountSubdomainUrl);
   return val;
 }

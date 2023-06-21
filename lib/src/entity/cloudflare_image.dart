@@ -85,7 +85,7 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// e.g: false
   final bool draft;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   String? _firstVariant;
 
   CloudflareImage({

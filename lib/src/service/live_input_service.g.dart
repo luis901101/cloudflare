@@ -19,7 +19,8 @@ class _LiveInputService implements LiveInputService {
   String? baseUrl;
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> create({data}) async {
+  Future<HttpResponse<CloudflareResponse?>> create(
+      {CloudflareLiveInput? data}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
@@ -38,7 +39,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -51,7 +56,7 @@ class _LiveInputService implements LiveInputService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -64,7 +69,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -73,11 +82,11 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -90,7 +99,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -99,11 +112,12 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> getVideos({required id}) async {
+  Future<HttpResponse<CloudflareResponse?>> getVideos(
+      {required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -116,7 +130,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -126,8 +144,8 @@ class _LiveInputService implements LiveInputService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> update({
-    required id,
-    data,
+    required String id,
+    CloudflareLiveInput? data,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -147,7 +165,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -156,11 +178,11 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required id}) async {
+  Future<HttpResponse<dynamic>> delete({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'DELETE',
@@ -173,7 +195,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
@@ -181,8 +207,8 @@ class _LiveInputService implements LiveInputService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> addOutput({
-    required liveInputId,
-    required data,
+    required String liveInputId,
+    required Map<String, dynamic> data,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -201,7 +227,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -211,11 +241,11 @@ class _LiveInputService implements LiveInputService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> getOutputs(
-      {required liveInputId}) async {
+      {required String liveInputId}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -228,7 +258,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -238,13 +272,13 @@ class _LiveInputService implements LiveInputService {
 
   @override
   Future<HttpResponse<dynamic>> removeOutput({
-    required liveInputId,
-    required outputId,
+    required String liveInputId,
+    required String outputId,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'DELETE',
@@ -257,7 +291,11 @@ class _LiveInputService implements LiveInputService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
@@ -274,5 +312,22 @@ class _LiveInputService implements LiveInputService {
       }
     }
     return requestOptions;
+  }
+
+  String _combineBaseUrls(
+    String dioBaseUrl,
+    String? baseUrl,
+  ) {
+    if (baseUrl == null || baseUrl.trim().isEmpty) {
+      return dioBaseUrl;
+    }
+
+    final url = Uri.parse(baseUrl);
+
+    if (url.isAbsolute) {
+      return url.toString();
+    }
+
+    return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }

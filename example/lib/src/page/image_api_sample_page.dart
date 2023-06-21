@@ -286,8 +286,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                       style: ButtonStyle(
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.all(8))),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           Text(
                             'Authenticated upload',
                             textAlign: TextAlign.center,
@@ -326,8 +326,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                               : Colors.deepOrange;
                         }),
                       ),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           Text(
                             'Direct upload',
                             textAlign: TextAlign.center,

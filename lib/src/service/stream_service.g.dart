@@ -20,9 +20,9 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
-    required data,
-    onUploadProgress,
-    cancelToken,
+    required Map<String, dynamic> data,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -44,7 +44,11 @@ class _StreamService implements StreamService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -54,9 +58,9 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromFile({
-    required file,
-    onUploadProgress,
-    cancelToken,
+    required File file,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -85,7 +89,11 @@ class _StreamService implements StreamService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -95,9 +103,9 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> streamFromBytes({
-    required bytes,
-    onUploadProgress,
-    cancelToken,
+    required List<int> bytes,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -125,7 +133,11 @@ class _StreamService implements StreamService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -135,7 +147,7 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> createDirectUpload(
-      {required data}) async {
+      {required Map<String, dynamic> data}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -153,7 +165,11 @@ class _StreamService implements StreamService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -163,8 +179,8 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<dynamic>> createTusDirectUpload({
-    required size,
-    metadata,
+    required int size,
+    String? metadata,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -175,7 +191,7 @@ class _StreamService implements StreamService {
       r'Upload-Metadata': metadata,
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'POST',
@@ -188,7 +204,11 @@ class _StreamService implements StreamService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
@@ -196,14 +216,14 @@ class _StreamService implements StreamService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> getAll({
-    after,
-    before,
-    creator,
-    includeCounts,
-    search,
-    limit,
-    asc,
-    status,
+    String? after,
+    String? before,
+    String? creator,
+    bool? includeCounts,
+    String? search,
+    int? limit,
+    bool? asc,
+    List<String>? status,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -218,7 +238,7 @@ class _StreamService implements StreamService {
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -231,7 +251,11 @@ class _StreamService implements StreamService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -240,11 +264,11 @@ class _StreamService implements StreamService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -257,7 +281,11 @@ class _StreamService implements StreamService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -266,11 +294,11 @@ class _StreamService implements StreamService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required id}) async {
+  Future<HttpResponse<dynamic>> delete({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'DELETE',
@@ -283,7 +311,11 @@ class _StreamService implements StreamService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
@@ -300,5 +332,22 @@ class _StreamService implements StreamService {
       }
     }
     return requestOptions;
+  }
+
+  String _combineBaseUrls(
+    String dioBaseUrl,
+    String? baseUrl,
+  ) {
+    if (baseUrl == null || baseUrl.trim().isEmpty) {
+      return dioBaseUrl;
+    }
+
+    final url = Uri.parse(baseUrl);
+
+    if (url.isAbsolute) {
+      return url.toString();
+    }
+
+    return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }

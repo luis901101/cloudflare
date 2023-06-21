@@ -65,8 +65,8 @@ class AlertUtils {
                     child: InkWell(
                       child: Container(
                         padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: const <Widget>[
+                        child: const Row(
+                          children: <Widget>[
                             Icon(
                               Icons.delete,
                               color: Colors.red,

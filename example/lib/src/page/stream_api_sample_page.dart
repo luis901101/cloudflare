@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:cloudflare/cloudflare.dart';
@@ -10,8 +9,8 @@ import 'package:cloudflare_example/src/utils/picker_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:video_player/video_player.dart';
 import 'package:tusc/tusc.dart';
+import 'package:video_player/video_player.dart';
 
 class StreamAPIDemoPage extends StatefulWidget {
   const StreamAPIDemoPage({Key? key}) : super(key: key);
@@ -174,11 +173,10 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                   .videoPlayerController.value.isInitialized
               ? AspectRatio(
                   key: ValueKey('video-from-file-$path'),
-                  aspectRatio:
-                      MediaQueryData.fromWindow(window).size.shortestSide > 600
-                          ? 3
-                          : chewieControllerFromPath!
-                              .videoPlayerController.value.aspectRatio,
+                  aspectRatio: MediaQuery.of(context).size.shortestSide > 600
+                      ? 3
+                      : chewieControllerFromPath!
+                          .videoPlayerController.value.aspectRatio,
                   // aspectRatio: 3,
                   child: Chewie(
                     controller: chewieControllerFromPath!,
@@ -227,11 +225,10 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
       child: chewieControllerFromUrl!.videoPlayerController.value.isInitialized
           ? AspectRatio(
               key: ValueKey('video-from-url-$url'),
-              aspectRatio:
-                  MediaQueryData.fromWindow(window).size.shortestSide > 600
-                      ? 3
-                      : chewieControllerFromUrl!
-                          .videoPlayerController.value.aspectRatio,
+              aspectRatio: MediaQuery.of(context).size.shortestSide > 600
+                  ? 3
+                  : chewieControllerFromUrl!
+                      .videoPlayerController.value.aspectRatio,
               child: Chewie(
                 controller: chewieControllerFromUrl!,
               ),
@@ -426,8 +423,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                       style: ButtonStyle(
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.all(8))),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           Text(
                             'Authenticated upload',
                             textAlign: TextAlign.center,
@@ -466,8 +463,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                               : Colors.deepOrange;
                         }),
                       ),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           Text(
                             'Direct upload',
                             textAlign: TextAlign.center,

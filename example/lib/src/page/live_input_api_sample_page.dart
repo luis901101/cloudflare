@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:apivideo_live_stream/apivideo_live_stream.dart';
 import 'package:chewie/chewie.dart';
@@ -397,11 +396,10 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
           ? AspectRatio(
               key: ValueKey(
                   'video-from-url-${chewieControllerFromUrl!.videoPlayerController.dataSource}'),
-              aspectRatio:
-                  MediaQueryData.fromWindow(window).size.shortestSide > 600
-                      ? 3
-                      : chewieControllerFromUrl!
-                          .videoPlayerController.value.aspectRatio,
+              aspectRatio: MediaQuery.of(context).size.shortestSide > 600
+                  ? 3
+                  : chewieControllerFromUrl!
+                      .videoPlayerController.value.aspectRatio,
               child: Chewie(
                 controller: chewieControllerFromUrl!,
               ),

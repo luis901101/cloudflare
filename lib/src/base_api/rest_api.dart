@@ -55,10 +55,8 @@ class RestAPI {
 
     // Adding custom httpClient
     if (httpClient != null) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
-          (client) {
-        return httpClient;
-      };
+      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
+          () => httpClient!;
     }
   }
 

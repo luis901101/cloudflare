@@ -19,14 +19,12 @@ part 'cloudflare_stream_video.g.dart';
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
-  static const videoDeliveryHost = 'videodelivery.net';
-  static const videoDeliveryUrl = 'https://$videoDeliveryHost';
-  static const videoCloudflareHost = 'cloudflarestream.com';
-  static const videoCloudflareUrl = 'https://$videoCloudflareHost';
-  static final specificCloudflareAccountSubdomainCodeRegExp =
-      RegExp(r'^https://customer-([A-Za-z0-9]+)\.(.*)$');
-  static final specificCloudflareAccountSubdomainRegExp =
-      RegExp(r'^https://customer-[A-Za-z0-9]+\.cloudflarestream.com/(.*)$');
+  static const videoDeliveryUrl = 'https://videoDeliveryHost';
+  static const videoCloudflareUrl = 'https://cloudflarestream.com';
+  static final customCloudflareAccountSubdomainRegExp =
+      RegExp(r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com\b');
+  static final customCloudflareAccountSubdomainInvertRegExp =
+      RegExp(r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com/(.*)$');
   static const specificCloudflareAccountSubdomainGeneric =
       'https://customer-{CODE}.cloudflarestream.com';
 
@@ -226,6 +224,13 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   /// e.g: "fc0a8dc887b16759bfd9ad922230a014"
   final String? liveInput;
 
+  /// Domain that is specific to your Cloudflare account: like customer-{CODE}.cloudflarestream.com.
+  ///
+  /// Expected value for this field is an url like: https://customer-nx3rti2365ngywuhef.cloudflarestream.com.
+  ///
+  /// Check here for mor info.: https://community.cloudflare.com/t/upcoming-domain-change-to-ensure-delivery-of-your-video-content/405842
+  final String? customAccountSubdomainUrl;
+
   CloudflareStreamVideo({
     String? id,
     DateTime? uploaded,
@@ -251,6 +256,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     this.liveInput,
     String? customAccountSubdomainUrl,
   })  : id = id ??= '',
+        customAccountSubdomainUrl = customAccountSubdomainUrl ??=
+            customAccountSubdomainFromUrl(thumbnail),
         uploaded = uploaded ?? DateTime.now(),
         size = size ?? 0,
         requireSignedURLs = requireSignedURLs ?? false,
@@ -268,10 +275,9 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
             (id.isNotEmpty
                 ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.jpg'
                 : ''),
-        animatedThumbnail = thumbnail ??
-            (id.isNotEmpty
-                ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.gif'
-                : ''),
+        animatedThumbnail = (id.isNotEmpty
+            ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.gif'
+            : ''),
         status = status ?? VideoStatus(),
         duration = duration ?? -1,
         thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
@@ -317,9 +323,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     /// e.g: scale
     ThumbnailFit? fit,
   }) =>
-      Uri(
-        scheme: 'https',
-        host: videoDeliveryHost,
+      Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl).replace(
         path: '/$id/thumbnails/thumbnail.jpg',
         queryParameters: {
           if (time != null) Params.time: time.toString(),
@@ -372,9 +376,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     /// Default value: 8
     int? fps,
   }) =>
-      Uri(
-        scheme: 'https',
-        host: videoDeliveryHost,
+      Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl).replace(
         path: '/$id/thumbnails/thumbnail.gif',
         queryParameters: {
           if (time != null) Params.time: time.toString(),
@@ -386,6 +388,10 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         },
       ).toString();
 
+  static String? customAccountSubdomainFromUrl(String? url) => url != null
+      ? customCloudflareAccountSubdomainRegExp.firstMatch(url)?.group(0)
+      : null;
+
   static Map<String, dynamic> dataFromVideoDeliveryUrl(String url) {
     String cleanUrl = url
         .replaceAll('$uploadVideoDeliveryUrl/', '')
@@ -393,20 +399,15 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         .replaceAll('$videoDeliveryUrl/', '')
         .replaceAll('$videoCloudflareUrl/', '');
     String? videoId;
-    String? customAccountSubdomainCode;
+    String? customAccountSubdomain = customAccountSubdomainFromUrl(cleanUrl);
+    String? customAccountSubdomainCode = customAccountSubdomain
+        ?.replaceAll('https://customer-', '')
+        .replaceAll('.cloudflarestream.com', '');
 
-    final specificAccountSubdomainMatch =
-        specificCloudflareAccountSubdomainRegExp.firstMatch(cleanUrl);
-    if (specificAccountSubdomainMatch != null) {
-      if (specificAccountSubdomainMatch.groupCount > 0) {
-        cleanUrl = specificAccountSubdomainMatch.group(1) ?? cleanUrl;
-        final codeMatch =
-            specificCloudflareAccountSubdomainCodeRegExp.firstMatch(url);
-        if (codeMatch != null && codeMatch.groupCount > 0) {
-          customAccountSubdomainCode = codeMatch.group(1);
-        }
-      }
-    }
+    cleanUrl = customCloudflareAccountSubdomainInvertRegExp
+            .firstMatch(cleanUrl)
+            ?.group(1) ??
+        cleanUrl;
 
     final split = cleanUrl.split('/');
     videoId = split.isNotEmpty ? split[0] : null;
@@ -417,6 +418,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     }
     return {
       Params.id: videoId,
+      Params.subdomainAccount: customAccountSubdomain,
       Params.subdomainAccountCode: customAccountSubdomainCode,
     };
   }
@@ -429,10 +431,7 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         : CloudflareStreamVideo(
             id: data[Params.id],
             readyToStream: !url.startsWith(uploadVideoDeliveryUrl),
-            customAccountSubdomainUrl: data[Params.subdomainAccountCode] == null
-                ? null
-                : specificCloudflareAccountSubdomainGeneric.replaceAll(
-                    '{CODE}', data[Params.subdomainAccountCode]),
+            customAccountSubdomainUrl: data[Params.subdomainAccount],
           );
   }
 

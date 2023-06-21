@@ -9,6 +9,12 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 3.2.0+1
+### Changed
+- Some dependencies updated.
+- Deprecated code refactored.
+- `customAccountSubdomainUrl` field added to `CloudflareStreamVideo` to better handle serving on-demand videos and thumbnails, avoiding deprecated `videodelivery.net` and `cloudflarestream.com` domains.
+
 ## 3.1.0+16
 ### Added
 - `httpClient` param added to `Cloudflare.basic(...)` factory constructor.

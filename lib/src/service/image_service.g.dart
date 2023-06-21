@@ -20,11 +20,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
-    required file,
-    requireSignedURLs,
-    metadata,
-    onUploadProgress,
-    cancelToken,
+    required File file,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -63,7 +63,11 @@ class _ImageService implements ImageService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -73,11 +77,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes({
-    required bytes,
-    requireSignedURLs,
-    metadata,
-    onUploadProgress,
-    cancelToken,
+    required List<int> bytes,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -115,7 +119,11 @@ class _ImageService implements ImageService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -125,11 +133,11 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromUrl({
-    required url,
-    requireSignedURLs,
-    metadata,
-    onUploadProgress,
-    cancelToken,
+    required String url,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
+    void Function(int, int)? onUploadProgress,
+    CancelToken? cancelToken,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -165,7 +173,11 @@ class _ImageService implements ImageService {
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -175,9 +187,9 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> update({
-    required id,
-    requireSignedURLs,
-    metadata,
+    required String id,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -200,7 +212,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -210,9 +226,9 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> createDirectUpload({
-    requireSignedURLs,
-    metadata,
-    expiry,
+    bool? requireSignedURLs,
+    Map<String, dynamic>? metadata,
+    String? expiry,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -248,7 +264,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -258,8 +278,8 @@ class _ImageService implements ImageService {
 
   @override
   Future<HttpResponse<CloudflareResponse?>> getAll({
-    page,
-    size,
+    int? page,
+    int? size,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -268,7 +288,7 @@ class _ImageService implements ImageService {
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -281,7 +301,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -290,11 +314,11 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -307,7 +331,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -316,11 +344,11 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getBase({required id}) async {
+  Future<HttpResponse<dynamic>> getBase({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'GET',
@@ -334,18 +362,22 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required id}) async {
+  Future<HttpResponse<dynamic>> delete({required String id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'DELETE',
@@ -358,7 +390,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data;
     final httpResponse = HttpResponse(value, _result);
     return httpResponse;
@@ -369,7 +405,7 @@ class _ImageService implements ImageService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>?>(
         _setStreamType<HttpResponse<CloudflareResponse>>(Options(
       method: 'GET',
@@ -382,7 +418,11 @@ class _ImageService implements ImageService {
               queryParameters: queryParameters,
               data: _data,
             )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
     final value = _result.data == null
         ? null
         : CloudflareResponse.fromJson(_result.data!);
@@ -401,5 +441,22 @@ class _ImageService implements ImageService {
       }
     }
     return requestOptions;
+  }
+
+  String _combineBaseUrls(
+    String dioBaseUrl,
+    String? baseUrl,
+  ) {
+    if (baseUrl == null || baseUrl.trim().isEmpty) {
+      return dioBaseUrl;
+    }
+
+    final url = Uri.parse(baseUrl);
+
+    if (url.isAbsolute) {
+      return url.toString();
+    }
+
+    return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
