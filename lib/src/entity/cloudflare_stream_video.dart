@@ -19,7 +19,7 @@ part 'cloudflare_stream_video.g.dart';
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
-  static const videoDeliveryUrl = 'https://videoDeliveryHost';
+  static const videoDeliveryUrl = 'https://videodelivery.net';
   static const videoCloudflareUrl = 'https://cloudflarestream.com';
   static final customCloudflareAccountSubdomainRegExp =
       RegExp(r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com\b');
