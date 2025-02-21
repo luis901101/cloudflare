@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo Running code generation
-echo ...
-dart run build_runner build --delete-conflicting-outputs \
---build-filter 'package:cloudflare/src/entity/*.dart' \
---build-filter 'package:cloudflare/src/service/*.dart' \
---build-filter 'package:cloudflare/src/model/*.dart' \
-"$2" "$3" "$4" "$5"

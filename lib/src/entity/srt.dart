@@ -7,7 +7,7 @@ part 'srt.g.dart';
 /// Support for SRT(Secure Reliable Transfer)
 ///
 /// Check here: https://blog.cloudflare.com/stream-now-supports-srt-as-a-drop-in-replacement-for-rtmp/
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class SRT extends Jsonable<SRT> {
   /// The URL the live input can be sent SRT data

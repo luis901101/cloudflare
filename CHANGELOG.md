@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 4.0.0
+### Changed
+- Updated dependencies to new breaking changes.
+
 ## 3.2.1+1
 ### Fixed
 - `videoDeliveryUrl` fixed on `CloudflareStreamVideo`.

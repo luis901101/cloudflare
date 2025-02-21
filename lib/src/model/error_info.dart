@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'error_info.g.dart';
 
-@JsonSerializable(includeIfNull: false)
+@JsonSerializable()
 class ErrorInfo extends Jsonable<ErrorInfo> {
   int? code;
   String? message;

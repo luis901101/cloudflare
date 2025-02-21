@@ -47,7 +47,7 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
       result: result == const $CopyWithPlaceholder()
           ? _value.result
           // ignore: cast_nullable_to_non_nullable
-          : result,
+          : result as Object?,
       success: success == const $CopyWithPlaceholder()
           ? _value.success
           // ignore: cast_nullable_to_non_nullable
@@ -94,19 +94,11 @@ CloudflareResponse _$CloudflareResponseFromJson(Map<String, dynamic> json) =>
           : Pagination.fromJson(json['result_info'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$CloudflareResponseToJson(CloudflareResponse instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('result', instance.result);
-  val['success'] = instance.success;
-  val['errors'] = instance.errors;
-  val['messages'] = instance.messages;
-  writeNotNull('result_info', instance.paginationInfo);
-  return val;
-}
+Map<String, dynamic> _$CloudflareResponseToJson(CloudflareResponse instance) =>
+    <String, dynamic>{
+      if (instance.result case final value?) 'result': value,
+      'success': instance.success,
+      'errors': instance.errors,
+      'messages': instance.messages,
+      if (instance.paginationInfo case final value?) 'result_info': value,
+    };

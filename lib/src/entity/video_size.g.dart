@@ -61,8 +61,8 @@ extension $VideoSizeCopyWith on VideoSize {
 // **************************************************************************
 
 VideoSize _$VideoSizeFromJson(Map<String, dynamic> json) => VideoSize(
-      width: json['width'] as int?,
-      height: json['height'] as int?,
+      width: (json['width'] as num?)?.toInt(),
+      height: (json['height'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$VideoSizeToJson(VideoSize instance) => <String, dynamic>{

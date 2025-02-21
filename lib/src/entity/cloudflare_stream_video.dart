@@ -14,8 +14,8 @@ part 'cloudflare_stream_video.g.dart';
 /// Documentation here:
 /// API docs: https://api.cloudflare.com/#stream-videos-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/stream
-@CopyWith(skipFields: true)
-@JsonSerializable(includeIfNull: false)
+@CopyWith()
+@JsonSerializable()
 class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   static const uploadVideoDeliveryUrl = 'https://upload.videodelivery.net';
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';

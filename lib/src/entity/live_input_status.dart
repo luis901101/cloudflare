@@ -7,7 +7,7 @@ part 'live_input_status.g.dart';
 
 /// LiveInputStatus represents the current and historical status of a
 /// Live Input after a streaming was started.
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class LiveInputStatus extends Jsonable<LiveInputStatus> {
   /// The current status for the Live Input

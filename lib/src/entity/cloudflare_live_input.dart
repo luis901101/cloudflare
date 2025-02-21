@@ -12,8 +12,8 @@ part 'cloudflare_live_input.g.dart';
 /// Documentation here:
 /// API docs: https://api.cloudflare.com/#stream-live-inputs-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/stream/stream-live/
-@CopyWith(skipFields: true)
-@JsonSerializable(includeIfNull: false)
+@CopyWith()
+@JsonSerializable()
 class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
   /// Live input unique identifier
   /// max length: 32

@@ -62,10 +62,10 @@ extension $MediaNFTCopyWith on MediaNFT {
 
 MediaNFT _$MediaNFTFromJson(Map<String, dynamic> json) => MediaNFT(
       contract: json['contract'] as String?,
-      token: json['token'] as int?,
+      token: (json['token'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$MediaNFTToJson(MediaNFT instance) => <String, dynamic>{
-      'contract': instance.contract,
-      'token': instance.token,
+      if (instance.contract case final value?) 'contract': value,
+      if (instance.token case final value?) 'token': value,
     };

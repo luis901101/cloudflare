@@ -116,9 +116,9 @@ extension $WatermarkCopyWith on Watermark {
 
 Watermark _$WatermarkFromJson(Map<String, dynamic> json) => Watermark(
       id: json['uid'] as String?,
-      size: json['size'] as int?,
-      width: json['width'] as int?,
-      height: json['height'] as int?,
+      size: (json['size'] as num?)?.toInt(),
+      width: (json['width'] as num?)?.toInt(),
+      height: (json['height'] as num?)?.toInt(),
       created: json['created'] == null
           ? null
           : DateTime.parse(json['created'] as String),
@@ -142,8 +142,8 @@ Map<String, dynamic> _$WatermarkToJson(Watermark instance) => <String, dynamic>{
       'scale': instance.scale,
       'opacity': instance.opacity,
       'padding': instance.padding,
-      'name': instance.name,
-      'downloadedFrom': instance.downloadedFrom,
+      if (instance.name case final value?) 'name': value,
+      if (instance.downloadedFrom case final value?) 'downloadedFrom': value,
     };
 
 const _$WatermarkPositionEnumMap = {

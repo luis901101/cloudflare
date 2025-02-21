@@ -7,20 +7,11 @@ part of 'error_info.dart';
 // **************************************************************************
 
 ErrorInfo _$ErrorInfoFromJson(Map<String, dynamic> json) => ErrorInfo(
-      code: json['code'] as int?,
+      code: (json['code'] as num?)?.toInt(),
       message: json['message'] as String?,
     );
 
-Map<String, dynamic> _$ErrorInfoToJson(ErrorInfo instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('code', instance.code);
-  writeNotNull('message', instance.message);
-  return val;
-}
+Map<String, dynamic> _$ErrorInfoToJson(ErrorInfo instance) => <String, dynamic>{
+      if (instance.code case final value?) 'code': value,
+      if (instance.message case final value?) 'message': value,
+    };

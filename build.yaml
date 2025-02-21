@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      json_serializable|json_serializable:
+        options:
+          include_if_null: false
+#          create_json_keys: true
+        generate_for:
+          - '**/entity/*.dart'
+          - '**/model/*.dart'
+      copy_with_extension_gen|copy_with_extension_gen:
+        options:
+          skip_fields: true
+        generate_for:
+          - '**/entity/*.dart'
+          - '**/model/*.dart'
+      retrofit_generator|retrofit_generator:
+        generate_for:
+          - '**/service/*.dart'

@@ -7,7 +7,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'watermark.g.dart';
 
 /// Watermark profile
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class Watermark extends Jsonable<Watermark> {
   /// Watermark profile unique identifier.

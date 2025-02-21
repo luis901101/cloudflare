@@ -8,7 +8,7 @@ part 'live_input_recording.g.dart';
 /// Control recording the input to a Stream video. Behavior depends on the mode.
 /// In most cases, the video will initially be viewable as a live video and
 /// transition to on-demand after a condition is satisfied.
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class LiveInputRecording extends Jsonable<LiveInputRecording> {
   /// Specifies the recording behavior of the live input. 'off' indicates no

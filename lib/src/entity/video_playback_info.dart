@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'video_playback_info.g.dart';
 
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class VideoPlaybackInfo extends Jsonable<VideoPlaybackInfo> {
   /// HLS manifest for the video

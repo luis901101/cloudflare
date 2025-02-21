@@ -140,25 +140,17 @@ CloudflareLiveInput _$CloudflareLiveInputFromJson(Map<String, dynamic> json) =>
           : LiveInputStatus.fromJson(json['status'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$CloudflareLiveInputToJson(CloudflareLiveInput instance) {
-  final val = <String, dynamic>{
-    'uid': instance.id,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('meta', instance.meta);
-  val['created'] = instance.created.toIso8601String();
-  val['modified'] = instance.modified.toIso8601String();
-  val['rtmps'] = instance.rtmps;
-  val['rtmpsPlayback'] = instance.rtmpsPlayback;
-  val['srt'] = instance.srt;
-  val['srtPlayback'] = instance.srtPlayback;
-  val['recording'] = instance.recording;
-  writeNotNull('status', instance.status);
-  return val;
-}
+Map<String, dynamic> _$CloudflareLiveInputToJson(
+        CloudflareLiveInput instance) =>
+    <String, dynamic>{
+      'uid': instance.id,
+      if (instance.meta case final value?) 'meta': value,
+      'created': instance.created.toIso8601String(),
+      'modified': instance.modified.toIso8601String(),
+      'rtmps': instance.rtmps,
+      'rtmpsPlayback': instance.rtmpsPlayback,
+      'srt': instance.srt,
+      'srtPlayback': instance.srtPlayback,
+      'recording': instance.recording,
+      if (instance.status case final value?) 'status': value,
+    };

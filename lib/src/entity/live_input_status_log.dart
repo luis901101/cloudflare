@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'live_input_status_log.g.dart';
 
 /// LiveInputStatusLog represents the status of a Live Input in a specific time
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class LiveInputStatusLog extends Jsonable<LiveInputStatusLog> {
   /// Specifies the state of the Live Input.

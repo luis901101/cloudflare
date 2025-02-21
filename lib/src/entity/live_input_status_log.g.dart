@@ -87,8 +87,10 @@ LiveInputStatusLog _$LiveInputStatusLogFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputStatusLogToJson(LiveInputStatusLog instance) =>
     <String, dynamic>{
-      'state': instance.state,
-      'reason': instance.reason,
-      'statusEnteredAt': instance.statusEnteredAt?.toIso8601String(),
-      'statusLastSeen': instance.statusLastSeen?.toIso8601String(),
+      if (instance.state case final value?) 'state': value,
+      if (instance.reason case final value?) 'reason': value,
+      if (instance.statusEnteredAt?.toIso8601String() case final value?)
+        'statusEnteredAt': value,
+      if (instance.statusLastSeen?.toIso8601String() case final value?)
+        'statusLastSeen': value,
     };

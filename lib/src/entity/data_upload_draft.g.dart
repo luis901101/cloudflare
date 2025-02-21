@@ -79,5 +79,5 @@ Map<String, dynamic> _$DataUploadDraftToJson(DataUploadDraft instance) =>
     <String, dynamic>{
       'id': instance.id,
       'uploadURL': instance.uploadURL,
-      'watermark': instance.watermark,
+      if (instance.watermark case final value?) 'watermark': value,
     };

@@ -8,8 +8,8 @@ part 'cloudflare_image.g.dart';
 /// Documentation here:
 /// API docs: https://api.cloudflare.com/#cloudflare-images-properties
 /// Developer Cloudflare docs: https://developers.cloudflare.com/images/cloudflare-images
-@CopyWith(skipFields: true)
-@JsonSerializable(includeIfNull: false)
+@CopyWith()
+@JsonSerializable()
 class CloudflareImage extends Jsonable<CloudflareImage> {
   static const uploadImageDeliveryUrl = 'https://upload.imagedelivery.net';
   static const imageDeliveryUrl = 'https://imagedelivery.net';

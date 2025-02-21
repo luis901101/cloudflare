@@ -7,8 +7,8 @@ part of 'image_stats.dart';
 // **************************************************************************
 
 ImageStats _$ImageStatsFromJson(Map<String, dynamic> json) => ImageStats(
-      current: json['current'] as int?,
-      allowed: json['allowed'] as int?,
+      current: (json['current'] as num?)?.toInt(),
+      allowed: (json['allowed'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ImageStatsToJson(ImageStats instance) =>

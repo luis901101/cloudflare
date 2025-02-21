@@ -7,7 +7,7 @@ part 'data_upload_draft.g.dart';
 
 /// DataUploadDraft is the response object when requesting `direct_upload`
 /// For instance: https://api.cloudflare.com/#cloudflare-images-create-authenticated-direct-upload-url-v2
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class DataUploadDraft extends Jsonable<DataUploadDraft> {
   /// Resource id.

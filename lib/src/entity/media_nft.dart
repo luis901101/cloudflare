@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'media_nft.g.dart';
 
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class MediaNFT extends Jsonable<MediaNFT> {
   /// ERC-721 compatible contract address

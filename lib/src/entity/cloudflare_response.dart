@@ -9,8 +9,8 @@ part 'cloudflare_response.g.dart';
 
 /// Documentation here:
 /// API docs: https://api.cloudflare.com/#getting-started-responses
-@CopyWith(skipFields: true)
-@JsonSerializable(includeIfNull: false)
+@CopyWith()
+@JsonSerializable()
 class CloudflareResponse extends Jsonable<CloudflareResponse> {
   Object? result;
   bool success;

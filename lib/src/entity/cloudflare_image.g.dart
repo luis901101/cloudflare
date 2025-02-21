@@ -113,23 +113,14 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
       draft: json['draft'] as bool?,
     );
 
-Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) {
-  final val = <String, dynamic>{
-    'id': instance.id,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('imageDeliveryId', instance.imageDeliveryId);
-  writeNotNull('filename', instance.filename);
-  writeNotNull('meta', instance.meta);
-  val['requireSignedURLs'] = instance.requireSignedURLs;
-  val['variants'] = instance.variants;
-  val['uploaded'] = instance.uploaded.toIso8601String();
-  val['draft'] = instance.draft;
-  return val;
-}
+Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      if (instance.imageDeliveryId case final value?) 'imageDeliveryId': value,
+      if (instance.filename case final value?) 'filename': value,
+      if (instance.meta case final value?) 'meta': value,
+      'requireSignedURLs': instance.requireSignedURLs,
+      'variants': instance.variants,
+      'uploaded': instance.uploaded.toIso8601String(),
+      'draft': instance.draft,
+    };

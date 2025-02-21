@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'live_input_output.g.dart';
 
 /// LiveInputOutput is the response object of associated outputs to a live input
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class LiveInputOutput extends Jsonable<LiveInputOutput> {
   /// Output id.

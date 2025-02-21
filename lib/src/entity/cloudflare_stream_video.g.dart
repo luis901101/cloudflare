@@ -197,7 +197,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
       uploaded: json['uploaded'] == null
           ? null
           : DateTime.parse(json['uploaded'] as String),
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
       watermark: json['watermark'] == null
           ? null
           : Watermark.fromJson(json['watermark'] as Map<String, dynamic>),
@@ -206,7 +206,7 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
       allowedOrigins: (json['allowedOrigins'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      maxDurationSeconds: json['maxDurationSeconds'] as int?,
+      maxDurationSeconds: (json['maxDurationSeconds'] as num?)?.toInt(),
       created: json['created'] == null
           ? null
           : DateTime.parse(json['created'] as String),
@@ -241,38 +241,32 @@ CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
     );
 
 Map<String, dynamic> _$CloudflareStreamVideoToJson(
-    CloudflareStreamVideo instance) {
-  final val = <String, dynamic>{
-    'uid': instance.id,
-    'uploaded': instance.uploaded.toIso8601String(),
-    'size': instance.size,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('watermark', instance.watermark);
-  val['requireSignedURLs'] = instance.requireSignedURLs;
-  writeNotNull('meta', instance.meta);
-  val['allowedOrigins'] = instance.allowedOrigins;
-  writeNotNull('maxDurationSeconds', instance.maxDurationSeconds);
-  val['created'] = instance.created.toIso8601String();
-  val['preview'] = instance.preview;
-  val['modified'] = instance.modified.toIso8601String();
-  val['input'] = instance.input;
-  val['thumbnail'] = instance.thumbnail;
-  val['animatedThumbnail'] = instance.animatedThumbnail;
-  val['status'] = instance.status;
-  val['duration'] = instance.duration;
-  writeNotNull('uploadExpiry', instance.uploadExpiry?.toIso8601String());
-  val['thumbnailTimestampPct'] = instance.thumbnailTimestampPct;
-  writeNotNull('playback', instance.playback);
-  writeNotNull('nft', instance.nft);
-  val['readyToStream'] = instance.readyToStream;
-  writeNotNull('liveInput', instance.liveInput);
-  writeNotNull('customAccountSubdomainUrl', instance.customAccountSubdomainUrl);
-  return val;
-}
+        CloudflareStreamVideo instance) =>
+    <String, dynamic>{
+      'uid': instance.id,
+      'uploaded': instance.uploaded.toIso8601String(),
+      'size': instance.size,
+      if (instance.watermark case final value?) 'watermark': value,
+      'requireSignedURLs': instance.requireSignedURLs,
+      if (instance.meta case final value?) 'meta': value,
+      'allowedOrigins': instance.allowedOrigins,
+      if (instance.maxDurationSeconds case final value?)
+        'maxDurationSeconds': value,
+      'created': instance.created.toIso8601String(),
+      'preview': instance.preview,
+      'modified': instance.modified.toIso8601String(),
+      'input': instance.input,
+      'thumbnail': instance.thumbnail,
+      'animatedThumbnail': instance.animatedThumbnail,
+      'status': instance.status,
+      'duration': instance.duration,
+      if (instance.uploadExpiry?.toIso8601String() case final value?)
+        'uploadExpiry': value,
+      'thumbnailTimestampPct': instance.thumbnailTimestampPct,
+      if (instance.playback case final value?) 'playback': value,
+      if (instance.nft case final value?) 'nft': value,
+      'readyToStream': instance.readyToStream,
+      if (instance.liveInput case final value?) 'liveInput': value,
+      if (instance.customAccountSubdomainUrl case final value?)
+        'customAccountSubdomainUrl': value,
+    };

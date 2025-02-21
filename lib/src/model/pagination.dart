@@ -6,7 +6,7 @@ part 'pagination.g.dart';
 
 /// Documentation here:
 /// API docs: https://api.cloudflare.com/#getting-started-responses
-@JsonSerializable(includeIfNull: false)
+@JsonSerializable()
 class Pagination extends Jsonable<Pagination> {
   static const String countHeader = 'X-Count';
   static const String totalCountHeader = 'X-Total-Count';

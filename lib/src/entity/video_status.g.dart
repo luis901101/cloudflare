@@ -75,7 +75,8 @@ extension $VideoStatusCopyWith on VideoStatus {
 VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
       state: $enumDecodeNullable(_$MediaProcessingStateEnumMap, json['state'],
           unknownValue: MediaProcessingState.unknown),
-      pctComplete: Jsonable.intReadValue(json, 'pctComplete') as int?,
+      pctComplete:
+          (Jsonable.intReadValue(json, 'pctComplete') as num?)?.toInt(),
       errorReasonCode: json['errorReasonCode'] as String?,
       errorReasonText: json['errorReasonText'] as String?,
     );
@@ -84,8 +85,8 @@ Map<String, dynamic> _$VideoStatusToJson(VideoStatus instance) =>
     <String, dynamic>{
       'state': _$MediaProcessingStateEnumMap[instance.state]!,
       'pctComplete': instance.pctComplete,
-      'errorReasonCode': instance.errorReasonCode,
-      'errorReasonText': instance.errorReasonText,
+      if (instance.errorReasonCode case final value?) 'errorReasonCode': value,
+      if (instance.errorReasonText case final value?) 'errorReasonText': value,
     };
 
 const _$MediaProcessingStateEnumMap = {

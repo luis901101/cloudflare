@@ -73,6 +73,6 @@ LiveInputStatus _$LiveInputStatusFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputStatusToJson(LiveInputStatus instance) =>
     <String, dynamic>{
-      'current': instance.current,
-      'history': instance.history,
+      if (instance.current case final value?) 'current': value,
+      if (instance.history case final value?) 'history': value,
     };

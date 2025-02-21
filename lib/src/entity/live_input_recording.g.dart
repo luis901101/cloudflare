@@ -80,7 +80,7 @@ LiveInputRecording _$LiveInputRecordingFromJson(Map<String, dynamic> json) =>
       allowedOrigins: (json['allowedOrigins'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      timeoutSeconds: json['timeoutSeconds'] as int?,
+      timeoutSeconds: (json['timeoutSeconds'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$LiveInputRecordingToJson(LiveInputRecording instance) =>

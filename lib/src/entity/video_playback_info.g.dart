@@ -69,6 +69,6 @@ VideoPlaybackInfo _$VideoPlaybackInfoFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$VideoPlaybackInfoToJson(VideoPlaybackInfo instance) =>
     <String, dynamic>{
-      'hls': instance.hls,
-      'dash': instance.dash,
+      if (instance.hls case final value?) 'hls': value,
+      if (instance.dash case final value?) 'dash': value,
     };

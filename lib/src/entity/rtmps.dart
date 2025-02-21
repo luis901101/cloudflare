@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'rtmps.g.dart';
 
-@CopyWith(skipFields: true)
+@CopyWith()
 @JsonSerializable()
 class RTMPS extends Jsonable<RTMPS> {
   /// The URL the live input can be sent RTMPS data
