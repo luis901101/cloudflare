@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:tusc/tusc.dart' as tus;
-import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
@@ -16,13 +15,11 @@ import 'package:retrofit/dio.dart';
 class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     CloudflareErrorResponse> {
   final String tusUploadUrl;
-  StreamAPI({required RestAPI restAPI, required String accountId})
+  StreamAPI({required super.restAPI, required super.accountId})
       : tusUploadUrl =
             'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
         super(
-            restAPI: restAPI,
             service: StreamService(dio: restAPI.dio, accountId: accountId),
-            accountId: accountId,
             dataType: CloudflareStreamVideo());
 
   /// A video up to 200 MegaBytes can be uploaded using a single

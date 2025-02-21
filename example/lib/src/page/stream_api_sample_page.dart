@@ -210,8 +210,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
     if (chewieControllerFromUrl?.videoPlayerController.dataSource != url) {
       clearVideoUrlControllers();
       chewieControllerFromUrl = ChewieController(
-        videoPlayerController: VideoPlayerController.network(
-          url,
+        videoPlayerController: VideoPlayerController.networkUrl(
+          Uri.parse(url),
         )..initialize()
               .then((_) => errorMessage = null)
               .onError((error, stackTrace) {
@@ -292,9 +292,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           setState(() {});
                         },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                      return states.contains(MaterialState.disabled)
+                    backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                      return states.contains(WidgetState.disabled)
                           ? null
                           : Colors.deepPurple;
                     }),
@@ -358,9 +358,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           setState(() {});
                         },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                      return states.contains(MaterialState.disabled)
+                    backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                      return states.contains(WidgetState.disabled)
                           ? null
                           : Colors.purple;
                     }),
@@ -398,9 +398,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                             },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
+                            WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                          return states.contains(WidgetState.disabled)
                               ? null
                               : Colors.blue;
                         }),
@@ -421,8 +421,8 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           ? null
                           : () => onClick(doAuthenticatedUpload),
                       style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.all(8))),
+                          padding:
+                              WidgetStateProperty.all(const EdgeInsets.all(8))),
                       child: const Column(
                         children: [
                           Text(
@@ -454,11 +454,11 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                           : () => onClick(doDirectUpload),
                       style: ButtonStyle(
                         padding:
-                            MaterialStateProperty.all(const EdgeInsets.all(8)),
+                            WidgetStateProperty.all(const EdgeInsets.all(8)),
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
+                            WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                          return states.contains(WidgetState.disabled)
                               ? null
                               : Colors.deepOrange;
                         }),
@@ -494,9 +494,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
                               : () => onClick(deleteUploadedData),
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                                    (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
+                                WidgetStateProperty.resolveWith<Color?>(
+                                    (Set<WidgetState> states) {
+                              return states.contains(WidgetState.disabled)
                                   ? null
                                   : Colors.red.shade600;
                             }),
@@ -575,7 +575,6 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
               data: await getFileBytes(dataVideo!.dataTransmit.data),
               progressCallback: dataVideo?.dataTransmit.progressCallback);
           break;
-        default:
       }
 
       CloudflareHTTPResponse<CloudflareStreamVideo?> response =
@@ -615,7 +614,6 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
         case FileSource.bytes:
           bytes = await getFileBytes(dataVideo!.dataTransmit.data);
           break;
-        default:
       }
 
       tusAPI = await cloudflare.streamAPI.tusStream(
@@ -667,7 +665,6 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
               data: await getFileBytes(dataVideo!.dataTransmit.data),
               progressCallback: dataVideo!.dataTransmit.progressCallback);
           break;
-        default:
       }
 
       DataTransmit<String>? contentFromPath;
@@ -723,7 +720,6 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
         case FileSource.bytes:
           bytes = await getFileBytes(dataVideo!.dataTransmit.data);
           break;
-        default:
       }
 
       final responseCreateDirectUpload = await cloudflare.streamAPI

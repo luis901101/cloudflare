@@ -25,8 +25,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
   /// Image unique identifier for cloudflare account image delivery, for
   /// instance this is the structure of an image delivery url:
   ///
-  /// https://imagedelivery.net/<image_delivery_id>/<image_id>/<variant_name>
-  /// https://imagedelivery.net/B45fsu4hrqe32jned3k2/<image_id>/<variant_name>
+  /// https://imagedelivery.net/[image_delivery_id]/[image_id]/[variant_name]
+  /// https://imagedelivery.net/B45fsu4hrqe32jned3k2/[image_id]/[variant_name]
   ///
   /// e.g: "B45fsu4hrqe32jned3k2"
   final String? imageDeliveryId;

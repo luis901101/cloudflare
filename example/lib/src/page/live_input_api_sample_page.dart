@@ -378,8 +378,8 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
           size: 48,
           color: Colors.lightBlue,
         )),
-        videoPlayerController: VideoPlayerController.network(
-          url,
+        videoPlayerController: VideoPlayerController.networkUrl(
+          Uri.parse(url),
         )..initialize().then((_) {
             errorMessage = null;
           }).onError((error, stackTrace) {
@@ -416,9 +416,9 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
       ElevatedButton(
         onPressed: onPressed,
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-            return states.contains(MaterialState.disabled) ? null : color;
+          backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+            return states.contains(WidgetState.disabled) ? null : color;
           }),
         ),
         child: Text(

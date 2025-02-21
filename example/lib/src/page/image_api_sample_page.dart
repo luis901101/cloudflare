@@ -178,9 +178,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           setState(() {});
                         },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                      return states.contains(MaterialState.disabled)
+                    backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                      return states.contains(WidgetState.disabled)
                           ? null
                           : Colors.deepPurple;
                     }),
@@ -227,9 +227,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           setState(() {});
                         },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                      return states.contains(MaterialState.disabled)
+                    backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                      return states.contains(WidgetState.disabled)
                           ? null
                           : Colors.purple;
                     }),
@@ -261,9 +261,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                             },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
+                            WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                          return states.contains(WidgetState.disabled)
                               ? null
                               : Colors.blue;
                         }),
@@ -284,8 +284,8 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           ? null
                           : () => onClick(doAuthenticatedUpload),
                       style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.all(8))),
+                          padding:
+                              WidgetStateProperty.all(const EdgeInsets.all(8))),
                       child: const Column(
                         children: [
                           Text(
@@ -317,11 +317,11 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                           : () => onClick(doDirectUpload),
                       style: ButtonStyle(
                         padding:
-                            MaterialStateProperty.all(const EdgeInsets.all(8)),
+                            WidgetStateProperty.all(const EdgeInsets.all(8)),
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                          return states.contains(MaterialState.disabled)
+                            WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                          return states.contains(WidgetState.disabled)
                               ? null
                               : Colors.deepOrange;
                         }),
@@ -357,9 +357,9 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                               : () => onClick(deleteUploadedData),
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                                    (Set<MaterialState> states) {
-                              return states.contains(MaterialState.disabled)
+                                WidgetStateProperty.resolveWith<Color?>(
+                                    (Set<WidgetState> states) {
+                              return states.contains(WidgetState.disabled)
                                   ? null
                                   : Colors.red.shade600;
                             }),
@@ -421,7 +421,6 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                   data: await getFileBytes(data.dataTransmit.data),
                   progressCallback: data.dataTransmit.progressCallback)));
           break;
-        default:
       }
 
       List<CloudflareHTTPResponse<CloudflareImage?>> responses =
@@ -465,7 +464,6 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
                   data: await getFileBytes(data.dataTransmit.data),
                   progressCallback: data.dataTransmit.progressCallback)));
           break;
-        default:
       }
 
       for (final content in contents) {

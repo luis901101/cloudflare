@@ -11,8 +11,11 @@ part 'image_service.g.dart';
 @RestApi()
 abstract class ImageService {
   factory ImageService({required Dio dio, required String accountId}) {
-    return _ImageService(dio,
-        baseUrl: '${dio.options.baseUrl}/accounts/$accountId/images');
+    return _ImageService(
+      dio,
+      baseUrl: '${dio.options.baseUrl}/accounts/$accountId/images',
+      errorLogger: null,
+    );
   }
 
   @POST('/v1')

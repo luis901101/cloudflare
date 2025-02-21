@@ -3,7 +3,6 @@ import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
@@ -14,11 +13,9 @@ import 'package:retrofit/dio.dart';
 
 class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     CloudflareErrorResponse> {
-  ImageAPI({required RestAPI restAPI, required String accountId})
+  ImageAPI({required super.restAPI, required super.accountId})
       : super(
-            restAPI: restAPI,
             service: ImageService(dio: restAPI.dio, accountId: accountId),
-            accountId: accountId,
             dataType: CloudflareImage());
 
   /// An image up to 10 Megabytes can be upload.
@@ -485,7 +482,7 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
 
   /// Fetch base image. For most images this will be the originally uploaded
   /// file. For larger images it can be a near-lossless version of the original.
-  /// Note: the response is <image blob data>
+  /// Note: the response is [image blob data]
   ///
   /// Documentation: https://api.cloudflare.com/#cloudflare-images-base-image
   Future<CloudflareHTTPResponse<Uint8List?>> getBase({

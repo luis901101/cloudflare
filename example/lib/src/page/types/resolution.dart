@@ -27,9 +27,6 @@ extension ResolutionExtension on Resolution {
       case Resolution.RESOLUTION_1080:
         result = '1920x1080';
         break;
-      default:
-        result = '1280x720';
-        break;
     }
     return result;
   }

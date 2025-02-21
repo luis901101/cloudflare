@@ -1,16 +1,13 @@
 import 'package:cloudflare/cloudflare.dart';
-import 'package:cloudflare/src/base_api/rest_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/live_input_service.dart';
 import 'package:cloudflare/src/utils/params.dart';
 
 class LiveInputAPI extends RestAPIService<LiveInputService, CloudflareLiveInput,
     CloudflareErrorResponse> {
-  LiveInputAPI({required RestAPI restAPI, required String accountId})
+  LiveInputAPI({required super.restAPI, required super.accountId})
       : super(
-            restAPI: restAPI,
             service: LiveInputService(dio: restAPI.dio, accountId: accountId),
-            accountId: accountId,
             dataType: CloudflareLiveInput());
 
   /// Creates a live input that can be streamed to. Add an output in order to

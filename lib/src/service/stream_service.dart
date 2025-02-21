@@ -10,8 +10,11 @@ part 'stream_service.g.dart';
 @RestApi()
 abstract class StreamService {
   factory StreamService({required Dio dio, required String accountId}) {
-    return _StreamService(dio,
-        baseUrl: '${dio.options.baseUrl}/accounts/$accountId/stream');
+    return _StreamService(
+      dio,
+      baseUrl: '${dio.options.baseUrl}/accounts/$accountId/stream',
+      errorLogger: null,
+    );
   }
 
   @POST('/copy')

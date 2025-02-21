@@ -18,9 +18,6 @@ extension ChannelExtension on Channel {
       case Channel.stereo:
         result = 'stereo';
         break;
-      default:
-        result = 'stereo';
-        break;
     }
     return result;
   }
