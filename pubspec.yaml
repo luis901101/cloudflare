@@ -1,6 +1,6 @@
 name: cloudflare
 description: This is a dart package for Cloudflare API to allow easy Image, Stream and Live Input api management.
-version: 5.0.0
+version: 5.1.0
 homepage: https://github.com/luis901101/cloudflare
 
 environment:
@@ -8,19 +8,19 @@ environment:
 
 dependencies:
   json_annotation: ^4.9.0
-  retrofit: ^4.0.0
+  retrofit: ^4.6.0
   http: '>=0.13.4 <2.0.0'
-  dio: ^5.0.0
+  dio: ^5.8.0+1
   cross_file: ^0.3.4+2
-  path: ^1.0.0
-  tusc: ^2.0.0
+  path: ^1.9.1
+  tusc: ^2.1.0
 #    path: ../tusc
   meta: ^1.0.0
   copy_with_extension: ^6.0.1
 
 dev_dependencies:
-  lints: ^5.1.1
-  test: ^1.25.15
+  lints: ^6.0.0
+  test: ^1.26.3
   json_serializable: ^6.9.4
   retrofit_generator: ^9.1.9
   copy_with_extension_gen: ^6.0.1

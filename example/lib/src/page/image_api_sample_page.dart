@@ -10,10 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageAPIDemoPage extends StatefulWidget {
-  const ImageAPIDemoPage({Key? key}) : super(key: key);
+  const ImageAPIDemoPage({super.key});
 
   @override
-  _ImageAPIDemoPageState createState() => _ImageAPIDemoPageState();
+  State createState() => _ImageAPIDemoPageState();
 }
 
 enum FileSource {
@@ -119,7 +119,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
           'Variants',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        ...image.variants.map((url) => imageView(url)).toList()
+        ...image.variants.map((url) => imageView(url))
       ],
     );
   }
@@ -599,7 +599,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
     if (resource.isEmpty) return [];
     switch (resource['status']) {
       case 'SUCCESS':
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
         return resource['data'];
       default:
         PickerUtils.showPermissionExplanation(

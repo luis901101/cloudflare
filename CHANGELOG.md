@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 5.1.0
+### Changed
+- Updated dependencies to latest versions.
+
 ## 5.0.0
 ### Changed
 - Changed hive dependency to hive_ce.

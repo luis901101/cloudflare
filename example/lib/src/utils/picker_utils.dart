@@ -107,7 +107,7 @@ class PickerUtils {
           multiple: false,
           pickImage: pickImage);
 
-  static showPermissionExplanation(
+  static void showPermissionExplanation(
       {required BuildContext context, String? message}) {
     showDialog(
         context: context,

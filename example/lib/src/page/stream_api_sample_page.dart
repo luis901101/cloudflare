@@ -13,10 +13,10 @@ import 'package:tusc/tusc.dart';
 import 'package:video_player/video_player.dart';
 
 class StreamAPIDemoPage extends StatefulWidget {
-  const StreamAPIDemoPage({Key? key}) : super(key: key);
+  const StreamAPIDemoPage({super.key});
 
   @override
-  _StreamAPIDemoPageState createState() => _StreamAPIDemoPageState();
+  State createState() => _StreamAPIDemoPageState();
 }
 
 enum FileSource {
@@ -840,7 +840,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
     if (resource.isEmpty) return [];
     switch (resource['status']) {
       case 'SUCCESS':
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
         return resource['data'];
       default:
         PickerUtils.showPermissionExplanation(

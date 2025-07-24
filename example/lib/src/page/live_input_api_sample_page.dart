@@ -21,11 +21,11 @@ import 'package:video_player/video_player.dart';
 T? _ambiguate<T>(T? value) => value;
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key, required this.params}) : super(key: key);
+  const SettingsScreen({super.key, required this.params});
   final Params params;
 
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  State createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
@@ -260,11 +260,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 class PickerScreen extends StatelessWidget {
   const PickerScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.initialValue,
     required this.values,
-  }) : super(key: key);
+  });
 
   final String title;
   final dynamic initialValue;
@@ -297,11 +297,10 @@ class PickerScreen extends StatelessWidget {
 
 class EditTextScreen extends StatelessWidget {
   const EditTextScreen(
-      {Key? key,
+      {super.key,
       required this.title,
       required this.initialValue,
-      required this.onChanged})
-      : super(key: key);
+      required this.onChanged});
 
   final String title;
   final String initialValue;
@@ -327,10 +326,10 @@ class EditTextScreen extends StatelessWidget {
 }
 
 class LiveInputAPIDemoPage extends StatefulWidget {
-  const LiveInputAPIDemoPage({Key? key}) : super(key: key);
+  const LiveInputAPIDemoPage({super.key});
 
   @override
-  _LiveInputAPIDemoPageState createState() => _LiveInputAPIDemoPageState();
+  State createState() => _LiveInputAPIDemoPageState();
 }
 
 enum FileSource {
@@ -653,11 +652,10 @@ class _LiveInputAPIDemoPageState extends State<LiveInputAPIDemoPage> {
 
 class LiveStreamingView extends StatefulWidget {
   final CloudflareLiveInput cloudflareLiveInput;
-  const LiveStreamingView({Key? key, required this.cloudflareLiveInput})
-      : super(key: key);
+  const LiveStreamingView({super.key, required this.cloudflareLiveInput});
 
   @override
-  _LiveStreamingViewState createState() => _LiveStreamingViewState();
+  State createState() => _LiveStreamingViewState();
 }
 
 class _LiveStreamingViewState extends State<LiveStreamingView>
@@ -753,7 +751,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _controlRowWidget() {
-    final LiveStreamController? liveStreamController = _controller;
+    final LiveStreamController liveStreamController = _controller;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -762,31 +760,26 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
         IconButton(
           icon: const Icon(Icons.cameraswitch),
           color: Colors.deepOrange,
-          onPressed:
-              liveStreamController != null ? onSwitchCameraButtonPressed : null,
+          onPressed: onSwitchCameraButtonPressed,
         ),
         IconButton(
           icon: const Icon(Icons.mic_off),
           color: Colors.deepOrange,
-          onPressed: liveStreamController != null
-              ? onToggleMicrophoneButtonPressed
-              : null,
+          onPressed: onToggleMicrophoneButtonPressed,
         ),
         IconButton(
           icon: const Icon(Icons.fiber_manual_record),
           color: Colors.red,
-          onPressed:
-              liveStreamController != null && !liveStreamController.isStreaming
-                  ? onStartStreamingButtonPressed
-                  : null,
+          onPressed: !liveStreamController.isStreaming
+              ? onStartStreamingButtonPressed
+              : null,
         ),
         IconButton(
           icon: const Icon(Icons.stop),
           color: Colors.red,
-          onPressed:
-              liveStreamController != null && liveStreamController.isStreaming
-                  ? onStopStreamingButtonPressed
-                  : null,
+          onPressed: liveStreamController.isStreaming
+              ? onStopStreamingButtonPressed
+              : null,
         ),
         IconButton(
           icon: const Icon(Icons.menu),
@@ -806,12 +799,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> switchCamera() async {
-    final LiveStreamController? liveStreamController = _controller;
-
-    if (liveStreamController == null) {
-      showInSnackBar('Error: create a camera controller first.');
-      return;
-    }
+    final LiveStreamController liveStreamController = _controller;
 
     try {
       liveStreamController.switchCamera();
@@ -826,12 +814,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> toggleMicrophone() async {
-    final LiveStreamController? liveStreamController = _controller;
-
-    if (liveStreamController == null) {
-      showInSnackBar('Error: create a camera controller first.');
-      return;
-    }
+    final LiveStreamController liveStreamController = _controller;
 
     try {
       liveStreamController.toggleMute();
@@ -846,12 +829,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> startStreaming() async {
-    final LiveStreamController? liveStreamController = _controller;
-
-    if (liveStreamController == null) {
-      showInSnackBar('Error: create a camera controller first.');
-      return;
-    }
+    final LiveStreamController liveStreamController = _controller;
 
     try {
       await liveStreamController.startStreaming(
@@ -866,12 +844,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> stopStreaming() async {
-    final LiveStreamController? liveStreamController = _controller;
-
-    if (liveStreamController == null) {
-      showInSnackBar('Error: create a camera controller first.');
-      return;
-    }
+    final LiveStreamController liveStreamController = _controller;
 
     try {
       liveStreamController.stopStreaming();
