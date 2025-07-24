@@ -8,7 +8,7 @@ format:
 fix:
 	dart fix --apply
 
-checkPublish:
+check-publish:
 	dart pub publish --dry-run
 
 publish:
