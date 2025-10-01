@@ -43,26 +43,28 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   Widget get uploadSourceView => Column(
         children: [
           const Text('File source'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 150,
-                child: RadioListTile<FileSource>(
+          RadioGroup(
+            groupValue: fileSource,
+            onChanged: onUploadSourceChanged,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: RadioListTile<FileSource>(
                     title: const Text('Path'),
                     value: FileSource.path,
-                    groupValue: fileSource,
-                    onChanged: onUploadSourceChanged),
-              ),
-              SizedBox(
-                width: 150,
-                child: RadioListTile<FileSource>(
+                  ),
+                ),
+                SizedBox(
+                  width: 150,
+                  child: RadioListTile<FileSource>(
                     title: const Text('Bytes'),
                     value: FileSource.bytes,
-                    groupValue: fileSource,
-                    onChanged: onUploadSourceChanged),
-              ),
-            ],
+                  ),
+                ),
+              ],
+            ),
           )
         ],
       );

@@ -9,7 +9,8 @@ class TusAPI {
 
   static String? generateMetadata(Map<String, dynamic>? map) {
     map?.removeWhere(
-        (key, value) => value == null || (value is List && value.isEmpty));
+      (key, value) => value == null || (value is List && value.isEmpty),
+    );
     if (map?.isEmpty ?? true) return null;
     return map?.parseToMetadata;
   }
@@ -72,12 +73,13 @@ class TusAPI {
           if (streamMediaId.isNotEmpty) {
             _dataUploadDraft = _dataUploadDraft.copyWith(id: streamMediaId);
           }
-          final cloudflareStreamVideo = (_dataUploadDraft.id.isEmpty
-                  ? CloudflareStreamVideo.fromUrl(_dataUploadDraft.uploadURL)
-                  : CloudflareStreamVideo(
-                      id: _dataUploadDraft.id,
-                    ))
-              ?.copyWith(readyToStream: true);
+          final cloudflareStreamVideo =
+              (_dataUploadDraft.id.isEmpty
+                      ? CloudflareStreamVideo.fromUrl(
+                          _dataUploadDraft.uploadURL,
+                        )
+                      : CloudflareStreamVideo(id: _dataUploadDraft.id))
+                  ?.copyWith(readyToStream: true);
           onComplete(cloudflareStreamVideo);
         }
       },

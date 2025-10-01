@@ -14,13 +14,14 @@ class RestAPI {
   String apiUrl = '';
   Map<String, dynamic>? headers;
 
-  void init(
-      {String? apiUrl,
-      Duration? connectTimeout,
-      Duration? receiveTimeout,
-      Duration? sendTimeout,
-      HttpClient? httpClient,
-      Map<String, dynamic>? headers}) {
+  void init({
+    String? apiUrl,
+    Duration? connectTimeout,
+    Duration? receiveTimeout,
+    Duration? sendTimeout,
+    HttpClient? httpClient,
+    Map<String, dynamic>? headers,
+  }) {
     if ((apiUrl?.isNotEmpty ?? true)) this.apiUrl = apiUrl!;
     if (connectTimeout != null) this.connectTimeout = connectTimeout;
     if (receiveTimeout != null) this.receiveTimeout = receiveTimeout;
@@ -35,28 +36,33 @@ class RestAPI {
   void _initDio() {
     dispose();
 
-    dio = Dio(BaseOptions(
-      baseUrl: apiUrl,
-      connectTimeout: connectTimeout,
-      receiveTimeout: receiveTimeout,
-      sendTimeout: sendTimeout,
-      // headers: RestAPIService.contentTypeJson,
-      contentType: Headers.jsonContentType,
-    ));
+    dio = Dio(
+      BaseOptions(
+        baseUrl: apiUrl,
+        connectTimeout: connectTimeout,
+        receiveTimeout: receiveTimeout,
+        sendTimeout: sendTimeout,
+        // headers: RestAPIService.contentTypeJson,
+        contentType: Headers.jsonContentType,
+      ),
+    );
 
     // Adding auth token to each request
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (options, handler) async {
-      if (headers != null) {
-        options.headers.addAll(headers!);
-      }
-      return handler.next(options);
-    }));
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          if (headers != null) {
+            options.headers.addAll(headers!);
+          }
+          return handler.next(options);
+        },
+      ),
+    );
 
     // Adding custom httpClient
     if (httpClient != null) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
-          () => httpClient!;
+      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () =>
+          httpClient!;
     }
   }
 

@@ -11,12 +11,14 @@ import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/dio.dart';
 
-class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
-    CloudflareErrorResponse> {
+class ImageAPI
+    extends
+        RestAPIService<ImageService, CloudflareImage, CloudflareErrorResponse> {
   ImageAPI({required super.restAPI, required super.accountId})
-      : super(
-            service: ImageService(dio: restAPI.dio, accountId: accountId),
-            dataType: CloudflareImage());
+    : super(
+        service: ImageService(dio: restAPI.dio, accountId: accountId),
+        dataType: CloudflareImage(),
+      );
 
   /// An image up to 10 Megabytes can be upload.
   ///
@@ -54,82 +56,97 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        contentFromFile != null ||
-            contentFromPath != null ||
-            contentFromBytes != null ||
-            contentFromUrl != null,
-        'One of the content must be specified.');
+      contentFromFile != null ||
+          contentFromPath != null ||
+          contentFromBytes != null ||
+          contentFromUrl != null,
+      'One of the content must be specified.',
+    );
 
     final CloudflareHTTPResponse<CloudflareImage?> response;
 
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
+        data: File(contentFromPath.data),
+        progressCallback: contentFromPath.progressCallback,
+      );
     }
 
     /// Web support
     if (contentFromFile != null && PlatformUtils.isWeb) {
       contentFromBytes ??= DataTransmit<Uint8List>(
-          data: contentFromFile.data.readAsBytesSync(),
-          progressCallback: contentFromFile.progressCallback);
+        data: contentFromFile.data.readAsBytesSync(),
+        progressCallback: contentFromFile.progressCallback,
+      );
       contentFromFile = null;
     }
 
     if (contentFromFile != null) {
       response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(service.uploadFromFile(
-              file: contentFromFile.data,
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromFile.progressCallback,
-              cancelToken: contentFromFile.cancelToken,
-            ))
-          : parseResponse(uploadGeneric(
-              multipartFile: MultipartFile.fromFileSync(
-                contentFromFile.data.path,
-                filename: fileName,
+          ? parseResponse(
+              service.uploadFromFile(
+                file: contentFromFile.data,
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromFile.progressCallback,
+                cancelToken: contentFromFile.cancelToken,
               ),
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromFile.progressCallback,
-              cancelToken: contentFromFile.cancelToken,
-            )));
+            )
+          : parseResponse(
+              uploadGeneric(
+                multipartFile: MultipartFile.fromFileSync(
+                  contentFromFile.data.path,
+                  filename: fileName,
+                ),
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromFile.progressCallback,
+                cancelToken: contentFromFile.cancelToken,
+              ),
+            ));
     } else if (contentFromBytes != null) {
       response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(service.uploadFromBytes(
-              bytes: contentFromBytes.data,
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromBytes.progressCallback,
-              cancelToken: contentFromBytes.cancelToken,
-            ))
-          : parseResponse(uploadGeneric(
-              multipartFile: MultipartFile.fromBytes(
-                contentFromBytes.data,
-                filename: fileName,
+          ? parseResponse(
+              service.uploadFromBytes(
+                bytes: contentFromBytes.data,
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromBytes.progressCallback,
+                cancelToken: contentFromBytes.cancelToken,
               ),
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromBytes.progressCallback,
-              cancelToken: contentFromBytes.cancelToken,
-            )));
+            )
+          : parseResponse(
+              uploadGeneric(
+                multipartFile: MultipartFile.fromBytes(
+                  contentFromBytes.data,
+                  filename: fileName,
+                ),
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromBytes.progressCallback,
+                cancelToken: contentFromBytes.cancelToken,
+              ),
+            ));
     } else {
       response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(service.uploadFromUrl(
-              url: contentFromUrl!.data,
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromUrl.progressCallback,
-              cancelToken: contentFromUrl.cancelToken,
-            ))
-          : parseResponse(uploadGeneric(
-              url: contentFromUrl!.data,
-              requireSignedURLs: requireSignedURLs,
-              metadata: metadata,
-              onUploadProgress: contentFromUrl.progressCallback,
-              cancelToken: contentFromUrl.cancelToken,
-            )));
+          ? parseResponse(
+              service.uploadFromUrl(
+                url: contentFromUrl!.data,
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromUrl.progressCallback,
+                cancelToken: contentFromUrl.cancelToken,
+              ),
+            )
+          : parseResponse(
+              uploadGeneric(
+                url: contentFromUrl!.data,
+                requireSignedURLs: requireSignedURLs,
+                metadata: metadata,
+                onUploadProgress: contentFromUrl.progressCallback,
+                cancelToken: contentFromUrl.cancelToken,
+              ),
+            ));
     }
 
     return response;
@@ -165,34 +182,25 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     final headers = <String, dynamic>{};
     final data = FormData();
     if (multipartFile != null) {
-      data.files.add(MapEntry(
-        'file',
-        multipartFile,
-      ));
+      data.files.add(MapEntry('file', multipartFile));
     }
     if (url != null) {
-      data.fields.add(MapEntry(
-        'url',
-        url,
-      ));
+      data.fields.add(MapEntry('url', url));
     }
     if (requireSignedURLs != null) {
-      data.fields.add(MapEntry(
-        'requireSignedURLs',
-        requireSignedURLs.toString(),
-      ));
+      data.fields.add(
+        MapEntry('requireSignedURLs', requireSignedURLs.toString()),
+      );
     }
-    data.fields.add(MapEntry(
-      'metadata',
-      jsonEncode(metadata),
-    ));
+    data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
     final result = await dio.fetch<Map<String, dynamic>?>(
-        setStreamType<HttpResponse<CloudflareResponse>>(Options(
-      method: 'POST',
-      headers: headers,
-      extra: extra,
-      contentType: 'multipart/form-data',
-    )
+      setStreamType<HttpResponse<CloudflareResponse>>(
+        Options(
+              method: 'POST',
+              headers: headers,
+              extra: extra,
+              contentType: 'multipart/form-data',
+            )
             .compose(
               dio.options,
               '/v1',
@@ -201,9 +209,12 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl)));
-    final value =
-        result.data == null ? null : CloudflareResponse.fromJson(result.data!);
+            .copyWith(baseUrl: baseUrl),
+      ),
+    );
+    final value = result.data == null
+        ? null
+        : CloudflareResponse.fromJson(result.data!);
     final httpResponse = HttpResponse(value, result);
     return httpResponse;
   }
@@ -230,10 +241,11 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     String? fileName,
   }) async {
     assert(
-        contentFromFile != null ||
-            contentFromPath != null ||
-            contentFromBytes != null,
-        'One of the content must be specified.');
+      contentFromFile != null ||
+          contentFromPath != null ||
+          contentFromBytes != null,
+      'One of the content must be specified.',
+    );
 
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
@@ -261,36 +273,41 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
       cancelToken = contentFromFile.cancelToken;
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
-      formData.files.add(MapEntry(
+      formData.files.add(
+        MapEntry(
           Params.file,
-          MultipartFile.fromFileSync(file.path,
-              filename:
-                  fileName ?? file.path.split(Platform.pathSeparator).last)));
+          MultipartFile.fromFileSync(
+            file.path,
+            filename: fileName ?? file.path.split(Platform.pathSeparator).last,
+          ),
+        ),
+      );
     } else {
       cancelToken = contentFromBytes!.cancelToken;
       final bytes = contentFromBytes.data;
       progressCallback = contentFromBytes.progressCallback;
-      formData.files.add(MapEntry(
+      formData.files.add(
+        MapEntry(
           Params.file,
-          MultipartFile.fromBytes(
-            bytes,
-            filename: fileName,
-          )));
+          MultipartFile.fromBytes(bytes, filename: fileName),
+        ),
+      );
     }
 
-    final rawResponse = await dio.fetch<Map<String, dynamic>?>(Options(
-      method: 'POST',
-      // headers: _headers,
-      responseType: ResponseType.json,
-      contentType: 'multipart/form-data',
-    ).compose(
-        BaseOptions(
-          baseUrl: dataUploadDraft.uploadURL,
-        ),
+    final rawResponse = await dio.fetch<Map<String, dynamic>?>(
+      Options(
+        method: 'POST',
+        // headers: _headers,
+        responseType: ResponseType.json,
+        contentType: 'multipart/form-data',
+      ).compose(
+        BaseOptions(baseUrl: dataUploadDraft.uploadURL),
         '',
         data: formData,
         onSendProgress: progressCallback,
-        cancelToken: cancelToken));
+        cancelToken: cancelToken,
+      ),
+    );
     final value = rawResponse.data == null
         ? null
         : CloudflareResponse.fromJson(rawResponse.data!);
@@ -326,20 +343,24 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        (contentFromFiles?.isNotEmpty ?? false) ||
-            (contentFromPaths?.isNotEmpty ?? false) ||
-            (contentFromBytes?.isNotEmpty ?? false) ||
-            (contentFromUrls?.isNotEmpty ?? false),
-        'One of the contents must be specified.');
+      (contentFromFiles?.isNotEmpty ?? false) ||
+          (contentFromPaths?.isNotEmpty ?? false) ||
+          (contentFromBytes?.isNotEmpty ?? false) ||
+          (contentFromUrls?.isNotEmpty ?? false),
+      'One of the contents must be specified.',
+    );
 
     List<CloudflareHTTPResponse<CloudflareImage?>> responses = [];
 
     if (contentFromPaths?.isNotEmpty ?? false) {
       contentFromFiles = [];
       for (final content in contentFromPaths!) {
-        contentFromFiles.add(DataTransmit<File>(
+        contentFromFiles.add(
+          DataTransmit<File>(
             data: File(content.data),
-            progressCallback: content.progressCallback));
+            progressCallback: content.progressCallback,
+          ),
+        );
       }
     }
     if (contentFromFiles?.isNotEmpty ?? false) {
@@ -383,12 +404,15 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     required CloudflareImage image,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    final response = await parseResponse(service.update(
-      id: image.id,
-      requireSignedURLs: image.requireSignedURLs,
-      metadata: image.meta?.map(
-          (key, value) => MapEntry<String, dynamic>(key.toString(), value)),
-    ));
+    final response = await parseResponse(
+      service.update(
+        id: image.id,
+        requireSignedURLs: image.requireSignedURLs,
+        metadata: image.meta?.map(
+          (key, value) => MapEntry<String, dynamic>(key.toString(), value),
+        ),
+      ),
+    );
 
     return response;
   }
@@ -454,8 +478,9 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     int? size,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    final response =
-        await parseResponseAsList(service.getAll(page: page, size: size));
+    final response = await parseResponseAsList(
+      service.getAll(page: page, size: size),
+    );
 
     return response;
   }
@@ -472,11 +497,11 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        id != null || image != null, 'One of id or image must not be empty.');
+      id != null || image != null,
+      'One of id or image must not be empty.',
+    );
     id ??= image?.id;
-    final response = await parseResponse(service.get(
-      id: id!,
-    ));
+    final response = await parseResponse(service.get(id: id!));
     return response;
   }
 
@@ -494,13 +519,14 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        id != null || image != null, 'One of id or image must not be empty.');
+      id != null || image != null,
+      'One of id or image must not be empty.',
+    );
     id ??= image?.id;
     final response = await genericParseResponse<Uint8List>(
-        service.getBase(
-          id: id!,
-        ),
-        parseCloudflareResponse: false);
+      service.getBase(id: id!),
+      parseCloudflareResponse: false,
+    );
 
     return response;
   }
@@ -520,10 +546,9 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     assert(id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
     final response = await getSaveResponse(
-        service.delete(
-          id: id!,
-        ),
-        parseCloudflareResponse: false);
+      service.delete(id: id!),
+      parseCloudflareResponse: false,
+    );
     return response;
   }
 
@@ -537,16 +562,16 @@ class ImageAPI extends RestAPIService<ImageService, CloudflareImage,
     List<CloudflareImage>? images,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert((ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
-        'One of ids or images must not be empty.');
+    assert(
+      (ids?.isNotEmpty ?? false) || (images?.isNotEmpty ?? false),
+      'One of ids or images must not be empty.',
+    );
 
     ids ??= images?.map((image) => image.id).toList();
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(
-        id: id,
-      );
+      final response = await delete(id: id);
       responses.add(response);
     }
     return responses;

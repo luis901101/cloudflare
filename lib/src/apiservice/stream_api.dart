@@ -12,15 +12,21 @@ import 'package:cross_file/cross_file.dart' show XFile;
 import 'package:dio/dio.dart';
 import 'package:retrofit/dio.dart';
 
-class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
-    CloudflareErrorResponse> {
+class StreamAPI
+    extends
+        RestAPIService<
+          StreamService,
+          CloudflareStreamVideo,
+          CloudflareErrorResponse
+        > {
   final String tusUploadUrl;
   StreamAPI({required super.restAPI, required super.accountId})
-      : tusUploadUrl =
-            'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
-        super(
-            service: StreamService(dio: restAPI.dio, accountId: accountId),
-            dataType: CloudflareStreamVideo());
+    : tusUploadUrl =
+          'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
+      super(
+        service: StreamService(dio: restAPI.dio, accountId: accountId),
+        dataType: CloudflareStreamVideo(),
+      );
 
   /// A video up to 200 MegaBytes can be uploaded using a single
   /// HTTP POST (multipart/form-data) request.
@@ -92,71 +98,87 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        contentFromFile != null ||
-            contentFromPath != null ||
-            contentFromBytes != null ||
-            contentFromUrl != null,
-        'One of the content must be specified.');
+      contentFromFile != null ||
+          contentFromPath != null ||
+          contentFromBytes != null ||
+          contentFromUrl != null,
+      'One of the content must be specified.',
+    );
 
     final CloudflareHTTPResponse<CloudflareStreamVideo?> response;
 
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
-          data: File(contentFromPath.data),
-          progressCallback: contentFromPath.progressCallback);
+        data: File(contentFromPath.data),
+        progressCallback: contentFromPath.progressCallback,
+      );
     }
 
     /// Web support
     if (contentFromFile != null && PlatformUtils.isWeb) {
       contentFromBytes ??= DataTransmit<Uint8List>(
-          data: contentFromFile.data.readAsBytesSync(),
-          progressCallback: contentFromFile.progressCallback);
+        data: contentFromFile.data.readAsBytesSync(),
+        progressCallback: contentFromFile.progressCallback,
+      );
       contentFromFile = null;
     }
 
     if (contentFromFile != null) {
       response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(service.streamFromFile(
-              file: contentFromFile.data,
-              onUploadProgress: contentFromFile.progressCallback,
-              cancelToken: contentFromFile.cancelToken,
-            ))
-          : parseResponse(streamGeneric(
-              multipartFile: MultipartFile.fromFileSync(
-                contentFromFile.data.path,
-                filename: fileName,
+          ? parseResponse(
+              service.streamFromFile(
+                file: contentFromFile.data,
+                onUploadProgress: contentFromFile.progressCallback,
+                cancelToken: contentFromFile.cancelToken,
               ),
-              onUploadProgress: contentFromFile.progressCallback,
-              cancelToken: contentFromFile.cancelToken,
-            )));
+            )
+          : parseResponse(
+              streamGeneric(
+                multipartFile: MultipartFile.fromFileSync(
+                  contentFromFile.data.path,
+                  filename: fileName,
+                ),
+                onUploadProgress: contentFromFile.progressCallback,
+                cancelToken: contentFromFile.cancelToken,
+              ),
+            ));
     } else if (contentFromBytes != null) {
       response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(service.streamFromBytes(
-              bytes: contentFromBytes.data,
-              onUploadProgress: contentFromBytes.progressCallback,
-              cancelToken: contentFromBytes.cancelToken,
-            ))
-          : parseResponse(streamGeneric(
-              multipartFile: MultipartFile.fromBytes(
-                contentFromBytes.data,
-                filename: fileName,
+          ? parseResponse(
+              service.streamFromBytes(
+                bytes: contentFromBytes.data,
+                onUploadProgress: contentFromBytes.progressCallback,
+                cancelToken: contentFromBytes.cancelToken,
               ),
-              onUploadProgress: contentFromBytes.progressCallback,
-              cancelToken: contentFromBytes.cancelToken,
-            )));
+            )
+          : parseResponse(
+              streamGeneric(
+                multipartFile: MultipartFile.fromBytes(
+                  contentFromBytes.data,
+                  filename: fileName,
+                ),
+                onUploadProgress: contentFromBytes.progressCallback,
+                cancelToken: contentFromBytes.cancelToken,
+              ),
+            ));
     } else {
-      response = await parseResponse(service.streamFromUrl(
-        data: {
-          Params.url: contentFromUrl!.data,
-          Params.thumbnailTimestampPct: thumbnailTimestampPct,
-          Params.allowedOrigins: allowedOrigins,
-          Params.requireSignedURLs: requireSignedURLs,
-          Params.watermark: watermark?.toJson(),
-        }..removeWhere(
-            (key, value) => value == null || (value is List && value.isEmpty)),
-        onUploadProgress: contentFromUrl.progressCallback,
-        cancelToken: contentFromUrl.cancelToken,
-      ));
+      response = await parseResponse(
+        service.streamFromUrl(
+          data:
+              {
+                Params.url: contentFromUrl!.data,
+                Params.thumbnailTimestampPct: thumbnailTimestampPct,
+                Params.allowedOrigins: allowedOrigins,
+                Params.requireSignedURLs: requireSignedURLs,
+                Params.watermark: watermark?.toJson(),
+              }..removeWhere(
+                (key, value) =>
+                    value == null || (value is List && value.isEmpty),
+              ),
+          onUploadProgress: contentFromUrl.progressCallback,
+          cancelToken: contentFromUrl.cancelToken,
+        ),
+      );
     }
     return response;
   }
@@ -189,24 +211,19 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     final headers = <String, dynamic>{};
     final data = FormData();
     if (multipartFile != null) {
-      data.files.add(MapEntry(
-        'file',
-        multipartFile,
-      ));
+      data.files.add(MapEntry('file', multipartFile));
     }
     if (url != null) {
-      data.fields.add(MapEntry(
-        'url',
-        url,
-      ));
+      data.fields.add(MapEntry('url', url));
     }
     final result = await dio.fetch<Map<String, dynamic>?>(
-        setStreamType<HttpResponse<CloudflareResponse>>(Options(
-      method: 'POST',
-      headers: headers,
-      extra: extra,
-      contentType: 'multipart/form-data',
-    )
+      setStreamType<HttpResponse<CloudflareResponse>>(
+        Options(
+              method: 'POST',
+              headers: headers,
+              extra: extra,
+              contentType: 'multipart/form-data',
+            )
             .compose(
               dio.options,
               '',
@@ -215,9 +232,12 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
               cancelToken: cancelToken,
               onSendProgress: onUploadProgress,
             )
-            .copyWith(baseUrl: baseUrl)));
-    final value =
-        result.data == null ? null : CloudflareResponse.fromJson(result.data!);
+            .copyWith(baseUrl: baseUrl),
+      ),
+    );
+    final value = result.data == null
+        ? null
+        : CloudflareResponse.fromJson(result.data!);
     final httpResponse = HttpResponse(value, result);
     return httpResponse;
   }
@@ -299,8 +319,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     Duration? timeout,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(file != null || path != null || bytes != null,
-        'One of the content must be specified.');
+    assert(
+      file != null || path != null || bytes != null,
+      'One of the content must be specified.',
+    );
 
     if (path != null) file ??= File(path);
 
@@ -317,19 +339,20 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       xFile = XFile.fromData(bytes!);
     }
     final tusAPI = TusAPI(
-        dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
-        file: xFile,
-        cache: cache,
-        chunkSize: chunkSize,
-        headers: restAPI.headers,
-        metadata: {
-          Params.name: name,
-          Params.thumbnailTimestampPct: thumbnailTimestampPct,
-          Params.allowedOrigins: allowedOrigins,
-          Params.requireSignedURLs: requireSignedURLs,
-          Params.watermark: watermark?.id,
-        },
-        timeout: timeout ?? restAPI.sendTimeout);
+      dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
+      file: xFile,
+      cache: cache,
+      chunkSize: chunkSize,
+      headers: restAPI.headers,
+      metadata: {
+        Params.name: name,
+        Params.thumbnailTimestampPct: thumbnailTimestampPct,
+        Params.allowedOrigins: allowedOrigins,
+        Params.requireSignedURLs: requireSignedURLs,
+        Params.watermark: watermark?.id,
+      },
+      timeout: timeout ?? restAPI.sendTimeout,
+    );
     return tusAPI;
   }
 
@@ -359,10 +382,11 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     String? fileName,
   }) async {
     assert(
-        contentFromFile != null ||
-            contentFromPath != null ||
-            contentFromBytes != null,
-        'One of the content must be specified.');
+      contentFromFile != null ||
+          contentFromPath != null ||
+          contentFromBytes != null,
+      'One of the content must be specified.',
+    );
 
     if (contentFromPath != null) {
       contentFromFile ??= DataTransmit<File>(
@@ -390,45 +414,57 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
       cancelToken = contentFromFile.cancelToken;
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
-      formData.files.add(MapEntry(
+      formData.files.add(
+        MapEntry(
           Params.file,
-          MultipartFile.fromFileSync(file.path,
-              filename:
-                  fileName ?? file.path.split(Platform.pathSeparator).last)));
+          MultipartFile.fromFileSync(
+            file.path,
+            filename: fileName ?? file.path.split(Platform.pathSeparator).last,
+          ),
+        ),
+      );
     } else {
       cancelToken = contentFromBytes!.cancelToken;
       final bytes = contentFromBytes.data;
       progressCallback = contentFromBytes.progressCallback;
-      formData.files.add(MapEntry(
+      formData.files.add(
+        MapEntry(
           Params.file,
-          MultipartFile.fromBytes(
-            bytes,
-            filename: fileName,
-          )));
+          MultipartFile.fromBytes(bytes, filename: fileName),
+        ),
+      );
     }
 
-    final rawResponse = await dio.fetch(Options(
-      method: 'POST',
-      // headers: _headers,
-      // responseType: ResponseType.plain,
-      contentType: 'multipart/form-data',
-    ).compose(BaseOptions(baseUrl: dataUploadDraft.uploadURL), '',
+    final rawResponse = await dio.fetch(
+      Options(
+        method: 'POST',
+        // headers: _headers,
+        // responseType: ResponseType.plain,
+        contentType: 'multipart/form-data',
+      ).compose(
+        BaseOptions(baseUrl: dataUploadDraft.uploadURL),
+        '',
         data: formData,
         onSendProgress: progressCallback,
-        cancelToken: cancelToken));
+        cancelToken: cancelToken,
+      ),
+    );
     final rawHttpResponse = HttpResponse(rawResponse.data, rawResponse);
     final rawCloudflareResponse = await getSaveResponse(
-        Future.value(rawHttpResponse),
-        parseCloudflareResponse: false);
+      Future.value(rawHttpResponse),
+      parseCloudflareResponse: false,
+    );
 
     return CloudflareHTTPResponse<CloudflareStreamVideo?>(
-        rawCloudflareResponse.base,
-        CloudflareStreamVideo(
-            id: dataUploadDraft.id,
-            readyToStream: true,
-            watermark: dataUploadDraft.watermark),
-        error: rawCloudflareResponse.error,
-        extraData: rawCloudflareResponse.extraData);
+      rawCloudflareResponse.base,
+      CloudflareStreamVideo(
+        id: dataUploadDraft.id,
+        readyToStream: true,
+        watermark: dataUploadDraft.watermark,
+      ),
+      error: rawCloudflareResponse.error,
+      extraData: rawCloudflareResponse.extraData,
+    );
   }
 
   /// For larger than 200 MegaBytes video direct stream upload using
@@ -507,8 +543,10 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     /// Defaults to Cloudflare timeout
     Duration? timeout,
   }) async {
-    assert(file != null || path != null || bytes != null,
-        'One of the content must be specified.');
+    assert(
+      file != null || path != null || bytes != null,
+      'One of the content must be specified.',
+    );
 
     if (path != null) file ??= File(path);
 
@@ -601,34 +639,34 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        (contentFromFiles?.isNotEmpty ?? false) ||
-            (contentFromPaths?.isNotEmpty ?? false) ||
-            (contentFromBytes?.isNotEmpty ?? false) ||
-            (contentFromUrls?.isNotEmpty ?? false),
-        'One of the contents must be specified.');
+      (contentFromFiles?.isNotEmpty ?? false) ||
+          (contentFromPaths?.isNotEmpty ?? false) ||
+          (contentFromBytes?.isNotEmpty ?? false) ||
+          (contentFromUrls?.isNotEmpty ?? false),
+      'One of the contents must be specified.',
+    );
 
     List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responses = [];
 
     if (contentFromPaths?.isNotEmpty ?? false) {
       contentFromFiles = [];
       for (final content in contentFromPaths!) {
-        contentFromFiles.add(DataTransmit<File>(
+        contentFromFiles.add(
+          DataTransmit<File>(
             data: File(content.data),
-            progressCallback: content.progressCallback));
+            progressCallback: content.progressCallback,
+          ),
+        );
       }
     }
     if (contentFromFiles?.isNotEmpty ?? false) {
       for (final content in contentFromFiles!) {
-        final response = await stream(
-          contentFromFile: content,
-        );
+        final response = await stream(contentFromFile: content);
         responses.add(response);
       }
     } else if (contentFromBytes?.isNotEmpty ?? false) {
       for (final content in contentFromBytes!) {
-        final response = await stream(
-          contentFromBytes: content,
-        );
+        final response = await stream(contentFromBytes: content);
         responses.add(response);
       }
     } else {
@@ -714,16 +752,18 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
       service.createDirectUpload(
-        data: {
-          Params.maxDurationSeconds: maxDurationSeconds,
-          Params.creator: creator,
-          Params.thumbnailTimestampPct: thumbnailTimestampPct,
-          Params.allowedOrigins: allowedOrigins,
-          Params.requireSignedURLs: requireSignedURLs,
-          Params.watermark: watermark?.toJson(),
-          Params.expiry: expiry?.toJson(),
-        }..removeWhere(
-            (key, value) => value == null || (value is List && value.isEmpty)),
+        data:
+            {
+              Params.maxDurationSeconds: maxDurationSeconds,
+              Params.creator: creator,
+              Params.thumbnailTimestampPct: thumbnailTimestampPct,
+              Params.allowedOrigins: allowedOrigins,
+              Params.requireSignedURLs: requireSignedURLs,
+              Params.watermark: watermark?.toJson(),
+              Params.expiry: expiry?.toJson(),
+            }..removeWhere(
+              (key, value) => value == null || (value is List && value.isEmpty),
+            ),
       ),
       dataType: DataUploadDraft(),
     );
@@ -823,19 +863,14 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     };
     final metadata = TusAPI.generateMetadata(metadataMap);
     final rawResponse = await getSaveResponse(
-        service.createTusDirectUpload(
-          size: size,
-          metadata: metadata,
-        ),
-        parseCloudflareResponse: false);
+      service.createTusDirectUpload(size: size, metadata: metadata),
+      parseCloudflareResponse: false,
+    );
     final id = rawResponse.headers[Params.streamMediaIdKC];
     final uploadURL = rawResponse.headers[Params.location];
     return CloudflareHTTPResponse<DataUploadDraft>(
       rawResponse.base,
-      DataUploadDraft(
-        id: id,
-        uploadURL: uploadURL,
-      ),
+      DataUploadDraft(id: id, uploadURL: uploadURL),
       error: rawResponse.error,
       extraData: rawResponse.extraData,
     );
@@ -904,16 +939,18 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     List<MediaProcessingState>? status,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    final response = await parseResponseAsList(service.getAll(
-      after: after?.toJson(),
-      before: before?.toJson(),
-      creator: creator,
-      includeCounts: includeCounts,
-      search: search,
-      limit: limit,
-      asc: asc,
-      status: status?.map((e) => e.name).toList(),
-    ));
+    final response = await parseResponseAsList(
+      service.getAll(
+        after: after?.toJson(),
+        before: before?.toJson(),
+        creator: creator,
+        includeCounts: includeCounts,
+        search: search,
+        limit: limit,
+        asc: asc,
+        status: status?.map((e) => e.name).toList(),
+      ),
+    );
 
     return response;
   }
@@ -929,11 +966,11 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-        id != null || video != null, 'One of id or video must not be empty.');
+      id != null || video != null,
+      'One of id or video must not be empty.',
+    );
     id ??= video?.id;
-    final response = await parseResponse(service.get(
-      id: id!,
-    ));
+    final response = await parseResponse(service.get(id: id!));
     return response;
   }
 
@@ -951,10 +988,9 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     assert(id != null || video != null, 'One of id or video must not be null.');
     id ??= video?.id;
     final response = await getSaveResponse(
-        service.delete(
-          id: id!,
-        ),
-        parseCloudflareResponse: false);
+      service.delete(id: id!),
+      parseCloudflareResponse: false,
+    );
     return response;
   }
 
@@ -968,16 +1004,16 @@ class StreamAPI extends RestAPIService<StreamService, CloudflareStreamVideo,
     List<CloudflareStreamVideo>? videos,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert((ids?.isNotEmpty ?? false) || (videos?.isNotEmpty ?? false),
-        'One of ids or live inputs must not be empty.');
+    assert(
+      (ids?.isNotEmpty ?? false) || (videos?.isNotEmpty ?? false),
+      'One of ids or live inputs must not be empty.',
+    );
 
     ids ??= videos?.map((video) => video.id).toList();
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(
-        id: id,
-      );
+      final response = await delete(id: id);
       responses.add(response);
     }
     return responses;

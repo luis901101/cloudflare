@@ -19,9 +19,7 @@ class VideoStatus extends Jsonable<VideoStatus> {
   /// read only
   ///
   /// e.g: "inprogress"
-  @JsonKey(
-    unknownEnumValue: MediaProcessingState.unknown,
-  )
+  @JsonKey(unknownEnumValue: MediaProcessingState.unknown)
   final MediaProcessingState state;
 
   /// Indicates the percent upload completed of the entire upload in bytes.
@@ -57,8 +55,8 @@ class VideoStatus extends Jsonable<VideoStatus> {
     int? pctComplete,
     this.errorReasonCode,
     this.errorReasonText,
-  })  : state = state ?? MediaProcessingState.ready,
-        pctComplete = pctComplete ?? 100;
+  }) : state = state ?? MediaProcessingState.ready,
+       pctComplete = pctComplete ?? 100;
 
   @override
   Map<String, dynamic> toJson() => _$VideoStatusToJson(this);

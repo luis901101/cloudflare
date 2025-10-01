@@ -85,7 +85,6 @@ class Cloudflare {
   @Deprecated('Use token authentication instead.')
   final String? accountEmail;
   @Deprecated('Use token authentication instead.')
-
   /// To be used as `X-Auth-User-Service-Key`. A special Cloudflare API key good
   /// for a restricted set of endpoints. Always begins with "v1.0-", may vary in length.
   final String? userServiceKey;
@@ -132,36 +131,38 @@ class Cloudflare {
     this.receiveTimeout,
     this.sendTimeout,
     this.httpClient,
-  })  : assert(
-            (((token?.isNotEmpty ?? false) && tokenCallback == null) ||
-                    ((token?.isEmpty ?? true) && tokenCallback != null)) ||
-                ((apiKey?.isNotEmpty ?? false) &&
-                    (accountEmail?.isNotEmpty ?? false)) ||
-                (userServiceKey?.isNotEmpty ?? false),
-            '\n\nA token or tokenCallback must be specified, only one of both. '
-            '\nOtherwise an apiKey and accountEmail must be specified. '
-            '\nOtherwise a userServiceKey must be specified.'),
-        apiUrl = apiUrl ?? defaultApiUrl,
-        tokenCallback = tokenCallback ?? (() async => token),
-        connectTimeout = connectTimeout ?? timeout;
+  }) : assert(
+         (((token?.isNotEmpty ?? false) && tokenCallback == null) ||
+                 ((token?.isEmpty ?? true) && tokenCallback != null)) ||
+             ((apiKey?.isNotEmpty ?? false) &&
+                 (accountEmail?.isNotEmpty ?? false)) ||
+             (userServiceKey?.isNotEmpty ?? false),
+         '\n\nA token or tokenCallback must be specified, only one of both. '
+         '\nOtherwise an apiKey and accountEmail must be specified. '
+         '\nOtherwise a userServiceKey must be specified.',
+       ),
+       apiUrl = apiUrl ?? defaultApiUrl,
+       tokenCallback = tokenCallback ?? (() async => token),
+       connectTimeout = connectTimeout ?? timeout;
 
   /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
   /// direct upload to an `uploadURL`
-  factory Cloudflare.basic(
-          {String? apiUrl,
-          Duration? connectTimeout,
-          Duration? receiveTimeout,
-          Duration? sendTimeout,
-          HttpClient? httpClient}) =>
-      Cloudflare(
-          apiUrl: apiUrl,
-          connectTimeout: connectTimeout,
-          receiveTimeout: receiveTimeout,
-          sendTimeout: sendTimeout,
-          accountId: '',
-          tokenCallback: () async => '',
-          httpClient: httpClient);
+  factory Cloudflare.basic({
+    String? apiUrl,
+    Duration? connectTimeout,
+    Duration? receiveTimeout,
+    Duration? sendTimeout,
+    HttpClient? httpClient,
+  }) => Cloudflare(
+    apiUrl: apiUrl,
+    connectTimeout: connectTimeout,
+    receiveTimeout: receiveTimeout,
+    sendTimeout: sendTimeout,
+    accountId: '',
+    tokenCallback: () async => '',
+    httpClient: httpClient,
+  );
 
   bool get isInitialized => _initialized;
 

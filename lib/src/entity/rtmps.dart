@@ -17,11 +17,9 @@ class RTMPS extends Jsonable<RTMPS> {
   /// e.g: "MjE2OTAxNzQyMjQxNDkyNDYyNTAxNjc3MzE3NzY4MjAwMTYx
   final String streamKey;
 
-  RTMPS({
-    String? url,
-    String? streamKey,
-  })  : url = url ?? '',
-        streamKey = streamKey ?? '';
+  RTMPS({String? url, String? streamKey})
+    : url = url ?? '',
+      streamKey = streamKey ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$RTMPSToJson(this);

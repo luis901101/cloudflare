@@ -5,6 +5,6 @@ class MapUtils {
       parseMapListHeaders(headers?.map);
 
   static Map<String, String>? parseMapListHeaders(
-          Map<String, List<String>>? map) =>
-      map?.map((key, value) => MapEntry(key, value.join('; ')));
+    Map<String, List<String>>? map,
+  ) => map?.map((key, value) => MapEntry(key, value.join('; ')));
 }

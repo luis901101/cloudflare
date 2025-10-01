@@ -20,12 +20,9 @@ class DataUploadDraft extends Jsonable<DataUploadDraft> {
   /// Only on video direct upload responses
   final Watermark? watermark;
 
-  const DataUploadDraft({
-    String? id,
-    String? uploadURL,
-    this.watermark,
-  })  : id = id ?? '',
-        uploadURL = uploadURL ?? '';
+  const DataUploadDraft({String? id, String? uploadURL, this.watermark})
+    : id = id ?? '',
+      uploadURL = uploadURL ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$DataUploadDraftToJson(this);

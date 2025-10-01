@@ -31,8 +31,12 @@ class CloudflareHTTPResponse<BodyType> {
 
   final dynamic extraData;
 
-  const CloudflareHTTPResponse(this.base, this.body,
-      {this.error, this.extraData});
+  const CloudflareHTTPResponse(
+    this.base,
+    this.body, {
+    this.error,
+    this.extraData,
+  });
 
   /// Makes a copy of this Response, replacing original values with the given ones.
   /// This method can also alter the type of the response body.
@@ -40,12 +44,11 @@ class CloudflareHTTPResponse<BodyType> {
     http.BaseResponse? base,
     NewBodyType? body,
     Object? bodyError,
-  }) =>
-      CloudflareHTTPResponse<NewBodyType>(
-        base ?? this.base,
-        body ?? (this.body as NewBodyType),
-        error: bodyError ?? error,
-      );
+  }) => CloudflareHTTPResponse<NewBodyType>(
+    base ?? this.base,
+    body ?? (this.body as NewBodyType),
+    error: bodyError ?? error,
+  );
 
   /// The HTTP status code of the response.
   int get statusCode => base.statusCode;

@@ -15,7 +15,6 @@ class Pagination extends Jsonable<Pagination> {
   /// default value: 1
   int page;
   @JsonKey(name: Params.perPage)
-
   /// The size of the requested page
   /// default value: 50
   int size;
@@ -27,15 +26,11 @@ class Pagination extends Jsonable<Pagination> {
   @JsonKey(name: Params.totalCount)
   int totalCount;
 
-  Pagination({
-    int? page,
-    int? size,
-    int? count,
-    int? totalCount,
-  })  : page = page ?? 1,
-        size = size ?? 50,
-        count = count ?? 0,
-        totalCount = totalCount ?? 0;
+  Pagination({int? page, int? size, int? count, int? totalCount})
+    : page = page ?? 1,
+      size = size ?? 50,
+      count = count ?? 0,
+      totalCount = totalCount ?? 0;
 
   @override
   Map<String, dynamic> toJson() => _$PaginationToJson(this);

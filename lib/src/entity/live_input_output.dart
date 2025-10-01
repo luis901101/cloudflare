@@ -22,13 +22,10 @@ class LiveInputOutput extends Jsonable<LiveInputOutput> {
   /// e.g: "uzya-f19y-g2g9-a2ee-51j2"
   final String streamKey;
 
-  const LiveInputOutput({
-    String? id,
-    String? url,
-    String? streamKey,
-  })  : id = id ?? '',
-        url = url ?? '',
-        streamKey = streamKey ?? '';
+  const LiveInputOutput({String? id, String? url, String? streamKey})
+    : id = id ?? '',
+      url = url ?? '',
+      streamKey = streamKey ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$LiveInputOutputToJson(this);

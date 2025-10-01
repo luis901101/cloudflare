@@ -33,7 +33,8 @@ class ResponseMatcher extends GenericMatcher {
     if (!response.isSuccessful) {
       // fail('Unsuccessful response: ${response.error?.toString()}');
       return printAndReturnOnFailure(
-          'Unsuccessful response: ${response.error?.toString()}');
+        'Unsuccessful response: ${response.error?.toString()}',
+      );
     }
     return true;
   }

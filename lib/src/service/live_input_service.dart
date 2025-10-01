@@ -27,9 +27,7 @@ abstract class LiveInputService {
 
   @GET('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> get({
-    @Path() required String id,
-  });
+  Future<HttpResponse<CloudflareResponse?>> get({@Path() required String id});
 
   @GET('/{id}/videos')
   @Headers(RestAPIService.defaultHeaders)
@@ -46,9 +44,7 @@ abstract class LiveInputService {
 
   @DELETE('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> delete({
-    @Path() required String id,
-  });
+  Future<HttpResponse> delete({@Path() required String id});
 
   @POST('/{liveInputId}/outputs')
   @Headers(RestAPIService.defaultHeaders)

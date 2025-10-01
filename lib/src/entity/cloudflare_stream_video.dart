@@ -21,10 +21,12 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
   static const watchVideoDeliveryUrl = 'https://watch.videodelivery.net';
   static const videoDeliveryUrl = 'https://videodelivery.net';
   static const videoCloudflareUrl = 'https://cloudflarestream.com';
-  static final customCloudflareAccountSubdomainRegExp =
-      RegExp(r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com\b');
-  static final customCloudflareAccountSubdomainInvertRegExp =
-      RegExp(r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com/(.*)$');
+  static final customCloudflareAccountSubdomainRegExp = RegExp(
+    r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com\b',
+  );
+  static final customCloudflareAccountSubdomainInvertRegExp = RegExp(
+    r'^https://customer-[A-Za-z\d]+\.cloudflarestream.com/(.*)$',
+  );
   static const specificCloudflareAccountSubdomainGeneric =
       'https://customer-{CODE}.cloudflarestream.com';
 
@@ -255,42 +257,45 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     bool? readyToStream,
     this.liveInput,
     String? customAccountSubdomainUrl,
-  })  : id = id ??= '',
-        customAccountSubdomainUrl = customAccountSubdomainUrl ??=
-            customAccountSubdomainFromUrl(thumbnail),
-        uploaded = uploaded ?? DateTime.now(),
-        size = size ?? 0,
-        requireSignedURLs = requireSignedURLs ?? false,
-        allowedOrigins = allowedOrigins ?? [],
-        created = created ?? DateTime.now(),
-        preview = preview ??
-            (id.isNotEmpty
-                ? (customAccountSubdomainUrl != null
-                    ? '$customAccountSubdomainUrl/$id/watch'
-                    : '$watchVideoDeliveryUrl/$id')
-                : ''),
-        modified = modified ?? DateTime.now(),
-        input = input ?? VideoSize(),
-        thumbnail = thumbnail ??
-            (id.isNotEmpty
-                ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.jpg'
-                : ''),
-        animatedThumbnail = (id.isNotEmpty
-            ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.gif'
-            : ''),
-        status = status ?? VideoStatus(),
-        duration = duration ?? -1,
-        thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
-        playback = playback ??
-            (id.isNotEmpty
-                ? VideoPlaybackInfo(
-                    hls:
-                        '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/manifest/video.m3u8',
-                    dash:
-                        '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/manifest/video.mpd',
-                  )
-                : null),
-        readyToStream = readyToStream ?? false;
+  }) : id = id ??= '',
+       customAccountSubdomainUrl = customAccountSubdomainUrl ??=
+           customAccountSubdomainFromUrl(thumbnail),
+       uploaded = uploaded ?? DateTime.now(),
+       size = size ?? 0,
+       requireSignedURLs = requireSignedURLs ?? false,
+       allowedOrigins = allowedOrigins ?? [],
+       created = created ?? DateTime.now(),
+       preview =
+           preview ??
+           (id.isNotEmpty
+               ? (customAccountSubdomainUrl != null
+                     ? '$customAccountSubdomainUrl/$id/watch'
+                     : '$watchVideoDeliveryUrl/$id')
+               : ''),
+       modified = modified ?? DateTime.now(),
+       input = input ?? VideoSize(),
+       thumbnail =
+           thumbnail ??
+           (id.isNotEmpty
+               ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.jpg'
+               : ''),
+       animatedThumbnail = (id.isNotEmpty
+           ? '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/thumbnails/thumbnail.gif'
+           : ''),
+       status = status ?? VideoStatus(),
+       duration = duration ?? -1,
+       thumbnailTimestampPct = thumbnailTimestampPct ?? 0,
+       playback =
+           playback ??
+           (id.isNotEmpty
+               ? VideoPlaybackInfo(
+                   hls:
+                       '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/manifest/video.m3u8',
+                   dash:
+                       '${customAccountSubdomainUrl ?? videoDeliveryUrl}/$id/manifest/video.mpd',
+                 )
+               : null),
+       readyToStream = readyToStream ?? false;
 
   bool get isReady => readyToStream;
 
@@ -322,8 +327,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     ///
     /// e.g: scale
     ThumbnailFit? fit,
-  }) =>
-      Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl).replace(
+  }) => Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl)
+      .replace(
         path: '/$id/thumbnails/thumbnail.jpg',
         queryParameters: {
           if (time != null) Params.time: time.toString(),
@@ -331,7 +336,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
           if (height != null) Params.height: height.toString(),
           if (fit != null) Params.fit: fit.name,
         },
-      ).toString();
+      )
+      .toString();
 
   /// Customizing animated GIF thumbnails on the fly
   ///
@@ -375,8 +381,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
     /// Max value: 15
     /// Default value: 8
     int? fps,
-  }) =>
-      Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl).replace(
+  }) => Uri.parse(customAccountSubdomainUrl ?? videoDeliveryUrl)
+      .replace(
         path: '/$id/thumbnails/thumbnail.gif',
         queryParameters: {
           if (time != null) Params.time: time.toString(),
@@ -386,7 +392,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
           if (duration != null) Params.duration: duration.toString(),
           if (fps != null) Params.fps: fps.toString(),
         },
-      ).toString();
+      )
+      .toString();
 
   static String? customAccountSubdomainFromUrl(String? url) => url != null
       ? customCloudflareAccountSubdomainRegExp.firstMatch(url)?.group(0)
@@ -404,7 +411,8 @@ class CloudflareStreamVideo extends Jsonable<CloudflareStreamVideo> {
         ?.replaceAll('https://customer-', '')
         .replaceAll('.cloudflarestream.com', '');
 
-    cleanUrl = customCloudflareAccountSubdomainInvertRegExp
+    cleanUrl =
+        customCloudflareAccountSubdomainInvertRegExp
             .firstMatch(cleanUrl)
             ?.group(1) ??
         cleanUrl;

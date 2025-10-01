@@ -10,11 +10,9 @@ class CloudflareErrorResponse extends Jsonable<CloudflareErrorResponse> {
   List<ErrorInfo> errors;
   List<String> messages;
 
-  CloudflareErrorResponse({
-    List<ErrorInfo>? errors,
-    List<String>? messages,
-  })  : errors = errors ?? [],
-        messages = messages ?? [];
+  CloudflareErrorResponse({List<ErrorInfo>? errors, List<String>? messages})
+    : errors = errors ?? [],
+      messages = messages ?? [];
 
   @override
   Map<String, dynamic> toJson() => _$CloudflareErrorResponseToJson(this);

@@ -25,9 +25,9 @@ class CloudflareResponse extends Jsonable<CloudflareResponse> {
     List<ErrorInfo>? errors,
     List<String>? messages,
     this.paginationInfo,
-  })  : success = success ?? false,
-        errors = errors ?? [],
-        messages = messages ?? [];
+  }) : success = success ?? false,
+       errors = errors ?? [],
+       messages = messages ?? [];
 
   @override
   Map<String, dynamic> toJson() => _$CloudflareResponseToJson(this);

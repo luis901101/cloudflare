@@ -78,22 +78,16 @@ abstract class ImageService {
 
   @GET('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> get({
-    @Path() required String id,
-  });
+  Future<HttpResponse<CloudflareResponse?>> get({@Path() required String id});
 
   @GET('/v1/{id}/blob')
   @DioResponseType(ResponseType.bytes)
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> getBase({
-    @Path() required String id,
-  });
+  Future<HttpResponse> getBase({@Path() required String id});
 
   @DELETE('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> delete({
-    @Path() required String id,
-  });
+  Future<HttpResponse> delete({@Path() required String id});
 
   @GET('/v1/stats')
   @Headers(RestAPIService.defaultHeaders)

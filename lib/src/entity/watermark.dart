@@ -82,15 +82,15 @@ class Watermark extends Jsonable<Watermark> {
     double? padding,
     this.name,
     this.downloadedFrom,
-  })  : id = id ?? '',
-        size = size ?? 0,
-        width = width ?? 0,
-        height = height ?? 0,
-        created = created ?? DateTime.now(),
-        position = position ?? WatermarkPosition.upperRight,
-        scale = scale ?? 0.0,
-        opacity = opacity ?? 0.0,
-        padding = padding ?? 0.0;
+  }) : id = id ?? '',
+       size = size ?? 0,
+       width = width ?? 0,
+       height = height ?? 0,
+       created = created ?? DateTime.now(),
+       position = position ?? WatermarkPosition.upperRight,
+       scale = scale ?? 0.0,
+       opacity = opacity ?? 0.0,
+       padding = padding ?? 0.0;
 
   @override
   Map<String, dynamic> toJson() => _$WatermarkToJson(this);

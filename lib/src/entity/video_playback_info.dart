@@ -17,10 +17,7 @@ class VideoPlaybackInfo extends Jsonable<VideoPlaybackInfo> {
   /// read only
   final String? dash;
 
-  VideoPlaybackInfo({
-    this.hls,
-    this.dash,
-  });
+  VideoPlaybackInfo({this.hls, this.dash});
 
   @override
   Map<String, dynamic> toJson() => _$VideoPlaybackInfoToJson(this);

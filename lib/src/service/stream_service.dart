@@ -51,9 +51,7 @@ abstract class StreamService {
   });
 
   @POST('?direct_user=true')
-  @Headers({
-    RestAPIService.tusResumableKey: TusAPI.tusVersion,
-  })
+  @Headers({RestAPIService.tusResumableKey: TusAPI.tusVersion})
   Future<HttpResponse> createTusDirectUpload({
     @Header(RestAPIService.uploadLengthKey) required int size,
     @Header(RestAPIService.uploadMetadataKey) String? metadata,
@@ -74,13 +72,9 @@ abstract class StreamService {
 
   @GET('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> get({
-    @Path() required String id,
-  });
+  Future<HttpResponse<CloudflareResponse?>> get({@Path() required String id});
 
   @DELETE('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> delete({
-    @Path() required String id,
-  });
+  Future<HttpResponse> delete({@Path() required String id});
 }

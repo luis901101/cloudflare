@@ -97,14 +97,15 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
     List<String>? variants,
     DateTime? uploaded,
     bool? draft,
-  })  : id = id ??= '',
-        requireSignedURLs = requireSignedURLs ?? false,
-        variants = variants ??
-            (id.isNotEmpty && imageDeliveryId != null
-                ? ['$imageDeliveryUrl/$imageDeliveryId/$id/${Params.public}']
-                : []),
-        uploaded = uploaded ?? DateTime.now(),
-        draft = draft ?? false;
+  }) : id = id ??= '',
+       requireSignedURLs = requireSignedURLs ?? false,
+       variants =
+           variants ??
+           (id.isNotEmpty && imageDeliveryId != null
+               ? ['$imageDeliveryUrl/$imageDeliveryId/$id/${Params.public}']
+               : []),
+       uploaded = uploaded ?? DateTime.now(),
+       draft = draft ?? false;
 
   static Map<String, dynamic> dataFromImageDeliveryUrl(String url) {
     final split = url
@@ -127,8 +128,8 @@ class CloudflareImage extends Jsonable<CloudflareImage> {
       Params.imageDeliveryId: imageDeliveryId,
       Params.variantName: variantName,
       Params.variants: [
-        '$imageDeliveryUrl/$imageDeliveryId/$imageId/$variantName'
-      ]
+        '$imageDeliveryUrl/$imageDeliveryId/$imageId/$variantName',
+      ],
     };
   }
 

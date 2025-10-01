@@ -24,10 +24,7 @@ class MediaNFT extends Jsonable<MediaNFT> {
   /// e.g: 5
   final int? token;
 
-  MediaNFT({
-    this.contract,
-    this.token,
-  });
+  MediaNFT({this.contract, this.token});
 
   @override
   Map<String, dynamic> toJson() => _$MediaNFTToJson(this);

@@ -16,10 +16,7 @@ class LiveInputStatus extends Jsonable<LiveInputStatus> {
   /// The history log for the Live Input statuses
   final List<LiveInputStatusLog>? history;
 
-  const LiveInputStatus({
-    this.current,
-    this.history,
-  });
+  const LiveInputStatus({this.current, this.history});
 
   @override
   Map<String, dynamic> toJson() => _$LiveInputStatusToJson(this);

@@ -70,14 +70,14 @@ class CloudflareLiveInput extends Jsonable<CloudflareLiveInput> {
     SRT? srtPlayback,
     LiveInputRecording? recording,
     this.status,
-  })  : id = id ?? '',
-        created = created ?? DateTime.now(),
-        modified = modified ?? DateTime.now(),
-        rtmps = rtmps ?? RTMPS(),
-        rtmpsPlayback = rtmpsPlayback ?? RTMPS(),
-        srt = srt ?? SRT(),
-        srtPlayback = srtPlayback ?? SRT(),
-        recording = recording ?? LiveInputRecording();
+  }) : id = id ?? '',
+       created = created ?? DateTime.now(),
+       modified = modified ?? DateTime.now(),
+       rtmps = rtmps ?? RTMPS(),
+       rtmpsPlayback = rtmpsPlayback ?? RTMPS(),
+       srt = srt ?? SRT(),
+       srtPlayback = srtPlayback ?? SRT(),
+       recording = recording ?? LiveInputRecording();
 
   @override
   bool operator ==(Object other) {

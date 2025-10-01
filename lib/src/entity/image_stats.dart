@@ -14,11 +14,9 @@ class ImageStats extends Jsonable<ImageStats> {
   /// Allowed usage
   final int allowed;
 
-  const ImageStats({
-    int? current,
-    int? allowed,
-  })  : current = current ?? 0,
-        allowed = allowed ?? 0;
+  const ImageStats({int? current, int? allowed})
+    : current = current ?? 0,
+      allowed = allowed ?? 0;
 
   @override
   Map<String, dynamic> toJson() => _$ImageStatsToJson(this);

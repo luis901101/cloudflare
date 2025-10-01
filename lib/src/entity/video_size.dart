@@ -23,11 +23,9 @@ class VideoSize extends Jsonable<VideoSize> {
   /// e.g: 1080
   final int height;
 
-  VideoSize({
-    int? width,
-    int? height,
-  })  : width = width ?? -1,
-        height = height ?? -1;
+  VideoSize({int? width, int? height})
+    : width = width ?? -1,
+      height = height ?? -1;
 
   @override
   Map<String, dynamic> toJson() => _$VideoSizeToJson(this);

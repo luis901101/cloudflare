@@ -58,26 +58,28 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   Widget get uploadSourceView => Column(
         children: [
           const Text('File source'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 150,
-                child: RadioListTile<FileSource>(
+          RadioGroup(
+            groupValue: fileSource,
+            onChanged: onUploadSourceChanged,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: RadioListTile<FileSource>(
                     title: const Text('Path'),
                     value: FileSource.path,
-                    groupValue: fileSource,
-                    onChanged: onUploadSourceChanged),
-              ),
-              SizedBox(
-                width: 150,
-                child: RadioListTile<FileSource>(
+                  ),
+                ),
+                SizedBox(
+                  width: 150,
+                  child: RadioListTile<FileSource>(
                     title: const Text('Bytes'),
                     value: FileSource.bytes,
-                    groupValue: fileSource,
-                    onChanged: onUploadSourceChanged),
-              ),
-            ],
+                  ),
+                ),
+              ],
+            ),
           )
         ],
       );
@@ -88,65 +90,67 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   bool get tusCanPlay => tusAPI?.state != TusUploadState.uploading;
   bool get tusCanPause => tusAPI?.state == TusUploadState.uploading;
 
-  Widget get uploadTypeView => Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text('Upload type'),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: 300,
-            child: RadioListTile<UploadType>(
+  Widget get uploadTypeView => RadioGroup(
+        groupValue: uploadType,
+        onChanged: onUploadTypeChanged,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text('Upload type'),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: 300,
+              child: RadioListTile<UploadType>(
                 title:
                     const Text('Single http request, for videos under 200 MB'),
                 value: UploadType.singleHttp,
-                groupValue: uploadType,
-                onChanged: onUploadTypeChanged),
-          ),
-          const SizedBox(height: 4),
-          SizedBox(
-            width: 300,
-            child: RadioListTile<UploadType>(
+              ),
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              width: 300,
+              child: RadioListTile<UploadType>(
                 title: const Text('Tus protocol, for videos over 200 MB'),
                 value: UploadType.tus,
-                groupValue: uploadType,
-                onChanged: onUploadTypeChanged),
-          ),
-          if (tusAPI != null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    if (tusCanPlay) {
-                      await tusAPI?.resumeUpload();
-                    } else {
-                      await tusAPI?.pauseUpload();
-                    }
-                    setState(() {});
-                  },
-                  iconSize: 32,
-                  icon: Icon(
-                    tusCanPlay
-                        ? Icons.play_circle_fill
-                        : Icons.pause_circle_filled,
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () async {
-                    await tusAPI?.cancelUpload();
-                    setState(() {});
-                  },
-                  iconSize: 32,
-                  icon: const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                  ),
-                )
-              ],
+              ),
             ),
-        ],
+            if (tusAPI != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      if (tusCanPlay) {
+                        await tusAPI?.resumeUpload();
+                      } else {
+                        await tusAPI?.pauseUpload();
+                      }
+                      setState(() {});
+                    },
+                    iconSize: 32,
+                    icon: Icon(
+                      tusCanPlay
+                          ? Icons.play_circle_fill
+                          : Icons.pause_circle_filled,
+                      color: Colors.green,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () async {
+                      await tusAPI?.cancelUpload();
+                      setState(() {});
+                    },
+                    iconSize: 32,
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Colors.red,
+                    ),
+                  )
+                ],
+              ),
+          ],
+        ),
       );
 
   Widget videoFromPathView(DataTransmitNotifier data) {

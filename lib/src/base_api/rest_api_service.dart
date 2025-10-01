@@ -19,14 +19,15 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   static const tusResumableKey = 'Tus-Resumable';
   static const uploadLengthKey = 'Upload-Length';
   static const uploadMetadataKey = 'Upload-Metadata';
-  static const authorizedRequestAssertMessage = 'This endpoint requires an '
+  static const authorizedRequestAssertMessage =
+      'This endpoint requires an '
       'authorized request, check the Cloudflare constructor you are using and '
       'make sure you are using a valid `accountId` and `token`';
   static String bearer(String token) => 'Bearer $token';
 
   static const Map<String, dynamic> defaultHeaders = {};
   static const Map<String, dynamic> contentTypeJson = {
-    Params.contentType: 'application/json'
+    Params.contentType: 'application/json',
   };
 
   I service;
@@ -46,15 +47,17 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
   bool get isBasic => accountId.isEmpty;
 
   Future<CloudflareHTTPResponse> getSaveResponse<ContainerDataTypeGeneric>(
-      Future futureResponse,
-      {bool parseCloudflareResponse = true}) async {
+    Future futureResponse, {
+    bool parseCloudflareResponse = true,
+  }) async {
     CloudflareHTTPResponse response = CloudflareHTTPResponse(
       http.Response('', HttpStatus.notFound),
       null,
     );
 
     CloudflareHTTPResponse httpResponseToCustomHttpResponse(
-        HttpResponse response) {
+      HttpResponse response,
+    ) {
       dynamic body = response.data;
       CloudflareErrorResponse? error;
       if (parseCloudflareResponse) {
@@ -71,40 +74,41 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
         }
       }
       return CloudflareHTTPResponse(
-          http.Response(
-            '',
-            response.response.statusCode ?? HttpStatus.notFound,
-            headers: MapUtils.parseHeaders(response.response.headers) ?? {},
-            isRedirect: response.response.isRedirect,
-            request: http.Request(
-              response.response.requestOptions.method,
-              response.response.requestOptions.uri,
-            ),
+        http.Response(
+          '',
+          response.response.statusCode ?? HttpStatus.notFound,
+          headers: MapUtils.parseHeaders(response.response.headers) ?? {},
+          isRedirect: response.response.isRedirect,
+          request: http.Request(
+            response.response.requestOptions.method,
+            response.response.requestOptions.uri,
           ),
-          body,
-          error: error,
-          extraData: response);
+        ),
+        body,
+        error: error,
+        extraData: response,
+      );
     }
 
     CloudflareHTTPResponse<CloudflareResponse> dioErrorToCustomHttpResponse(
-            dio.DioException error) =>
-        CloudflareHTTPResponse(
-            http.Response(
-              '',
-              error.response?.statusCode ?? HttpStatus.notFound,
-              headers: MapUtils.parseHeaders(error.response?.headers) ?? {},
-              isRedirect: error.response?.isRedirect ?? false,
-              request: http.Request(
-                error.response?.requestOptions.method ?? HttpMethod.GET,
-                error.response?.requestOptions.uri ?? Uri(),
-              ),
-            ),
-            null,
-            error: error.response?.data ??
-                CloudflareErrorResponse(
-                  errors: [ErrorInfo(message: error.message)],
-                ),
-            extraData: error);
+      dio.DioException error,
+    ) => CloudflareHTTPResponse(
+      http.Response(
+        '',
+        error.response?.statusCode ?? HttpStatus.notFound,
+        headers: MapUtils.parseHeaders(error.response?.headers) ?? {},
+        isRedirect: error.response?.isRedirect ?? false,
+        request: http.Request(
+          error.response?.requestOptions.method ?? HttpMethod.GET,
+          error.response?.requestOptions.uri ?? Uri(),
+        ),
+      ),
+      null,
+      error:
+          error.response?.data ??
+          CloudflareErrorResponse(errors: [ErrorInfo(message: error.message)]),
+      extraData: error,
+    );
 
     try {
       final HttpResponse httpResponse = await futureResponse;
@@ -129,25 +133,38 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     return response;
   }
 
-  Future<CloudflareHTTPResponse<DataType>> parseResponse(Future futureResponse,
-      {bool parseCloudflareResponse = true}) async {
-    return genericParseResponse(futureResponse,
-        dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
+  Future<CloudflareHTTPResponse<DataType>> parseResponse(
+    Future futureResponse, {
+    bool parseCloudflareResponse = true,
+  }) async {
+    return genericParseResponse(
+      futureResponse,
+      dataType: dataType,
+      parseCloudflareResponse: parseCloudflareResponse,
+    );
   }
 
   Future<CloudflareHTTPResponse<List<DataType>>> parseResponseAsList(
-      Future futureResponse,
-      {bool parseCloudflareResponse = true}) async {
-    return genericParseResponseAsList(futureResponse,
-        dataType: dataType, parseCloudflareResponse: parseCloudflareResponse);
+    Future futureResponse, {
+    bool parseCloudflareResponse = true,
+  }) async {
+    return genericParseResponseAsList(
+      futureResponse,
+      dataType: dataType,
+      parseCloudflareResponse: parseCloudflareResponse,
+    );
   }
 
   Future<CloudflareHTTPResponse<DataTypeGeneric>>
-      genericParseResponse<DataTypeGeneric>(Future futureResponse,
-          {DataTypeGeneric? dataType,
-          bool parseCloudflareResponse = true}) async {
-    CloudflareHTTPResponse response = await getSaveResponse(futureResponse,
-        parseCloudflareResponse: parseCloudflareResponse);
+  genericParseResponse<DataTypeGeneric>(
+    Future futureResponse, {
+    DataTypeGeneric? dataType,
+    bool parseCloudflareResponse = true,
+  }) async {
+    CloudflareHTTPResponse response = await getSaveResponse(
+      futureResponse,
+      parseCloudflareResponse: parseCloudflareResponse,
+    );
     try {
       DataTypeGeneric? dataTypeResult;
       dynamic body = response.body;
@@ -163,33 +180,39 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
         }
       }
       return CloudflareHTTPResponse<DataTypeGeneric>(
-          response.base, dataTypeResult,
-          error: response.error);
+        response.base,
+        dataTypeResult,
+        error: response.error,
+      );
     } catch (e) {
       String message = e.toString();
       print(e);
       return CloudflareHTTPResponse<DataTypeGeneric>(
-          http.Response(
-            response.body?.toString() ?? '',
-            Jsonable.jsonParserError,
-            headers: response.base.headers,
-            isRedirect: response.base.isRedirect,
-            persistentConnection: response.base.persistentConnection,
-            reasonPhrase: response.base.reasonPhrase,
-            request: response.base.request,
-          ),
-          null,
-          error: message);
+        http.Response(
+          response.body?.toString() ?? '',
+          Jsonable.jsonParserError,
+          headers: response.base.headers,
+          isRedirect: response.base.isRedirect,
+          persistentConnection: response.base.persistentConnection,
+          reasonPhrase: response.base.reasonPhrase,
+          request: response.base.request,
+        ),
+        null,
+        error: message,
+      );
     }
   }
 
   Future<CloudflareHTTPResponse<List<DataTypeGeneric>>>
-      genericParseResponseAsList<DataTypeGeneric extends Jsonable?>(
-          Future futureResponse,
-          {DataTypeGeneric? dataType,
-          bool parseCloudflareResponse = true}) async {
-    CloudflareHTTPResponse response = await getSaveResponse(futureResponse,
-        parseCloudflareResponse: parseCloudflareResponse);
+  genericParseResponseAsList<DataTypeGeneric extends Jsonable?>(
+    Future futureResponse, {
+    DataTypeGeneric? dataType,
+    bool parseCloudflareResponse = true,
+  }) async {
+    CloudflareHTTPResponse response = await getSaveResponse(
+      futureResponse,
+      parseCloudflareResponse: parseCloudflareResponse,
+    );
     try {
       List<DataTypeGeneric>? dataList;
       dynamic body = response.body;
@@ -224,23 +247,26 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
         }
       }
       return CloudflareHTTPResponse<List<DataTypeGeneric>>(
-          response.base, dataList,
-          error: response.error);
+        response.base,
+        dataList,
+        error: response.error,
+      );
     } catch (e) {
       String message = e.toString();
       print(e);
       return CloudflareHTTPResponse<List<DataTypeGeneric>>(
-          http.Response(
-            response.body?.toString() ?? '',
-            Jsonable.jsonParserError,
-            headers: response.base.headers,
-            isRedirect: response.base.isRedirect,
-            persistentConnection: response.base.persistentConnection,
-            reasonPhrase: response.base.reasonPhrase,
-            request: response.base.request,
-          ),
-          null,
-          error: message);
+        http.Response(
+          response.body?.toString() ?? '',
+          Jsonable.jsonParserError,
+          headers: response.base.headers,
+          isRedirect: response.base.isRedirect,
+          persistentConnection: response.base.persistentConnection,
+          reasonPhrase: response.base.reasonPhrase,
+          request: response.base.request,
+        ),
+        null,
+        error: message,
+      );
     }
   }
 }

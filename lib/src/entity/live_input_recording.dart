@@ -52,10 +52,10 @@ class LiveInputRecording extends Jsonable<LiveInputRecording> {
     bool? requireSignedURLs,
     List<String>? allowedOrigins,
     int? timeoutSeconds,
-  })  : mode = mode ?? LiveInputRecordingMode.automatic,
-        requireSignedURLs = requireSignedURLs ?? false,
-        allowedOrigins = allowedOrigins ?? [],
-        timeoutSeconds = timeoutSeconds ?? 0;
+  }) : mode = mode ?? LiveInputRecordingMode.automatic,
+       requireSignedURLs = requireSignedURLs ?? false,
+       allowedOrigins = allowedOrigins ?? [],
+       timeoutSeconds = timeoutSeconds ?? 0;
 
   @override
   Map<String, dynamic> toJson() => _$LiveInputRecordingToJson(this);

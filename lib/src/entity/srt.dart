@@ -17,13 +17,10 @@ class SRT extends Jsonable<SRT> {
   final String streamId;
   final String passphrase;
 
-  SRT({
-    String? url,
-    String? streamId,
-    String? passphrase,
-  })  : url = url ?? '',
-        streamId = streamId ?? '',
-        passphrase = passphrase ?? '';
+  SRT({String? url, String? streamId, String? passphrase})
+    : url = url ?? '',
+      streamId = streamId ?? '',
+      passphrase = passphrase ?? '';
 
   @override
   Map<String, dynamic> toJson() => _$SRTToJson(this);

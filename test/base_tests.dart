@@ -32,13 +32,15 @@ final String? accountEmail = Platform.environment['CLOUDFLARE_ACCOUNT_EMAIL'];
 final String? userServiceKey =
     Platform.environment['CLOUDFLARE_USER_SERVICE_KEY'];
 
-final File imageFile =
-        File(Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? ''),
+final File imageFile = File(
+      Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '',
+    ),
     imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
     imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
 final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
-final File videoFile =
-        File(Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? ''),
+final File videoFile = File(
+      Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? '',
+    ),
     videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
     videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
     videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
