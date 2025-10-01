@@ -7,33 +7,31 @@ part of 'live_input_output.dart';
 // **************************************************************************
 
 abstract class _$LiveInputOutputCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputOutput(...).copyWith(id: 12, name: "My name")
-  /// ````
-  LiveInputOutput call({
-    String? id,
-    String? url,
-    String? streamKey,
-  });
+  /// ```
+  LiveInputOutput call({String? id, String? url, String? streamKey});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputOutput.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfLiveInputOutput.copyWith(...)`.
 class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
   const _$LiveInputOutputCWProxyImpl(this._value);
 
   final LiveInputOutput _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputOutput(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputOutput call({
     Object? id = const $CopyWithPlaceholder(),
     Object? url = const $CopyWithPlaceholder(),
@@ -57,7 +55,8 @@ class _$LiveInputOutputCWProxyImpl implements _$LiveInputOutputCWProxy {
 }
 
 extension $LiveInputOutputCopyWith on LiveInputOutput {
-  /// Returns a callable class that can be used as follows: `instanceOfLiveInputOutput.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfLiveInputOutput.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$LiveInputOutputCWProxy get copyWith => _$LiveInputOutputCWProxyImpl(this);
 }

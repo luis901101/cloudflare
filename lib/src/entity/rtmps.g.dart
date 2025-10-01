@@ -7,32 +7,31 @@ part of 'rtmps.dart';
 // **************************************************************************
 
 abstract class _$RTMPSCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// RTMPS(...).copyWith(id: 12, name: "My name")
-  /// ````
-  RTMPS call({
-    String? url,
-    String? streamKey,
-  });
+  /// ```
+  RTMPS call({String? url, String? streamKey});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfRTMPS.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfRTMPS.copyWith(...)`.
 class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
   const _$RTMPSCWProxyImpl(this._value);
 
   final RTMPS _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// RTMPS(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   RTMPS call({
     Object? url = const $CopyWithPlaceholder(),
     Object? streamKey = const $CopyWithPlaceholder(),
@@ -51,7 +50,8 @@ class _$RTMPSCWProxyImpl implements _$RTMPSCWProxy {
 }
 
 extension $RTMPSCopyWith on RTMPS {
-  /// Returns a callable class that can be used as follows: `instanceOfRTMPS.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfRTMPS.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$RTMPSCWProxy get copyWith => _$RTMPSCWProxyImpl(this);
 }
@@ -60,12 +60,10 @@ extension $RTMPSCopyWith on RTMPS {
 // JsonSerializableGenerator
 // **************************************************************************
 
-RTMPS _$RTMPSFromJson(Map<String, dynamic> json) => RTMPS(
-      url: json['url'] as String?,
-      streamKey: json['streamKey'] as String?,
-    );
+RTMPS _$RTMPSFromJson(Map<String, dynamic> json) =>
+    RTMPS(url: json['url'] as String?, streamKey: json['streamKey'] as String?);
 
 Map<String, dynamic> _$RTMPSToJson(RTMPS instance) => <String, dynamic>{
-      'url': instance.url,
-      'streamKey': instance.streamKey,
-    };
+  'url': instance.url,
+  'streamKey': instance.streamKey,
+};

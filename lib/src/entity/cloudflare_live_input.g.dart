@@ -7,12 +7,13 @@ part of 'cloudflare_live_input.dart';
 // **************************************************************************
 
 abstract class _$CloudflareLiveInputCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareLiveInput(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareLiveInput call({
     String? id,
     Map<dynamic, dynamic>? meta,
@@ -27,20 +28,21 @@ abstract class _$CloudflareLiveInputCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareLiveInput.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfCloudflareLiveInput.copyWith(...)`.
 class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
   const _$CloudflareLiveInputCWProxyImpl(this._value);
 
   final CloudflareLiveInput _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareLiveInput(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareLiveInput call({
     Object? id = const $CopyWithPlaceholder(),
     Object? meta = const $CopyWithPlaceholder(),
@@ -99,7 +101,8 @@ class _$CloudflareLiveInputCWProxyImpl implements _$CloudflareLiveInputCWProxy {
 }
 
 extension $CloudflareLiveInputCopyWith on CloudflareLiveInput {
-  /// Returns a callable class that can be used as follows: `instanceOfCloudflareLiveInput.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfCloudflareLiveInput.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$CloudflareLiveInputCWProxy get copyWith =>
       _$CloudflareLiveInputCWProxyImpl(this);
@@ -134,23 +137,24 @@ CloudflareLiveInput _$CloudflareLiveInputFromJson(Map<String, dynamic> json) =>
       recording: json['recording'] == null
           ? null
           : LiveInputRecording.fromJson(
-              json['recording'] as Map<String, dynamic>),
+              json['recording'] as Map<String, dynamic>,
+            ),
       status: json['status'] == null
           ? null
           : LiveInputStatus.fromJson(json['status'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CloudflareLiveInputToJson(
-        CloudflareLiveInput instance) =>
-    <String, dynamic>{
-      'uid': instance.id,
-      if (instance.meta case final value?) 'meta': value,
-      'created': instance.created.toIso8601String(),
-      'modified': instance.modified.toIso8601String(),
-      'rtmps': instance.rtmps,
-      'rtmpsPlayback': instance.rtmpsPlayback,
-      'srt': instance.srt,
-      'srtPlayback': instance.srtPlayback,
-      'recording': instance.recording,
-      if (instance.status case final value?) 'status': value,
-    };
+  CloudflareLiveInput instance,
+) => <String, dynamic>{
+  'uid': instance.id,
+  'meta': ?instance.meta,
+  'created': instance.created.toIso8601String(),
+  'modified': instance.modified.toIso8601String(),
+  'rtmps': instance.rtmps,
+  'rtmpsPlayback': instance.rtmpsPlayback,
+  'srt': instance.srt,
+  'srtPlayback': instance.srtPlayback,
+  'recording': instance.recording,
+  'status': ?instance.status,
+};

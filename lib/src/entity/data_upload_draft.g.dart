@@ -7,33 +7,31 @@ part of 'data_upload_draft.dart';
 // **************************************************************************
 
 abstract class _$DataUploadDraftCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// DataUploadDraft(...).copyWith(id: 12, name: "My name")
-  /// ````
-  DataUploadDraft call({
-    String? id,
-    String? uploadURL,
-    Watermark? watermark,
-  });
+  /// ```
+  DataUploadDraft call({String? id, String? uploadURL, Watermark? watermark});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfDataUploadDraft.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfDataUploadDraft.copyWith(...)`.
 class _$DataUploadDraftCWProxyImpl implements _$DataUploadDraftCWProxy {
   const _$DataUploadDraftCWProxyImpl(this._value);
 
   final DataUploadDraft _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// DataUploadDraft(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   DataUploadDraft call({
     Object? id = const $CopyWithPlaceholder(),
     Object? uploadURL = const $CopyWithPlaceholder(),
@@ -57,7 +55,8 @@ class _$DataUploadDraftCWProxyImpl implements _$DataUploadDraftCWProxy {
 }
 
 extension $DataUploadDraftCopyWith on DataUploadDraft {
-  /// Returns a callable class that can be used as follows: `instanceOfDataUploadDraft.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfDataUploadDraft.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$DataUploadDraftCWProxy get copyWith => _$DataUploadDraftCWProxyImpl(this);
 }
@@ -79,5 +78,5 @@ Map<String, dynamic> _$DataUploadDraftToJson(DataUploadDraft instance) =>
     <String, dynamic>{
       'id': instance.id,
       'uploadURL': instance.uploadURL,
-      if (instance.watermark case final value?) 'watermark': value,
+      'watermark': ?instance.watermark,
     };

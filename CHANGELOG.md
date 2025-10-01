@@ -9,6 +9,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 6.0.0
+### Changed
+- Sdk constraint updated to: `sdk: '>=3.8.0 <4.0.0'`
+- Updated dependencies to latest versions.
+
 ## 5.1.0
 ### Changed
 - Updated dependencies to latest versions.

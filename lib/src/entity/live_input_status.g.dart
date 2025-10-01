@@ -7,32 +7,34 @@ part of 'live_input_status.dart';
 // **************************************************************************
 
 abstract class _$LiveInputStatusCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputStatus(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputStatus call({
     LiveInputStatusLog? current,
     List<LiveInputStatusLog>? history,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputStatus.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfLiveInputStatus.copyWith(...)`.
 class _$LiveInputStatusCWProxyImpl implements _$LiveInputStatusCWProxy {
   const _$LiveInputStatusCWProxyImpl(this._value);
 
   final LiveInputStatus _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputStatus(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputStatus call({
     Object? current = const $CopyWithPlaceholder(),
     Object? history = const $CopyWithPlaceholder(),
@@ -51,7 +53,8 @@ class _$LiveInputStatusCWProxyImpl implements _$LiveInputStatusCWProxy {
 }
 
 extension $LiveInputStatusCopyWith on LiveInputStatus {
-  /// Returns a callable class that can be used as follows: `instanceOfLiveInputStatus.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfLiveInputStatus.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$LiveInputStatusCWProxy get copyWith => _$LiveInputStatusCWProxyImpl(this);
 }
@@ -65,7 +68,8 @@ LiveInputStatus _$LiveInputStatusFromJson(Map<String, dynamic> json) =>
       current: json['current'] == null
           ? null
           : LiveInputStatusLog.fromJson(
-              json['current'] as Map<String, dynamic>),
+              json['current'] as Map<String, dynamic>,
+            ),
       history: (json['history'] as List<dynamic>?)
           ?.map((e) => LiveInputStatusLog.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -73,6 +77,6 @@ LiveInputStatus _$LiveInputStatusFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputStatusToJson(LiveInputStatus instance) =>
     <String, dynamic>{
-      if (instance.current case final value?) 'current': value,
-      if (instance.history case final value?) 'history': value,
+      'current': ?instance.current,
+      'history': ?instance.history,
     };

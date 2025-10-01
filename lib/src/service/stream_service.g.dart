@@ -2,11 +2,13 @@
 
 part of 'stream_service.dart';
 
+// dart format off
+
 // **************************************************************************
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _StreamService implements StreamService {
   _StreamService(this._dio, {this.baseUrl, this.errorLogger});
@@ -77,11 +79,11 @@ class _StreamService implements StreamService {
     );
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
       Options(
-        method: 'POST',
-        headers: _headers,
-        extra: _extra,
-        contentType: 'multipart/form-data',
-      )
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
           .compose(
             _dio.options,
             '',
@@ -125,11 +127,11 @@ class _StreamService implements StreamService {
     );
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
       Options(
-        method: 'POST',
-        headers: _headers,
-        extra: _extra,
-        contentType: 'multipart/form-data',
-      )
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
           .compose(
             _dio.options,
             '',
@@ -346,3 +348,5 @@ class _StreamService implements StreamService {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
+
+// dart format on

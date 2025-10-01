@@ -7,32 +7,31 @@ part of 'video_playback_info.dart';
 // **************************************************************************
 
 abstract class _$VideoPlaybackInfoCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoPlaybackInfo(...).copyWith(id: 12, name: "My name")
-  /// ````
-  VideoPlaybackInfo call({
-    String? hls,
-    String? dash,
-  });
+  /// ```
+  VideoPlaybackInfo call({String? hls, String? dash});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoPlaybackInfo.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfVideoPlaybackInfo.copyWith(...)`.
 class _$VideoPlaybackInfoCWProxyImpl implements _$VideoPlaybackInfoCWProxy {
   const _$VideoPlaybackInfoCWProxyImpl(this._value);
 
   final VideoPlaybackInfo _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoPlaybackInfo(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   VideoPlaybackInfo call({
     Object? hls = const $CopyWithPlaceholder(),
     Object? dash = const $CopyWithPlaceholder(),
@@ -51,7 +50,8 @@ class _$VideoPlaybackInfoCWProxyImpl implements _$VideoPlaybackInfoCWProxy {
 }
 
 extension $VideoPlaybackInfoCopyWith on VideoPlaybackInfo {
-  /// Returns a callable class that can be used as follows: `instanceOfVideoPlaybackInfo.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfVideoPlaybackInfo.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$VideoPlaybackInfoCWProxy get copyWith =>
       _$VideoPlaybackInfoCWProxyImpl(this);
@@ -68,7 +68,4 @@ VideoPlaybackInfo _$VideoPlaybackInfoFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$VideoPlaybackInfoToJson(VideoPlaybackInfo instance) =>
-    <String, dynamic>{
-      if (instance.hls case final value?) 'hls': value,
-      if (instance.dash case final value?) 'dash': value,
-    };
+    <String, dynamic>{'hls': ?instance.hls, 'dash': ?instance.dash};

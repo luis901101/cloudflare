@@ -7,12 +7,13 @@ part of 'watermark.dart';
 // **************************************************************************
 
 abstract class _$WatermarkCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Watermark(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Watermark call({
     String? id,
     int? size,
@@ -28,20 +29,21 @@ abstract class _$WatermarkCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfWatermark.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfWatermark.copyWith(...)`.
 class _$WatermarkCWProxyImpl implements _$WatermarkCWProxy {
   const _$WatermarkCWProxyImpl(this._value);
 
   final Watermark _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Watermark(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Watermark call({
     Object? id = const $CopyWithPlaceholder(),
     Object? size = const $CopyWithPlaceholder(),
@@ -105,7 +107,8 @@ class _$WatermarkCWProxyImpl implements _$WatermarkCWProxy {
 }
 
 extension $WatermarkCopyWith on Watermark {
-  /// Returns a callable class that can be used as follows: `instanceOfWatermark.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfWatermark.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$WatermarkCWProxy get copyWith => _$WatermarkCWProxyImpl(this);
 }
@@ -115,36 +118,38 @@ extension $WatermarkCopyWith on Watermark {
 // **************************************************************************
 
 Watermark _$WatermarkFromJson(Map<String, dynamic> json) => Watermark(
-      id: json['uid'] as String?,
-      size: (json['size'] as num?)?.toInt(),
-      width: (json['width'] as num?)?.toInt(),
-      height: (json['height'] as num?)?.toInt(),
-      created: json['created'] == null
-          ? null
-          : DateTime.parse(json['created'] as String),
-      position: $enumDecodeNullable(
-          _$WatermarkPositionEnumMap, json['position'],
-          unknownValue: WatermarkPosition.upperRight),
-      scale: (json['scale'] as num?)?.toDouble(),
-      opacity: (json['opacity'] as num?)?.toDouble(),
-      padding: (json['padding'] as num?)?.toDouble(),
-      name: json['name'] as String?,
-      downloadedFrom: json['downloadedFrom'] as String?,
-    );
+  id: json['uid'] as String?,
+  size: (json['size'] as num?)?.toInt(),
+  width: (json['width'] as num?)?.toInt(),
+  height: (json['height'] as num?)?.toInt(),
+  created: json['created'] == null
+      ? null
+      : DateTime.parse(json['created'] as String),
+  position: $enumDecodeNullable(
+    _$WatermarkPositionEnumMap,
+    json['position'],
+    unknownValue: WatermarkPosition.upperRight,
+  ),
+  scale: (json['scale'] as num?)?.toDouble(),
+  opacity: (json['opacity'] as num?)?.toDouble(),
+  padding: (json['padding'] as num?)?.toDouble(),
+  name: json['name'] as String?,
+  downloadedFrom: json['downloadedFrom'] as String?,
+);
 
 Map<String, dynamic> _$WatermarkToJson(Watermark instance) => <String, dynamic>{
-      'uid': instance.id,
-      'size': instance.size,
-      'width': instance.width,
-      'height': instance.height,
-      'created': instance.created.toIso8601String(),
-      'position': _$WatermarkPositionEnumMap[instance.position]!,
-      'scale': instance.scale,
-      'opacity': instance.opacity,
-      'padding': instance.padding,
-      if (instance.name case final value?) 'name': value,
-      if (instance.downloadedFrom case final value?) 'downloadedFrom': value,
-    };
+  'uid': instance.id,
+  'size': instance.size,
+  'width': instance.width,
+  'height': instance.height,
+  'created': instance.created.toIso8601String(),
+  'position': _$WatermarkPositionEnumMap[instance.position]!,
+  'scale': instance.scale,
+  'opacity': instance.opacity,
+  'padding': instance.padding,
+  'name': ?instance.name,
+  'downloadedFrom': ?instance.downloadedFrom,
+};
 
 const _$WatermarkPositionEnumMap = {
   WatermarkPosition.upperRight: 'upperRight',

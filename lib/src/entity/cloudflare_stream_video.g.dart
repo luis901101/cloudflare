@@ -7,12 +7,13 @@ part of 'cloudflare_stream_video.dart';
 // **************************************************************************
 
 abstract class _$CloudflareStreamVideoCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareStreamVideo(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareStreamVideo call({
     String? id,
     DateTime? uploaded,
@@ -40,7 +41,8 @@ abstract class _$CloudflareStreamVideoCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareStreamVideo.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfCloudflareStreamVideo.copyWith(...)`.
 class _$CloudflareStreamVideoCWProxyImpl
     implements _$CloudflareStreamVideoCWProxy {
   const _$CloudflareStreamVideoCWProxyImpl(this._value);
@@ -48,13 +50,13 @@ class _$CloudflareStreamVideoCWProxyImpl
   final CloudflareStreamVideo _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareStreamVideo(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareStreamVideo call({
     Object? id = const $CopyWithPlaceholder(),
     Object? uploaded = const $CopyWithPlaceholder(),
@@ -151,9 +153,9 @@ class _$CloudflareStreamVideoCWProxyImpl
           : uploadExpiry as DateTime?,
       thumbnailTimestampPct:
           thumbnailTimestampPct == const $CopyWithPlaceholder()
-              ? _value.thumbnailTimestampPct
-              // ignore: cast_nullable_to_non_nullable
-              : thumbnailTimestampPct as double?,
+          ? _value.thumbnailTimestampPct
+          // ignore: cast_nullable_to_non_nullable
+          : thumbnailTimestampPct as double?,
       playback: playback == const $CopyWithPlaceholder()
           ? _value.playback
           // ignore: cast_nullable_to_non_nullable
@@ -172,15 +174,16 @@ class _$CloudflareStreamVideoCWProxyImpl
           : liveInput as String?,
       customAccountSubdomainUrl:
           customAccountSubdomainUrl == const $CopyWithPlaceholder()
-              ? _value.customAccountSubdomainUrl
-              // ignore: cast_nullable_to_non_nullable
-              : customAccountSubdomainUrl as String?,
+          ? _value.customAccountSubdomainUrl
+          // ignore: cast_nullable_to_non_nullable
+          : customAccountSubdomainUrl as String?,
     );
   }
 }
 
 extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
-  /// Returns a callable class that can be used as follows: `instanceOfCloudflareStreamVideo.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfCloudflareStreamVideo.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$CloudflareStreamVideoCWProxy get copyWith =>
       _$CloudflareStreamVideoCWProxyImpl(this);
@@ -191,82 +194,77 @@ extension $CloudflareStreamVideoCopyWith on CloudflareStreamVideo {
 // **************************************************************************
 
 CloudflareStreamVideo _$CloudflareStreamVideoFromJson(
-        Map<String, dynamic> json) =>
-    CloudflareStreamVideo(
-      id: json['uid'] as String?,
-      uploaded: json['uploaded'] == null
-          ? null
-          : DateTime.parse(json['uploaded'] as String),
-      size: (json['size'] as num?)?.toInt(),
-      watermark: json['watermark'] == null
-          ? null
-          : Watermark.fromJson(json['watermark'] as Map<String, dynamic>),
-      requireSignedURLs: json['requireSignedURLs'] as bool?,
-      meta: json['meta'] as Map<String, dynamic>?,
-      allowedOrigins: (json['allowedOrigins'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      maxDurationSeconds: (json['maxDurationSeconds'] as num?)?.toInt(),
-      created: json['created'] == null
-          ? null
-          : DateTime.parse(json['created'] as String),
-      preview: json['preview'] as String?,
-      modified: json['modified'] == null
-          ? null
-          : DateTime.parse(json['modified'] as String),
-      input: json['input'] == null
-          ? null
-          : VideoSize.fromJson(json['input'] as Map<String, dynamic>),
-      thumbnail: json['thumbnail'] as String?,
-      animatedThumbnail: json['animatedThumbnail'] as String?,
-      status: json['status'] == null
-          ? null
-          : VideoStatus.fromJson(json['status'] as Map<String, dynamic>),
-      duration: (json['duration'] as num?)?.toDouble(),
-      uploadExpiry: json['uploadExpiry'] == null
-          ? null
-          : DateTime.parse(json['uploadExpiry'] as String),
-      thumbnailTimestampPct:
-          (json['thumbnailTimestampPct'] as num?)?.toDouble(),
-      playback: json['playback'] == null
-          ? null
-          : VideoPlaybackInfo.fromJson(
-              json['playback'] as Map<String, dynamic>),
-      nft: json['nft'] == null
-          ? null
-          : MediaNFT.fromJson(json['nft'] as Map<String, dynamic>),
-      readyToStream: json['readyToStream'] as bool?,
-      liveInput: json['liveInput'] as String?,
-      customAccountSubdomainUrl: json['customAccountSubdomainUrl'] as String?,
-    );
+  Map<String, dynamic> json,
+) => CloudflareStreamVideo(
+  id: json['uid'] as String?,
+  uploaded: json['uploaded'] == null
+      ? null
+      : DateTime.parse(json['uploaded'] as String),
+  size: (json['size'] as num?)?.toInt(),
+  watermark: json['watermark'] == null
+      ? null
+      : Watermark.fromJson(json['watermark'] as Map<String, dynamic>),
+  requireSignedURLs: json['requireSignedURLs'] as bool?,
+  meta: json['meta'] as Map<String, dynamic>?,
+  allowedOrigins: (json['allowedOrigins'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  maxDurationSeconds: (json['maxDurationSeconds'] as num?)?.toInt(),
+  created: json['created'] == null
+      ? null
+      : DateTime.parse(json['created'] as String),
+  preview: json['preview'] as String?,
+  modified: json['modified'] == null
+      ? null
+      : DateTime.parse(json['modified'] as String),
+  input: json['input'] == null
+      ? null
+      : VideoSize.fromJson(json['input'] as Map<String, dynamic>),
+  thumbnail: json['thumbnail'] as String?,
+  animatedThumbnail: json['animatedThumbnail'] as String?,
+  status: json['status'] == null
+      ? null
+      : VideoStatus.fromJson(json['status'] as Map<String, dynamic>),
+  duration: (json['duration'] as num?)?.toDouble(),
+  uploadExpiry: json['uploadExpiry'] == null
+      ? null
+      : DateTime.parse(json['uploadExpiry'] as String),
+  thumbnailTimestampPct: (json['thumbnailTimestampPct'] as num?)?.toDouble(),
+  playback: json['playback'] == null
+      ? null
+      : VideoPlaybackInfo.fromJson(json['playback'] as Map<String, dynamic>),
+  nft: json['nft'] == null
+      ? null
+      : MediaNFT.fromJson(json['nft'] as Map<String, dynamic>),
+  readyToStream: json['readyToStream'] as bool?,
+  liveInput: json['liveInput'] as String?,
+  customAccountSubdomainUrl: json['customAccountSubdomainUrl'] as String?,
+);
 
 Map<String, dynamic> _$CloudflareStreamVideoToJson(
-        CloudflareStreamVideo instance) =>
-    <String, dynamic>{
-      'uid': instance.id,
-      'uploaded': instance.uploaded.toIso8601String(),
-      'size': instance.size,
-      if (instance.watermark case final value?) 'watermark': value,
-      'requireSignedURLs': instance.requireSignedURLs,
-      if (instance.meta case final value?) 'meta': value,
-      'allowedOrigins': instance.allowedOrigins,
-      if (instance.maxDurationSeconds case final value?)
-        'maxDurationSeconds': value,
-      'created': instance.created.toIso8601String(),
-      'preview': instance.preview,
-      'modified': instance.modified.toIso8601String(),
-      'input': instance.input,
-      'thumbnail': instance.thumbnail,
-      'animatedThumbnail': instance.animatedThumbnail,
-      'status': instance.status,
-      'duration': instance.duration,
-      if (instance.uploadExpiry?.toIso8601String() case final value?)
-        'uploadExpiry': value,
-      'thumbnailTimestampPct': instance.thumbnailTimestampPct,
-      if (instance.playback case final value?) 'playback': value,
-      if (instance.nft case final value?) 'nft': value,
-      'readyToStream': instance.readyToStream,
-      if (instance.liveInput case final value?) 'liveInput': value,
-      if (instance.customAccountSubdomainUrl case final value?)
-        'customAccountSubdomainUrl': value,
-    };
+  CloudflareStreamVideo instance,
+) => <String, dynamic>{
+  'uid': instance.id,
+  'uploaded': instance.uploaded.toIso8601String(),
+  'size': instance.size,
+  'watermark': ?instance.watermark,
+  'requireSignedURLs': instance.requireSignedURLs,
+  'meta': ?instance.meta,
+  'allowedOrigins': instance.allowedOrigins,
+  'maxDurationSeconds': ?instance.maxDurationSeconds,
+  'created': instance.created.toIso8601String(),
+  'preview': instance.preview,
+  'modified': instance.modified.toIso8601String(),
+  'input': instance.input,
+  'thumbnail': instance.thumbnail,
+  'animatedThumbnail': instance.animatedThumbnail,
+  'status': instance.status,
+  'duration': instance.duration,
+  'uploadExpiry': ?instance.uploadExpiry?.toIso8601String(),
+  'thumbnailTimestampPct': instance.thumbnailTimestampPct,
+  'playback': ?instance.playback,
+  'nft': ?instance.nft,
+  'readyToStream': instance.readyToStream,
+  'liveInput': ?instance.liveInput,
+  'customAccountSubdomainUrl': ?instance.customAccountSubdomainUrl,
+};

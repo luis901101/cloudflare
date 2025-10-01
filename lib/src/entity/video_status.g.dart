@@ -7,12 +7,13 @@ part of 'video_status.dart';
 // **************************************************************************
 
 abstract class _$VideoStatusCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoStatus(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   VideoStatus call({
     MediaProcessingState? state,
     int? pctComplete,
@@ -21,20 +22,21 @@ abstract class _$VideoStatusCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoStatus.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfVideoStatus.copyWith(...)`.
 class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
   const _$VideoStatusCWProxyImpl(this._value);
 
   final VideoStatus _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoStatus(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   VideoStatus call({
     Object? state = const $CopyWithPlaceholder(),
     Object? pctComplete = const $CopyWithPlaceholder(),
@@ -63,7 +65,8 @@ class _$VideoStatusCWProxyImpl implements _$VideoStatusCWProxy {
 }
 
 extension $VideoStatusCopyWith on VideoStatus {
-  /// Returns a callable class that can be used as follows: `instanceOfVideoStatus.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfVideoStatus.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$VideoStatusCWProxy get copyWith => _$VideoStatusCWProxyImpl(this);
 }
@@ -73,20 +76,22 @@ extension $VideoStatusCopyWith on VideoStatus {
 // **************************************************************************
 
 VideoStatus _$VideoStatusFromJson(Map<String, dynamic> json) => VideoStatus(
-      state: $enumDecodeNullable(_$MediaProcessingStateEnumMap, json['state'],
-          unknownValue: MediaProcessingState.unknown),
-      pctComplete:
-          (Jsonable.intReadValue(json, 'pctComplete') as num?)?.toInt(),
-      errorReasonCode: json['errorReasonCode'] as String?,
-      errorReasonText: json['errorReasonText'] as String?,
-    );
+  state: $enumDecodeNullable(
+    _$MediaProcessingStateEnumMap,
+    json['state'],
+    unknownValue: MediaProcessingState.unknown,
+  ),
+  pctComplete: (Jsonable.intReadValue(json, 'pctComplete') as num?)?.toInt(),
+  errorReasonCode: json['errorReasonCode'] as String?,
+  errorReasonText: json['errorReasonText'] as String?,
+);
 
 Map<String, dynamic> _$VideoStatusToJson(VideoStatus instance) =>
     <String, dynamic>{
       'state': _$MediaProcessingStateEnumMap[instance.state]!,
       'pctComplete': instance.pctComplete,
-      if (instance.errorReasonCode case final value?) 'errorReasonCode': value,
-      if (instance.errorReasonText case final value?) 'errorReasonText': value,
+      'errorReasonCode': ?instance.errorReasonCode,
+      'errorReasonText': ?instance.errorReasonText,
     };
 
 const _$MediaProcessingStateEnumMap = {

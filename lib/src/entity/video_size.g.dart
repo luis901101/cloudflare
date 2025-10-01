@@ -7,32 +7,31 @@ part of 'video_size.dart';
 // **************************************************************************
 
 abstract class _$VideoSizeCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoSize(...).copyWith(id: 12, name: "My name")
-  /// ````
-  VideoSize call({
-    int? width,
-    int? height,
-  });
+  /// ```
+  VideoSize call({int? width, int? height});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfVideoSize.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfVideoSize.copyWith(...)`.
 class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
   const _$VideoSizeCWProxyImpl(this._value);
 
   final VideoSize _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// VideoSize(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   VideoSize call({
     Object? width = const $CopyWithPlaceholder(),
     Object? height = const $CopyWithPlaceholder(),
@@ -51,7 +50,8 @@ class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
 }
 
 extension $VideoSizeCopyWith on VideoSize {
-  /// Returns a callable class that can be used as follows: `instanceOfVideoSize.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfVideoSize.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$VideoSizeCWProxy get copyWith => _$VideoSizeCWProxyImpl(this);
 }
@@ -61,11 +61,11 @@ extension $VideoSizeCopyWith on VideoSize {
 // **************************************************************************
 
 VideoSize _$VideoSizeFromJson(Map<String, dynamic> json) => VideoSize(
-      width: (json['width'] as num?)?.toInt(),
-      height: (json['height'] as num?)?.toInt(),
-    );
+  width: (json['width'] as num?)?.toInt(),
+  height: (json['height'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$VideoSizeToJson(VideoSize instance) => <String, dynamic>{
-      'width': instance.width,
-      'height': instance.height,
-    };
+  'width': instance.width,
+  'height': instance.height,
+};

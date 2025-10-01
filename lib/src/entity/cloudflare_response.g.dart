@@ -7,12 +7,13 @@ part of 'cloudflare_response.dart';
 // **************************************************************************
 
 abstract class _$CloudflareResponseCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareResponse call({
     Object? result,
     bool? success,
@@ -22,20 +23,21 @@ abstract class _$CloudflareResponseCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfCloudflareResponse.copyWith(...)`.
 class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
   const _$CloudflareResponseCWProxyImpl(this._value);
 
   final CloudflareResponse _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareResponse(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareResponse call({
     Object? result = const $CopyWithPlaceholder(),
     Object? success = const $CopyWithPlaceholder(),
@@ -47,7 +49,7 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
       result: result == const $CopyWithPlaceholder()
           ? _value.result
           // ignore: cast_nullable_to_non_nullable
-          : result,
+          : result as Object?,
       success: success == const $CopyWithPlaceholder()
           ? _value.success
           // ignore: cast_nullable_to_non_nullable
@@ -69,7 +71,8 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
 }
 
 extension $CloudflareResponseCopyWith on CloudflareResponse {
-  /// Returns a callable class that can be used as follows: `instanceOfCloudflareResponse.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfCloudflareResponse.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$CloudflareResponseCWProxy get copyWith =>
       _$CloudflareResponseCWProxyImpl(this);
@@ -96,9 +99,9 @@ CloudflareResponse _$CloudflareResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$CloudflareResponseToJson(CloudflareResponse instance) =>
     <String, dynamic>{
-      if (instance.result case final value?) 'result': value,
+      'result': ?instance.result,
       'success': instance.success,
       'errors': instance.errors,
       'messages': instance.messages,
-      if (instance.paginationInfo case final value?) 'result_info': value,
+      'result_info': ?instance.paginationInfo,
     };

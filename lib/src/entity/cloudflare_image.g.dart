@@ -7,12 +7,13 @@ part of 'cloudflare_image.dart';
 // **************************************************************************
 
 abstract class _$CloudflareImageCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareImage(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareImage call({
     String? id,
     String? imageDeliveryId,
@@ -25,20 +26,21 @@ abstract class _$CloudflareImageCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfCloudflareImage.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfCloudflareImage.copyWith(...)`.
 class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
   const _$CloudflareImageCWProxyImpl(this._value);
 
   final CloudflareImage _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// CloudflareImage(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   CloudflareImage call({
     Object? id = const $CopyWithPlaceholder(),
     Object? imageDeliveryId = const $CopyWithPlaceholder(),
@@ -87,7 +89,8 @@ class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
 }
 
 extension $CloudflareImageCopyWith on CloudflareImage {
-  /// Returns a callable class that can be used as follows: `instanceOfCloudflareImage.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfCloudflareImage.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$CloudflareImageCWProxy get copyWith => _$CloudflareImageCWProxyImpl(this);
 }
@@ -116,9 +119,9 @@ CloudflareImage _$CloudflareImageFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$CloudflareImageToJson(CloudflareImage instance) =>
     <String, dynamic>{
       'id': instance.id,
-      if (instance.imageDeliveryId case final value?) 'imageDeliveryId': value,
-      if (instance.filename case final value?) 'filename': value,
-      if (instance.meta case final value?) 'meta': value,
+      'imageDeliveryId': ?instance.imageDeliveryId,
+      'filename': ?instance.filename,
+      'meta': ?instance.meta,
       'requireSignedURLs': instance.requireSignedURLs,
       'variants': instance.variants,
       'uploaded': instance.uploaded.toIso8601String(),

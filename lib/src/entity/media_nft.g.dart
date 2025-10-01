@@ -7,32 +7,31 @@ part of 'media_nft.dart';
 // **************************************************************************
 
 abstract class _$MediaNFTCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// MediaNFT(...).copyWith(id: 12, name: "My name")
-  /// ````
-  MediaNFT call({
-    String? contract,
-    int? token,
-  });
+  /// ```
+  MediaNFT call({String? contract, int? token});
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfMediaNFT.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfMediaNFT.copyWith(...)`.
 class _$MediaNFTCWProxyImpl implements _$MediaNFTCWProxy {
   const _$MediaNFTCWProxyImpl(this._value);
 
   final MediaNFT _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// MediaNFT(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   MediaNFT call({
     Object? contract = const $CopyWithPlaceholder(),
     Object? token = const $CopyWithPlaceholder(),
@@ -51,7 +50,8 @@ class _$MediaNFTCWProxyImpl implements _$MediaNFTCWProxy {
 }
 
 extension $MediaNFTCopyWith on MediaNFT {
-  /// Returns a callable class that can be used as follows: `instanceOfMediaNFT.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfMediaNFT.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$MediaNFTCWProxy get copyWith => _$MediaNFTCWProxyImpl(this);
 }
@@ -61,11 +61,11 @@ extension $MediaNFTCopyWith on MediaNFT {
 // **************************************************************************
 
 MediaNFT _$MediaNFTFromJson(Map<String, dynamic> json) => MediaNFT(
-      contract: json['contract'] as String?,
-      token: (json['token'] as num?)?.toInt(),
-    );
+  contract: json['contract'] as String?,
+  token: (json['token'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$MediaNFTToJson(MediaNFT instance) => <String, dynamic>{
-      if (instance.contract case final value?) 'contract': value,
-      if (instance.token case final value?) 'token': value,
-    };
+  'contract': ?instance.contract,
+  'token': ?instance.token,
+};

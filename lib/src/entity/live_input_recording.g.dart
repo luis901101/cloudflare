@@ -7,12 +7,13 @@ part of 'live_input_recording.dart';
 // **************************************************************************
 
 abstract class _$LiveInputRecordingCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputRecording(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputRecording call({
     LiveInputRecordingMode? mode,
     bool? requireSignedURLs,
@@ -21,20 +22,21 @@ abstract class _$LiveInputRecordingCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputRecording.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfLiveInputRecording.copyWith(...)`.
 class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
   const _$LiveInputRecordingCWProxyImpl(this._value);
 
   final LiveInputRecording _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputRecording(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputRecording call({
     Object? mode = const $CopyWithPlaceholder(),
     Object? requireSignedURLs = const $CopyWithPlaceholder(),
@@ -63,7 +65,8 @@ class _$LiveInputRecordingCWProxyImpl implements _$LiveInputRecordingCWProxy {
 }
 
 extension $LiveInputRecordingCopyWith on LiveInputRecording {
-  /// Returns a callable class that can be used as follows: `instanceOfLiveInputRecording.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfLiveInputRecording.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$LiveInputRecordingCWProxy get copyWith =>
       _$LiveInputRecordingCWProxyImpl(this);

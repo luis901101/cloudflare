@@ -7,12 +7,13 @@ part of 'live_input_status_log.dart';
 // **************************************************************************
 
 abstract class _$LiveInputStatusLogCWProxy {
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputStatusLog call({
     String? state,
     String? reason,
@@ -21,20 +22,21 @@ abstract class _$LiveInputStatusLogCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLiveInputStatusLog.copyWith(...)`.
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfLiveInputStatusLog.copyWith(...)`.
 class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
   const _$LiveInputStatusLogCWProxyImpl(this._value);
 
   final LiveInputStatusLog _value;
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   LiveInputStatusLog call({
     Object? state = const $CopyWithPlaceholder(),
     Object? reason = const $CopyWithPlaceholder(),
@@ -63,7 +65,8 @@ class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
 }
 
 extension $LiveInputStatusLogCopyWith on LiveInputStatusLog {
-  /// Returns a callable class that can be used as follows: `instanceOfLiveInputStatusLog.copyWith(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfLiveInputStatusLog.copyWith(...)`.
   // ignore: library_private_types_in_public_api
   _$LiveInputStatusLogCWProxy get copyWith =>
       _$LiveInputStatusLogCWProxyImpl(this);
@@ -87,10 +90,8 @@ LiveInputStatusLog _$LiveInputStatusLogFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$LiveInputStatusLogToJson(LiveInputStatusLog instance) =>
     <String, dynamic>{
-      if (instance.state case final value?) 'state': value,
-      if (instance.reason case final value?) 'reason': value,
-      if (instance.statusEnteredAt?.toIso8601String() case final value?)
-        'statusEnteredAt': value,
-      if (instance.statusLastSeen?.toIso8601String() case final value?)
-        'statusLastSeen': value,
+      'state': ?instance.state,
+      'reason': ?instance.reason,
+      'statusEnteredAt': ?instance.statusEnteredAt?.toIso8601String(),
+      'statusLastSeen': ?instance.statusLastSeen?.toIso8601String(),
     };
