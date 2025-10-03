@@ -17,7 +17,7 @@ import 'package:retrofit/retrofit.dart' hide Headers;
 export 'package:cloudflare/src/apiservice/image_api.dart';
 export 'package:cloudflare/src/apiservice/stream_api.dart';
 export 'package:cloudflare/src/apiservice/tus_api.dart';
-export 'package:dio/dio.dart';
+export 'package:dio/dio.dart' hide Response;
 export 'package:retrofit/retrofit.dart' hide Headers;
 
 // Entities
@@ -210,5 +210,6 @@ class Cloudflare {
     headers: headers,
     cancelTokenCallback: cancelTokenCallback,
     interceptors: interceptors,
+    tokenCallback: () async => null,
   );
 }

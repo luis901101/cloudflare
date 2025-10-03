@@ -1,5 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
+import 'package:cross_file/cross_file.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:cloudflare/cloudflare.dart';
@@ -56,34 +55,11 @@ void main() async {
         }
         final response = await cloudflare.imageAPI.upload(
           fileName: 'image-from-file',
-          contentFromFile: DataTransmit<File>(
+          contentFromFile: DataTransmit<XFile>(
             data: imageFile,
             progressCallback: (count, total) {
               print(
                 'Simple upload image: ${p.basename(imageFile.path)} from file progress: $count/$total',
-              );
-            },
-          ),
-        );
-        expect(response, ImageMatcher());
-        addId(response.body?.id);
-      },
-      timeout: Timeout(Duration(minutes: 2)),
-    );
-
-    test(
-      'Simple upload image from path with progress update',
-      () async {
-        if (!imageFile.existsSync()) {
-          fail('No image path available to upload');
-        }
-        final response = await cloudflare.imageAPI.upload(
-          fileName: 'image-from-path',
-          contentFromPath: DataTransmit<String>(
-            data: imageFile.path,
-            progressCallback: (count, total) {
-              print(
-                'Simple upload image: ${p.basename(imageFile.path)} from path progress: $count/$total',
               );
             },
           ),
@@ -102,8 +78,8 @@ void main() async {
         }
         final response = await cloudflare.imageAPI.upload(
           fileName: 'image-from-bytes',
-          contentFromBytes: DataTransmit<Uint8List>(
-            data: imageFile.readAsBytesSync(),
+          contentFromFile: DataTransmit<XFile>(
+            data: XFile.fromData(await imageFile.readAsBytes()),
             progressCallback: (count, total) {
               print(
                 'Simple upload image: ${p.basename(imageFile.path)} from bytes progress: $count/$total',
@@ -150,10 +126,10 @@ void main() async {
           );
         }
         final files = [imageFile, imageFile1, imageFile2];
-        List<DataTransmit<File>> contents = [];
+        List<DataTransmit<XFile>> contents = [];
         for (final file in files) {
           contents.add(
-            DataTransmit<File>(
+            DataTransmit<XFile>(
               data: file,
               progressCallback: (count, total) {
                 print(
@@ -175,41 +151,6 @@ void main() async {
     );
 
     test(
-      'Multiple upload image from path with progress update',
-      () async {
-        if (!imageFile.existsSync() ||
-            !imageFile1.existsSync() ||
-            !imageFile2.existsSync()) {
-          fail(
-            'imageFile and imageFile1 and imageFile2 are required for multiple upload test. Check if you set each image file for each env var.',
-          );
-        }
-        final paths = [imageFile.path, imageFile1.path, imageFile2.path];
-        List<DataTransmit<String>> contents = [];
-        for (final path in paths) {
-          contents.add(
-            DataTransmit<String>(
-              data: path,
-              progressCallback: (count, total) {
-                print(
-                  'Multiple upload image from path: ${p.basename(path)} progress: $count/$total',
-                );
-              },
-            ),
-          );
-        }
-        final responses = await cloudflare.imageAPI.uploadMultiple(
-          contentFromPaths: contents,
-        );
-        for (final response in responses) {
-          expect(response, ImageMatcher());
-          addId(response.body?.id);
-        }
-      },
-      timeout: Timeout(Duration(minutes: 2)),
-    );
-
-    test(
       'Multiple upload image from bytes with progress update',
       () async {
         if (!imageFile.existsSync() ||
@@ -220,11 +161,11 @@ void main() async {
           );
         }
         final files = [imageFile, imageFile1, imageFile2];
-        List<DataTransmit<Uint8List>> contents = [];
+        List<DataTransmit<XFile>> contents = [];
         for (final file in files) {
           contents.add(
-            DataTransmit<Uint8List>(
-              data: file.readAsBytesSync(),
+            DataTransmit<XFile>(
+              data: XFile.fromData(await file.readAsBytes()),
               progressCallback: (count, total) {
                 print(
                   'Multiple upload image from bytes: ${p.basename(file.path)} progress: $count/$total',
@@ -234,7 +175,7 @@ void main() async {
           );
         }
         final responses = await cloudflare.imageAPI.uploadMultiple(
-          contentFromBytes: contents,
+          contentFromFiles: contents,
         );
         for (final response in responses) {
           expect(response, ImageMatcher());
@@ -288,7 +229,7 @@ void main() async {
           'description': 'This is an image test',
         };
         final response = await cloudflare.imageAPI.upload(
-          contentFromFile: DataTransmit<File>(data: imageFile),
+          contentFromFile: DataTransmit<XFile>(data: imageFile),
           requireSignedURLs: true,
           metadata: metadata,
         );
@@ -333,7 +274,7 @@ void main() async {
           final response = await cloudflare.imageAPI.directUpload(
             fileName: 'direct-upload-image',
             dataUploadDraft: dataUploadDraft!,
-            contentFromFile: DataTransmit<File>(
+            contentFromFile: DataTransmit<XFile>(
               data: imageFile,
               progressCallback: (count, total) {
                 print(
@@ -403,7 +344,7 @@ void main() async {
     };
     setUpAll(() async {
       final response = await cloudflare.imageAPI.upload(
-        contentFromFile: DataTransmit<File>(data: imageFile),
+        contentFromFile: DataTransmit<XFile>(data: imageFile),
         requireSignedURLs: true,
         metadata: metadata,
       );

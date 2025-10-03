@@ -1,13 +1,9 @@
-import 'dart:io' hide HttpResponse;
-import 'dart:typed_data';
-
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
 import 'package:cloudflare/src/utils/custom_parser_error_logger.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
-import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:cross_file/cross_file.dart' show XFile;
 import 'package:tusc/tusc.dart' as tus;
 
@@ -43,13 +39,7 @@ class StreamAPI
   /// https://api.cloudflare.com/#stream-videos-upload-a-video-from-a-url
   Future<CloudflareHTTPResponse<CloudflareStreamVideo?>> stream({
     /// Video file to stream
-    DataTransmit<File>? contentFromFile,
-
-    /// Path to the video file to stream
-    DataTransmit<String>? contentFromPath,
-
-    /// Video byte array representation to stream
-    DataTransmit<Uint8List>? contentFromBytes,
+    DataTransmit<XFile>? contentFromFile,
 
     /// URL to the video. Server must be publicly routable and support
     /// HTTP HEAD requests and HTTP GET range requests. Server should respond
@@ -103,82 +93,31 @@ class StreamAPI
     String? fileName,
 
     /// Used to cancel the request, if not specified, the cancelToken from
-    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// [contentFromFile] or [contentFromUrl]
     /// will be used. If none of the mentioned provides a [cancelToken] then the
     /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-      contentFromFile != null ||
-          contentFromPath != null ||
-          contentFromBytes != null ||
-          contentFromUrl != null,
+      contentFromFile != null || contentFromUrl != null,
       'One of the content must be specified.',
     );
 
     final CloudflareHTTPResponse<CloudflareStreamVideo?> response;
 
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-        data: File(contentFromPath.data),
-        progressCallback: contentFromPath.progressCallback,
-      );
-    }
-
-    /// Web support
-    if (contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-        data: contentFromFile.data.readAsBytesSync(),
-        progressCallback: contentFromFile.progressCallback,
-      );
-      contentFromFile = null;
-    }
-
     if (contentFromFile != null) {
-      response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(
-              service.streamFromFile(
-                file: contentFromFile.data,
-                onUploadProgress: contentFromFile.progressCallback,
-                cancelToken:
-                    cancelToken ??
-                    contentFromFile.cancelToken ??
-                    restAPI.cancelTokenCallback?.call(),
-              ),
-            )
-          : parseResponse(
-              streamGeneric(
-                multipartFile: MultipartFile.fromFileSync(
-                  contentFromFile.data.path,
-                  filename: fileName,
-                ),
-                onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: cancelToken ?? contentFromFile.cancelToken,
-              ),
-            ));
-    } else if (contentFromBytes != null) {
-      response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(
-              service.streamFromBytes(
-                bytes: contentFromBytes.data,
-                onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken:
-                    cancelToken ??
-                    contentFromBytes.cancelToken ??
-                    restAPI.cancelTokenCallback?.call(),
-              ),
-            )
-          : parseResponse(
-              streamGeneric(
-                multipartFile: MultipartFile.fromBytes(
-                  contentFromBytes.data,
-                  filename: fileName,
-                ),
-                onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: cancelToken ?? contentFromBytes.cancelToken,
-              ),
-            ));
+      response = await parseResponse(
+        streamGeneric(
+          multipartFile: MultipartFile.fromStream(
+            () => contentFromFile.data.openRead(),
+            await contentFromFile.data.length(),
+            filename: fileName ?? contentFromFile.data.name,
+          ),
+          onUploadProgress: contentFromFile.progressCallback,
+          cancelToken: cancelToken ?? contentFromFile.cancelToken,
+        ),
+      );
     } else {
       response = await parseResponse(
         service.streamFromUrl(
@@ -272,13 +211,7 @@ class StreamAPI
   /// https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#resumable-uploads-with-tus-for-large-files
   Future<TusAPI> tusStream({
     /// Video file to stream
-    File? file,
-
-    /// Path to the video file to stream
-    String? path,
-
-    /// Video byte array representation to stream
-    Uint8List? bytes,
+    required XFile file,
 
     /// The name of the video in the dashboard.
     String? name,
@@ -343,28 +276,10 @@ class StreamAPI
     Duration? timeout,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    assert(
-      file != null || path != null || bytes != null,
-      'One of the content must be specified.',
-    );
 
-    if (path != null) file ??= File(path);
-
-    /// Web support
-    if (file != null && PlatformUtils.isWeb) {
-      bytes ??= file.readAsBytesSync();
-      file = null;
-    }
-
-    final XFile xFile;
-    if (file != null) {
-      xFile = XFile(file.path);
-    } else {
-      xFile = XFile.fromData(bytes!);
-    }
     final tusAPI = TusAPI(
       dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
-      file: xFile,
+      file: file,
       cache: cache,
       chunkSize: chunkSize,
       headers: restAPI.headers,
@@ -394,13 +309,7 @@ class StreamAPI
     required DataUploadDraft dataUploadDraft,
 
     /// Video file to upload
-    DataTransmit<File>? contentFromFile,
-
-    /// Path to the video file to upload
-    DataTransmit<String>? contentFromPath,
-
-    /// Image byte array representation to upload
-    DataTransmit<Uint8List>? contentFromBytes,
+    required DataTransmit<XFile> contentFromFile,
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
@@ -411,58 +320,22 @@ class StreamAPI
     /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
-    assert(
-      contentFromFile != null ||
-          contentFromPath != null ||
-          contentFromBytes != null,
-      'One of the content must be specified.',
-    );
-
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-        data: File(contentFromPath.data),
-        progressCallback: contentFromPath.progressCallback,
-        cancelToken: contentFromPath.cancelToken,
-      );
-    }
-
-    /// Web support
-    if (contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-        data: contentFromFile.data.readAsBytesSync(),
-        progressCallback: contentFromFile.progressCallback,
-        cancelToken: contentFromFile.cancelToken,
-      );
-      contentFromFile = null;
-    }
-
     final dio = restAPI.dio;
     final formData = FormData();
     ProgressCallback? progressCallback;
-    if (contentFromFile != null) {
-      cancelToken ??= contentFromFile.cancelToken;
-      final file = contentFromFile.data;
-      progressCallback = contentFromFile.progressCallback;
-      formData.files.add(
-        MapEntry(
-          Params.file,
-          MultipartFile.fromFileSync(
-            file.path,
-            filename: fileName ?? file.path.split(Platform.pathSeparator).last,
-          ),
+    cancelToken ??= contentFromFile.cancelToken;
+    final file = contentFromFile.data;
+    progressCallback = contentFromFile.progressCallback;
+    formData.files.add(
+      MapEntry(
+        Params.file,
+        MultipartFile.fromStream(
+          () => file.openRead(),
+          await file.length(),
+          filename: fileName ?? file.name,
         ),
-      );
-    } else {
-      cancelToken ??= contentFromBytes!.cancelToken;
-      final bytes = contentFromBytes!.data;
-      progressCallback = contentFromBytes.progressCallback;
-      formData.files.add(
-        MapEntry(
-          Params.file,
-          MultipartFile.fromBytes(bytes, filename: fileName),
-        ),
-      );
-    }
+      ),
+    );
 
     final rawResponse = await dio.fetch(
       Options(
@@ -505,13 +378,7 @@ class StreamAPI
     required DataUploadDraft dataUploadDraft,
 
     /// Video file to stream
-    File? file,
-
-    /// Path to the video file to stream
-    String? path,
-
-    /// Video byte array representation to stream
-    Uint8List? bytes,
+    required XFile file,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -572,28 +439,9 @@ class StreamAPI
     /// Defaults to Cloudflare timeout
     Duration? timeout,
   }) async {
-    assert(
-      file != null || path != null || bytes != null,
-      'One of the content must be specified.',
-    );
-
-    if (path != null) file ??= File(path);
-
-    /// Web support
-    if (file != null && PlatformUtils.isWeb) {
-      bytes ??= file.readAsBytesSync();
-      file = null;
-    }
-
-    final XFile xFile;
-    if (file != null) {
-      xFile = XFile(file.path);
-    } else {
-      xFile = XFile.fromData(bytes!);
-    }
     final tusAPI = TusAPI(
       dataUploadDraft: dataUploadDraft,
-      file: xFile,
+      file: file,
       cache: cache,
       chunkSize: chunkSize,
       metadata: {
@@ -610,13 +458,7 @@ class StreamAPI
   /// Stream multiple videos by repeatedly calling stream
   Future<List<CloudflareHTTPResponse<CloudflareStreamVideo?>>> streamMultiple({
     /// Video files to stream
-    List<DataTransmit<File>>? contentFromFiles,
-
-    /// Paths to the video files to stream
-    List<DataTransmit<String>>? contentFromPaths,
-
-    /// List of video byte array representations to stream
-    List<DataTransmit<Uint8List>>? contentFromBytes,
+    List<DataTransmit<XFile>>? contentFromFiles,
 
     /// URL list to the videos. Server must be publicly routable and support
     /// HTTP HEAD requests and HTTP GET range requests. Server should respond
@@ -675,38 +517,18 @@ class StreamAPI
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
       (contentFromFiles?.isNotEmpty ?? false) ||
-          (contentFromPaths?.isNotEmpty ?? false) ||
-          (contentFromBytes?.isNotEmpty ?? false) ||
           (contentFromUrls?.isNotEmpty ?? false),
       'One of the contents must be specified.',
     );
 
     List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responses = [];
 
-    if (contentFromPaths?.isNotEmpty ?? false) {
-      contentFromFiles = [];
-      for (final content in contentFromPaths!) {
-        contentFromFiles.add(
-          DataTransmit<File>(
-            data: File(content.data),
-            progressCallback: content.progressCallback,
-          ),
-        );
-      }
-    }
     if (contentFromFiles?.isNotEmpty ?? false) {
       for (final content in contentFromFiles!) {
         final response = await stream(
           contentFromFile: content,
           cancelToken: cancelToken,
-        );
-        responses.add(response);
-      }
-    } else if (contentFromBytes?.isNotEmpty ?? false) {
-      for (final content in contentFromBytes!) {
-        final response = await stream(
-          contentFromBytes: content,
-          cancelToken: cancelToken,
+          fileName: content.data.name.isNotEmpty ? null : 'stream-from-file',
         );
         responses.add(response);
       }

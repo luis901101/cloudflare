@@ -1,32 +1,9 @@
-import 'dart:io';
+// Public entrypoint with conditional import
+import 'package:cloudflare/src/utils/platform_stub/platform_stub.dart'
+    if (dart.library.html) 'package:cloudflare/src/utils/platform_stub/platform_web.dart'
+    if (dart.library.io) 'package:cloudflare/src/utils/platform_stub/platform_io.dart';
 
+/// Utilities to check the current platform in pure Dart.
 class PlatformUtils {
-  /// Workaround to know if dart code is running on web
-  static bool get isWeb {
-    try {
-      Platform.isAndroid;
-      return false;
-    } catch (e) {
-      print(e);
-    }
-    return true;
-  }
-
-  static bool get isIOS {
-    try {
-      return Platform.isIOS;
-    } catch (e) {
-      print(e);
-    }
-    return false;
-  }
-
-  static bool get isAndroid {
-    try {
-      return Platform.isAndroid;
-    } catch (e) {
-      print(e);
-    }
-    return false;
-  }
+  static bool get isWeb => platformIsWeb;
 }

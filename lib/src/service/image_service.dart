@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/utils/params.dart';
@@ -22,16 +21,17 @@ abstract class ImageService {
     );
   }
 
-  @POST('/v1')
-  @MultiPart()
-  @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
-    @Part(name: Params.file) required File file,
-    @Part() bool? requireSignedURLs,
-    @Part() Map<String, dynamic>? metadata,
-    @SendProgress() ProgressCallback? onUploadProgress,
-    @CancelRequest() CancelToken? cancelToken,
-  });
+  // COMMENTED OUT DUE TO WEB PLATFORM ISSUES WITH File from 'dart:io'
+  // @POST('/v1')
+  // @MultiPart()
+  // @Headers(RestAPIService.defaultHeaders)
+  // Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
+  //   @Part(name: Params.file) required File file,
+  //   @Part() bool? requireSignedURLs,
+  //   @Part() Map<String, dynamic>? metadata,
+  //   @SendProgress() ProgressCallback? onUploadProgress,
+  //   @CancelRequest() CancelToken? cancelToken,
+  // });
 
   @POST('/v1')
   @MultiPart()

@@ -1,10 +1,8 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:tusc/tusc.dart';
-import 'package:path/path.dart' as p;
-
 import 'package:cloudflare/cloudflare.dart';
+import 'package:cross_file/cross_file.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
+import 'package:tusc/tusc.dart';
 
 import 'base_tests.dart';
 import 'utils/matchers.dart';
@@ -84,34 +82,11 @@ void main() async {
         }
         final response = await cloudflare.streamAPI.stream(
           fileName: 'stream-from-file',
-          contentFromFile: DataTransmit<File>(
+          contentFromFile: DataTransmit<XFile>(
             data: videoFile,
             progressCallback: (count, total) {
               print(
                 'Simple stream video: ${p.basename(videoFile.path)} from file progress: $count/$total',
-              );
-            },
-          ),
-        );
-        expect(response, StreamVideoMatcher());
-        addId(response.body?.id);
-      },
-      timeout: Timeout(Duration(minutes: 5)),
-    );
-
-    test(
-      'Simple stream video from path with progress update',
-      () async {
-        if (!videoFile.existsSync()) {
-          fail('No video path available to stream');
-        }
-        final response = await cloudflare.streamAPI.stream(
-          fileName: 'stream-from-path',
-          contentFromPath: DataTransmit<String>(
-            data: videoFile.path,
-            progressCallback: (count, total) {
-              print(
-                'Simple stream video: ${p.basename(videoFile.path)} from path progress: $count/$total',
               );
             },
           ),
@@ -129,9 +104,11 @@ void main() async {
           fail('No video bytes available to stream');
         }
         final response = await cloudflare.streamAPI.stream(
-          fileName: 'stream-from-bytes',
-          contentFromBytes: DataTransmit<Uint8List>(
-            data: videoFile.readAsBytesSync(),
+          fileName: videoFile.name.isNotEmpty
+              ? videoFile.name
+              : 'stream-from-bytes',
+          contentFromFile: DataTransmit<XFile>(
+            data: XFile.fromData(await videoFile.readAsBytes()),
             progressCallback: (count, total) {
               print(
                 'Simple stream video: ${p.basename(videoFile.path)} from bytes progress: $count/$total',
@@ -178,10 +155,10 @@ void main() async {
           );
         }
         final files = [videoFile, videoFile1, videoFile2];
-        List<DataTransmit<File>> contents = [];
+        List<DataTransmit<XFile>> contents = [];
         for (final file in files) {
           contents.add(
-            DataTransmit<File>(
+            DataTransmit<XFile>(
               data: file,
               progressCallback: (count, total) {
                 print(
@@ -203,41 +180,6 @@ void main() async {
     );
 
     test(
-      'Multiple stream video from path with progress update',
-      () async {
-        if (!videoFile.existsSync() ||
-            !videoFile1.existsSync() ||
-            !videoFile2.existsSync()) {
-          fail(
-            'videoFile and videoFile1 and videoFile2 are required for multiple stream test. Check if you set each video file for each env var.',
-          );
-        }
-        final paths = [videoFile.path, videoFile1.path, videoFile2.path];
-        List<DataTransmit<String>> contents = [];
-        for (final path in paths) {
-          contents.add(
-            DataTransmit<String>(
-              data: path,
-              progressCallback: (count, total) {
-                print(
-                  'Multiple stream video from path: ${p.basename(path)} progress: $count/$total',
-                );
-              },
-            ),
-          );
-        }
-        final responses = await cloudflare.streamAPI.streamMultiple(
-          contentFromPaths: contents,
-        );
-        for (final response in responses) {
-          expect(response, StreamVideoMatcher());
-          addId(response.body?.id);
-        }
-      },
-      timeout: Timeout(Duration(minutes: 5)),
-    );
-
-    test(
       'Multiple stream video from bytes with progress update',
       () async {
         if (!videoFile.existsSync() ||
@@ -248,11 +190,12 @@ void main() async {
           );
         }
         final files = [videoFile, videoFile1, videoFile2];
-        List<DataTransmit<Uint8List>> contents = [];
+        List<DataTransmit<XFile>> contents = [];
         for (final file in files) {
           contents.add(
-            DataTransmit<Uint8List>(
-              data: file.readAsBytesSync(),
+            DataTransmit<XFile>(
+              //IMPORTANT: When testing on IO platforms (not web platforms) XFile ignores the name param in constructor
+              data: XFile.fromData(await file.readAsBytes(), name: file.name),
               progressCallback: (count, total) {
                 print(
                   'Multiple stream video from bytes: ${p.basename(file.path)} progress: $count/$total',
@@ -262,7 +205,7 @@ void main() async {
           );
         }
         final responses = await cloudflare.streamAPI.streamMultiple(
-          contentFromBytes: contents,
+          contentFromFiles: contents,
         );
         for (final response in responses) {
           expect(response, StreamVideoMatcher());
@@ -377,7 +320,7 @@ void main() async {
           final response = await cloudflare.streamAPI.directStreamUpload(
             fileName: 'direct-stream-upload',
             dataUploadDraft: dataUploadDraft!,
-            contentFromFile: DataTransmit<File>(
+            contentFromFile: DataTransmit<XFile>(
               data: videoFile,
               progressCallback: (count, total) {
                 print(
@@ -463,7 +406,7 @@ void main() async {
         if (!videoFile3.existsSync()) {
           fail('No video file available to get its file size');
         }
-        final fileSize = videoFile3.lengthSync();
+        final fileSize = await videoFile3.length();
         final response = await cloudflare.streamAPI.createTusDirectStreamUpload(
           size: fileSize,
           name: 'test-video-direct-upload',

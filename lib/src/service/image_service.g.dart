@@ -20,65 +20,6 @@ class _ImageService implements ImageService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> uploadFromFile({
-    required File file,
-    bool? requireSignedURLs,
-    Map<String, dynamic>? metadata,
-    void Function(int, int)? onUploadProgress,
-    CancelToken? cancelToken,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
-    final _data = FormData();
-    _data.files.add(
-      MapEntry(
-        'file',
-        MultipartFile.fromFileSync(
-          file.path,
-          filename: file.path.split(Platform.pathSeparator).last,
-        ),
-      ),
-    );
-    if (requireSignedURLs != null) {
-      _data.fields.add(
-        MapEntry('requireSignedURLs', requireSignedURLs.toString()),
-      );
-    }
-    _data.fields.add(MapEntry('metadata', jsonEncode(metadata)));
-    final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
-      Options(
-            method: 'POST',
-            headers: _headers,
-            extra: _extra,
-            contentType: 'multipart/form-data',
-          )
-          .compose(
-            _dio.options,
-            '/v1',
-            queryParameters: queryParameters,
-            data: _data,
-            cancelToken: cancelToken,
-            onSendProgress: onUploadProgress,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>?>(_options);
-    late CloudflareResponse? _value;
-    try {
-      _value = _result.data == null
-          ? null
-          : CloudflareResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
-  }
-
-  @override
   Future<HttpResponse<CloudflareResponse?>> uploadFromBytes({
     required List<int> bytes,
     bool? requireSignedURLs,

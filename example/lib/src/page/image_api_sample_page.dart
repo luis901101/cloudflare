@@ -404,31 +404,33 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
   }
 
   Future<Uint8List> getFileBytes(String path) async {
-    return await File(path).readAsBytes();
+    return await XFile(path).readAsBytes();
   }
 
   Future<void> doMultipleAuthenticatedUpload() async {
     try {
-      List<DataTransmit<String>>? contentFromPaths;
-      List<DataTransmit<Uint8List>>? contentFromBytes;
+      List<DataTransmit<XFile>> contentFromFiles = [];
 
       switch (fileSource) {
         case FileSource.path:
-          contentFromPaths =
-              dataImages.map((data) => data.dataTransmit).toList();
+          contentFromFiles = dataImages
+              .map((data) =>
+                  DataTransmit<XFile>(data: XFile(data.dataTransmit.data)))
+              .toList();
           break;
         case FileSource.bytes:
-          contentFromBytes = await Future.wait(dataImages.map((data) async =>
-              DataTransmit<Uint8List>(
-                  data: await getFileBytes(data.dataTransmit.data),
+          contentFromFiles = await Future.wait(dataImages.map((data) async =>
+              DataTransmit<XFile>(
+                  data: XFile.fromData(
+                      await getFileBytes(data.dataTransmit.data),
+                      name: XFile(data.dataTransmit.data).name),
                   progressCallback: data.dataTransmit.progressCallback)));
           break;
       }
 
       List<CloudflareHTTPResponse<CloudflareImage?>> responses =
           await cloudflare.imageAPI.uploadMultiple(
-        contentFromPaths: contentFromPaths,
-        contentFromBytes: contentFromBytes,
+        contentFromFiles: contentFromFiles,
       );
 
       for (var response in responses) {
@@ -469,12 +471,16 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
       }
 
       for (final content in contents) {
-        DataTransmit<String>? contentFromPath;
-        DataTransmit<Uint8List>? contentFromBytes;
+        DataTransmit<XFile> contentFromFile =
+            DataTransmit<XFile>(data: XFile(''));
         if (content.data is String) {
-          contentFromPath = content as DataTransmit<String>;
+          contentFromFile = DataTransmit<XFile>(
+              data: XFile(content.data),
+              progressCallback: content.progressCallback);
         } else if (content.data is Uint8List) {
-          contentFromBytes = content as DataTransmit<Uint8List>;
+          contentFromFile = DataTransmit<XFile>(
+              data: XFile.fromData(content.data),
+              progressCallback: content.progressCallback);
         }
         final responseCreateDirectUpload =
             await cloudflare.imageAPI.createDirectUpload();
@@ -482,8 +488,7 @@ class _ImageAPIDemoPageState extends State<ImageAPIDemoPage> {
             responseCreateDirectUpload.body != null) {
           final responseUpload = await cloudflare.imageAPI.directUpload(
             dataUploadDraft: responseCreateDirectUpload.body!,
-            contentFromPath: contentFromPath,
-            contentFromBytes: contentFromBytes,
+            contentFromFile: contentFromFile,
           );
           setState(() {});
           if (responseUpload.isSuccessful && responseUpload.body != null) {

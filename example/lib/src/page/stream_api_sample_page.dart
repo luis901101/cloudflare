@@ -567,24 +567,26 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
 
   Future<void> singleHttpRequestAuthenticatedUpload() async {
     try {
-      DataTransmit<String>? contentFromPath;
-      DataTransmit<Uint8List>? contentFromBytes;
+      DataTransmit<XFile> contentFromFile =
+          DataTransmit<XFile>(data: XFile(''));
 
       switch (fileSource) {
         case FileSource.path:
-          contentFromPath = dataVideo?.dataTransmit;
+          contentFromFile = DataTransmit<XFile>(
+              data: XFile(dataVideo?.dataTransmit.data ?? ''),
+              progressCallback: dataVideo?.dataTransmit.progressCallback);
           break;
         case FileSource.bytes:
-          contentFromBytes = DataTransmit<Uint8List>(
-              data: await getFileBytes(dataVideo!.dataTransmit.data),
+          contentFromFile = DataTransmit<XFile>(
+              data: XFile.fromData(
+                  await getFileBytes(dataVideo!.dataTransmit.data)),
               progressCallback: dataVideo?.dataTransmit.progressCallback);
           break;
       }
 
       CloudflareHTTPResponse<CloudflareStreamVideo?> response =
           await cloudflare.streamAPI.stream(
-        contentFromPath: contentFromPath,
-        contentFromBytes: contentFromBytes,
+        contentFromFile: contentFromFile,
       );
 
       if (response.isSuccessful && response.body != null) {
@@ -621,8 +623,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
       }
 
       tusAPI = await cloudflare.streamAPI.tusStream(
-        path: path,
-        bytes: bytes,
+        file: path != null ? XFile(path) : XFile.fromData(bytes!),
         timeout: const Duration(minutes: 2),
       );
       setState(() {});
@@ -671,12 +672,16 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           break;
       }
 
-      DataTransmit<String>? contentFromPath;
-      DataTransmit<Uint8List>? contentFromBytes;
+      DataTransmit<XFile> contentFromFile =
+          DataTransmit<XFile>(data: XFile(''));
       if (content?.data is String) {
-        contentFromPath = content as DataTransmit<String>;
+        contentFromFile = DataTransmit<XFile>(
+            data: XFile(content!.data),
+            progressCallback: content.progressCallback);
       } else if (content?.data is Uint8List) {
-        contentFromBytes = content as DataTransmit<Uint8List>;
+        contentFromFile = DataTransmit<XFile>(
+            data: XFile.fromData(content!.data),
+            progressCallback: content.progressCallback);
       }
       final responseCreateDirectUpload = await cloudflare.streamAPI
           .createDirectStreamUpload(
@@ -686,8 +691,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           responseCreateDirectUpload.body != null) {
         final responseUpload = await cloudflare.streamAPI.directStreamUpload(
           dataUploadDraft: responseCreateDirectUpload.body!,
-          contentFromPath: contentFromPath,
-          contentFromBytes: contentFromBytes,
+          contentFromFile: contentFromFile,
         );
         if (responseUpload.isSuccessful && responseUpload.body != null) {
           awaitForVideoToBeReadyToStream(responseUpload.body!);
@@ -735,8 +739,7 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           responseCreateDirectUpload.body != null) {
         tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
           dataUploadDraft: responseCreateDirectUpload.body!,
-          path: path,
-          bytes: bytes,
+          file: path != null ? XFile(path) : XFile.fromData(bytes!),
           timeout: const Duration(minutes: 2),
         );
         setState(() {});

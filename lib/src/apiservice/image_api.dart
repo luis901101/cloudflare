@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
@@ -8,7 +7,7 @@ import 'package:cloudflare/src/service/image_service.dart';
 import 'package:cloudflare/src/utils/custom_parser_error_logger.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
-import 'package:cloudflare/src/utils/platform_utils.dart';
+import 'package:cross_file/cross_file.dart';
 
 class ImageAPI
     extends
@@ -31,13 +30,7 @@ class ImageAPI
   /// Documentation: https://api.cloudflare.com/#cloudflare-images-upload-an-image-using-a-single-http-request
   Future<CloudflareHTTPResponse<CloudflareImage?>> upload({
     /// Image file to upload
-    DataTransmit<File>? contentFromFile,
-
-    /// Path to the image file to upload
-    DataTransmit<String>? contentFromPath,
-
-    /// Image byte array representation to upload
-    DataTransmit<Uint8List>? contentFromBytes,
+    DataTransmit<XFile>? contentFromFile,
 
     /// An url to fetch an image from origin and upload it.
     ///
@@ -61,90 +54,33 @@ class ImageAPI
     String? fileName,
 
     /// Used to cancel the request, if not specified, the cancelToken from
-    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// [contentFromFile] or [contentFromUrl]
     /// will be used. If none of the mentioned provides a [cancelToken] then the
     /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
-      contentFromFile != null ||
-          contentFromPath != null ||
-          contentFromBytes != null ||
-          contentFromUrl != null,
+      contentFromFile != null || contentFromUrl != null,
       'One of the content must be specified.',
     );
 
     final CloudflareHTTPResponse<CloudflareImage?> response;
 
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-        data: File(contentFromPath.data),
-        progressCallback: contentFromPath.progressCallback,
-      );
-    }
-
-    /// Web support
-    if (contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-        data: contentFromFile.data.readAsBytesSync(),
-        progressCallback: contentFromFile.progressCallback,
-      );
-      contentFromFile = null;
-    }
-
     if (contentFromFile != null) {
-      response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(
-              service.uploadFromFile(
-                file: contentFromFile.data,
-                requireSignedURLs: requireSignedURLs,
-                metadata: metadata,
-                onUploadProgress: contentFromFile.progressCallback,
-                cancelToken:
-                    cancelToken ??
-                    contentFromFile.cancelToken ??
-                    restAPI.cancelTokenCallback?.call(),
-              ),
-            )
-          : parseResponse(
-              uploadGeneric(
-                multipartFile: MultipartFile.fromFileSync(
-                  contentFromFile.data.path,
-                  filename: fileName,
-                ),
-                requireSignedURLs: requireSignedURLs,
-                metadata: metadata,
-                onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: cancelToken ?? contentFromFile.cancelToken,
-              ),
-            ));
-    } else if (contentFromBytes != null) {
-      response = await ((fileName?.isEmpty ?? true)
-          ? parseResponse(
-              service.uploadFromBytes(
-                bytes: contentFromBytes.data,
-                requireSignedURLs: requireSignedURLs,
-                metadata: metadata,
-                onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken:
-                    cancelToken ??
-                    contentFromBytes.cancelToken ??
-                    restAPI.cancelTokenCallback?.call(),
-              ),
-            )
-          : parseResponse(
-              uploadGeneric(
-                multipartFile: MultipartFile.fromBytes(
-                  contentFromBytes.data,
-                  filename: fileName,
-                ),
-                requireSignedURLs: requireSignedURLs,
-                metadata: metadata,
-                onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: cancelToken ?? contentFromBytes.cancelToken,
-              ),
-            ));
+      response = await parseResponse(
+        uploadGeneric(
+          multipartFile: MultipartFile.fromStream(
+            () => contentFromFile.data.openRead(),
+            await contentFromFile.data.length(),
+            filename: fileName ?? contentFromFile.data.name,
+          ),
+          requireSignedURLs: requireSignedURLs,
+          metadata: metadata,
+          onUploadProgress: contentFromFile.progressCallback,
+          cancelToken: cancelToken ?? contentFromFile.cancelToken,
+        ),
+      );
     } else {
       response = await ((fileName?.isEmpty ?? true)
           ? parseResponse(
@@ -253,75 +189,32 @@ class ImageAPI
     required DataUploadDraft dataUploadDraft,
 
     /// Image file to upload
-    DataTransmit<File>? contentFromFile,
-
-    /// Path to the image file to upload
-    DataTransmit<String>? contentFromPath,
-
-    /// Image byte array representation to upload
-    DataTransmit<Uint8List>? contentFromBytes,
+    required DataTransmit<XFile> contentFromFile,
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
 
     /// Used to cancel the request, if not specified, the cancelToken from
-    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
-    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// [contentFromFile] will be used. If none of the mentioned provides a [cancelToken] then the
     /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
-    assert(
-      contentFromFile != null ||
-          contentFromPath != null ||
-          contentFromBytes != null,
-      'One of the content must be specified.',
-    );
-
-    if (contentFromPath != null) {
-      contentFromFile ??= DataTransmit<File>(
-        data: File(contentFromPath.data),
-        progressCallback: contentFromPath.progressCallback,
-        cancelToken: contentFromPath.cancelToken,
-      );
-    }
-
-    /// Web support
-    if (contentFromFile != null && PlatformUtils.isWeb) {
-      contentFromBytes ??= DataTransmit<Uint8List>(
-        data: contentFromFile.data.readAsBytesSync(),
-        progressCallback: contentFromFile.progressCallback,
-        cancelToken: contentFromFile.cancelToken,
-      );
-      contentFromFile = null;
-    }
-
     final dio = restAPI.dio;
     final formData = FormData();
     ProgressCallback? progressCallback;
-    if (contentFromFile != null) {
-      cancelToken ??= contentFromFile.cancelToken;
-      final file = contentFromFile.data;
-      progressCallback = contentFromFile.progressCallback;
-      formData.files.add(
-        MapEntry(
-          Params.file,
-          MultipartFile.fromFileSync(
-            file.path,
-            filename: fileName ?? file.path.split(Platform.pathSeparator).last,
-          ),
+    cancelToken ??= contentFromFile.cancelToken;
+    final file = contentFromFile.data;
+    progressCallback = contentFromFile.progressCallback;
+    formData.files.add(
+      MapEntry(
+        Params.file,
+        MultipartFile.fromStream(
+          () => file.openRead(),
+          await file.length(),
+          filename: fileName ?? file.name,
         ),
-      );
-    } else {
-      cancelToken ??= contentFromBytes!.cancelToken;
-      final bytes = contentFromBytes!.data;
-      progressCallback = contentFromBytes.progressCallback;
-      formData.files.add(
-        MapEntry(
-          Params.file,
-          MultipartFile.fromBytes(bytes, filename: fileName),
-        ),
-      );
-    }
+      ),
+    );
 
     final rawResponse = await dio.fetch<Map<String, dynamic>?>(
       Options(
@@ -349,13 +242,7 @@ class ImageAPI
   /// Uploads multiple images by repeatedly calling upload
   Future<List<CloudflareHTTPResponse<CloudflareImage?>>> uploadMultiple({
     /// Image files to upload
-    List<DataTransmit<File>>? contentFromFiles,
-
-    /// Paths to the image files to upload
-    List<DataTransmit<String>>? contentFromPaths,
-
-    /// List of image byte array representations to upload
-    List<DataTransmit<Uint8List>>? contentFromBytes,
+    List<DataTransmit<XFile>>? contentFromFiles,
 
     /// List of image urls to upload
     List<DataTransmit<String>>? contentFromUrls,
@@ -371,7 +258,7 @@ class ImageAPI
     Map<String, dynamic>? metadata,
 
     /// Used to cancel the request, if not specified, the cancelToken from
-    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// [contentFromFile] or [contentFromUrl]
     /// will be used. If none of the mentioned provides a [cancelToken] then the
     /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
@@ -379,39 +266,16 @@ class ImageAPI
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
       (contentFromFiles?.isNotEmpty ?? false) ||
-          (contentFromPaths?.isNotEmpty ?? false) ||
-          (contentFromBytes?.isNotEmpty ?? false) ||
           (contentFromUrls?.isNotEmpty ?? false),
       'One of the contents must be specified.',
     );
 
     List<CloudflareHTTPResponse<CloudflareImage?>> responses = [];
 
-    if (contentFromPaths?.isNotEmpty ?? false) {
-      contentFromFiles = [];
-      for (final content in contentFromPaths!) {
-        contentFromFiles.add(
-          DataTransmit<File>(
-            data: File(content.data),
-            progressCallback: content.progressCallback,
-          ),
-        );
-      }
-    }
     if (contentFromFiles?.isNotEmpty ?? false) {
       for (final content in contentFromFiles!) {
         final response = await upload(
           contentFromFile: content,
-          requireSignedURLs: requireSignedURLs,
-          metadata: metadata,
-          cancelToken: cancelToken,
-        );
-        responses.add(response);
-      }
-    } else if (contentFromBytes?.isNotEmpty ?? false) {
-      for (final content in contentFromBytes!) {
-        final response = await upload(
-          contentFromBytes: content,
           requireSignedURLs: requireSignedURLs,
           metadata: metadata,
           cancelToken: cancelToken,

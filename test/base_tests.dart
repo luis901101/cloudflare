@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:dio/io.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -39,21 +40,26 @@ final String? accountEmail = Platform.environment['CLOUDFLARE_ACCOUNT_EMAIL'];
 final String? userServiceKey =
     Platform.environment['CLOUDFLARE_USER_SERVICE_KEY'];
 
-final File imageFile = File(
+final XFile imageFile = XFile(
       Platform.environment['CLOUDFLARE_IMAGE_FILE'] ?? '',
     ),
-    imageFile1 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
-    imageFile2 = File(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
+    imageFile1 = XFile(Platform.environment['CLOUDFLARE_IMAGE_FILE_1'] ?? ''),
+    imageFile2 = XFile(Platform.environment['CLOUDFLARE_IMAGE_FILE_2'] ?? '');
 final String imageUrl = Platform.environment['CLOUDFLARE_IMAGE_URL'] ?? '';
-final File videoFile = File(
+final XFile videoFile = XFile(
       Platform.environment['CLOUDFLARE_VIDEO_FILE'] ?? '',
     ),
-    videoFile1 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
-    videoFile2 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
-    videoFile3 = File(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
+    videoFile1 = XFile(Platform.environment['CLOUDFLARE_VIDEO_FILE_1'] ?? ''),
+    videoFile2 = XFile(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
+    videoFile3 = XFile(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
 final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
 
 Cloudflare cloudflare = Cloudflare.basic();
+
+extension XFileUtils on XFile {
+  bool existsSync() => File(path).existsSync();
+  Future<bool> exists() => File(path).exists();
+}
 
 void init() {
   if (accountId == null) throw Exception("accountId can't be null");
@@ -152,7 +158,7 @@ void main() {
         }
         final response = await cloudflare.imageAPI.upload(
           fileName: 'image-from-file',
-          contentFromFile: DataTransmit<File>(
+          contentFromFile: DataTransmit<XFile>(
             data: imageFile,
             progressCallback: (count, total) {
               print(
@@ -182,7 +188,7 @@ void main() {
         cancelToken.cancel(cancellationReason);
         final response = await cloudflare.imageAPI.upload(
           fileName: 'image-from-file',
-          contentFromFile: DataTransmit<File>(data: imageFile),
+          contentFromFile: DataTransmit<XFile>(data: imageFile),
           cancelToken: cancelToken,
         );
         expect(response.isSuccessful, false);
@@ -208,7 +214,7 @@ void main() {
         cloudflare.restAPI.cancelTokenCallback = () => cancelToken;
         final response = await cloudflare.imageAPI.upload(
           fileName: 'image-from-file',
-          contentFromFile: DataTransmit<File>(data: imageFile),
+          contentFromFile: DataTransmit<XFile>(data: imageFile),
         );
         cloudflare.restAPI.cancelTokenCallback =
             null; // Reset cancel token callback for future requests

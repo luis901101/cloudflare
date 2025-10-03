@@ -11,6 +11,7 @@ Types of changes
 
 ## 7.0.0
 ### Added
+- Added support for Web, this required several breaking changes due to the replace of `File` usage by `XFile`.
 - Added `interceptors` to allow adding Dio interceptors globally.
 - Added `cancelTokenCallback` to allow cancelling requests on any request globally.
 - Added `cancelToken` to each individual API request.

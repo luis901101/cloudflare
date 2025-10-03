@@ -80,7 +80,7 @@ class RestAPI {
           if (tokenCallback != null &&
               tempHeaders[RestAPIService.authorizationKey] == null) {
             String? token = await tokenCallback!();
-            if (token != null) {
+            if (token != null && token.isNotEmpty) {
               tempHeaders[RestAPIService.authorizationKey] = 'Bearer $token';
             }
           }

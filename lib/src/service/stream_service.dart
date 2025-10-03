@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cloudflare/src/apiservice/tus_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/entity/cloudflare_response.dart';
@@ -22,22 +21,15 @@ abstract class StreamService {
     );
   }
 
-  @POST('/copy')
-  @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
-    @Body() required Map<String, dynamic> data,
-    @SendProgress() ProgressCallback? onUploadProgress,
-    @CancelRequest() CancelToken? cancelToken,
-  });
-
-  @POST('')
-  @MultiPart()
-  @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> streamFromFile({
-    @Part(name: Params.file) required File file,
-    @SendProgress() ProgressCallback? onUploadProgress,
-    @CancelRequest() CancelToken? cancelToken,
-  });
+  // COMMENTED OUT DUE TO WEB PLATFORM ISSUES WITH File from 'dart:io'
+  // @POST('')
+  // @MultiPart()
+  // @Headers(RestAPIService.defaultHeaders)
+  // Future<HttpResponse<CloudflareResponse?>> streamFromFile({
+  //   @Part(name: Params.file) required File file,
+  //   @SendProgress() ProgressCallback? onUploadProgress,
+  //   @CancelRequest() CancelToken? cancelToken,
+  // });
 
   @POST('')
   @MultiPart()
@@ -45,6 +37,14 @@ abstract class StreamService {
   Future<HttpResponse<CloudflareResponse?>> streamFromBytes({
     @Part(name: Params.file, fileName: 'video-from-bytes')
     required List<int> bytes,
+    @SendProgress() ProgressCallback? onUploadProgress,
+    @CancelRequest() CancelToken? cancelToken,
+  });
+
+  @POST('/copy')
+  @Headers(RestAPIService.defaultHeaders)
+  Future<HttpResponse<CloudflareResponse?>> streamFromUrl({
+    @Body() required Map<String, dynamic> data,
     @SendProgress() ProgressCallback? onUploadProgress,
     @CancelRequest() CancelToken? cancelToken,
   });
