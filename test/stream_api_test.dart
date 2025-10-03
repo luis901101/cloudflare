@@ -14,7 +14,7 @@ import 'utils/matchers.dart';
 ///
 // ignore_for_file: void_checks
 void main() async {
-  await init();
+  init();
   Set<String> cacheIds = {};
   void addId(String? id) {
     if (id != null) cacheIds.add(id);

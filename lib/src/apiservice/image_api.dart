@@ -5,20 +5,26 @@ import 'dart:typed_data';
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/image_service.dart';
+import 'package:cloudflare/src/utils/custom_parser_error_logger.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:cloudflare/src/utils/platform_utils.dart';
-import 'package:dio/dio.dart';
-import 'package:retrofit/dio.dart';
 
 class ImageAPI
     extends
         RestAPIService<ImageService, CloudflareImage, CloudflareErrorResponse> {
-  ImageAPI({required super.restAPI, required super.accountId})
-    : super(
-        service: ImageService(dio: restAPI.dio, accountId: accountId),
-        dataType: CloudflareImage(),
-      );
+  ImageAPI({
+    required super.restAPI,
+    required super.accountId,
+    ParseErrorLogger? errorLogger,
+  }) : super(
+         service: ImageService(
+           dio: restAPI.dio,
+           accountId: accountId,
+           errorLogger: errorLogger ?? CustomParseErrorLogger(),
+         ),
+         dataType: CloudflareImage(),
+       );
 
   /// An image up to 10 Megabytes can be upload.
   ///
@@ -53,6 +59,12 @@ class ImageAPI
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -89,7 +101,10 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: contentFromFile.cancelToken,
+                cancelToken:
+                    cancelToken ??
+                    contentFromFile.cancelToken ??
+                    restAPI.cancelTokenCallback?.call(),
               ),
             )
           : parseResponse(
@@ -101,7 +116,7 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: contentFromFile.cancelToken,
+                cancelToken: cancelToken ?? contentFromFile.cancelToken,
               ),
             ));
     } else if (contentFromBytes != null) {
@@ -112,7 +127,10 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: contentFromBytes.cancelToken,
+                cancelToken:
+                    cancelToken ??
+                    contentFromBytes.cancelToken ??
+                    restAPI.cancelTokenCallback?.call(),
               ),
             )
           : parseResponse(
@@ -124,7 +142,7 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: contentFromBytes.cancelToken,
+                cancelToken: cancelToken ?? contentFromBytes.cancelToken,
               ),
             ));
     } else {
@@ -135,7 +153,10 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromUrl.progressCallback,
-                cancelToken: contentFromUrl.cancelToken,
+                cancelToken:
+                    cancelToken ??
+                    contentFromUrl.cancelToken ??
+                    restAPI.cancelTokenCallback?.call(),
               ),
             )
           : parseResponse(
@@ -144,7 +165,7 @@ class ImageAPI
                 requireSignedURLs: requireSignedURLs,
                 metadata: metadata,
                 onUploadProgress: contentFromUrl.progressCallback,
-                cancelToken: contentFromUrl.cancelToken,
+                cancelToken: cancelToken ?? contentFromUrl.cancelToken,
               ),
             ));
     }
@@ -158,6 +179,9 @@ class ImageAPI
     bool? requireSignedURLs,
     Map<String, dynamic>? metadata,
     ProgressCallback? onUploadProgress,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
     assert(multipartFile != null || url != null);
@@ -206,7 +230,7 @@ class ImageAPI
               '/v1',
               queryParameters: queryParameters,
               data: data,
-              cancelToken: cancelToken,
+              cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
               onSendProgress: onUploadProgress,
             )
             .copyWith(baseUrl: baseUrl),
@@ -239,6 +263,12 @@ class ImageAPI
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(
       contentFromFile != null ||
@@ -267,10 +297,9 @@ class ImageAPI
 
     final dio = restAPI.dio;
     final formData = FormData();
-    CancelToken? cancelToken;
     ProgressCallback? progressCallback;
     if (contentFromFile != null) {
-      cancelToken = contentFromFile.cancelToken;
+      cancelToken ??= contentFromFile.cancelToken;
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
       formData.files.add(
@@ -283,8 +312,8 @@ class ImageAPI
         ),
       );
     } else {
-      cancelToken = contentFromBytes!.cancelToken;
-      final bytes = contentFromBytes.data;
+      cancelToken ??= contentFromBytes!.cancelToken;
+      final bytes = contentFromBytes!.data;
       progressCallback = contentFromBytes.progressCallback;
       formData.files.add(
         MapEntry(
@@ -305,7 +334,7 @@ class ImageAPI
         '',
         data: formData,
         onSendProgress: progressCallback,
-        cancelToken: cancelToken,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
     );
     final value = rawResponse.data == null
@@ -340,6 +369,12 @@ class ImageAPI
     /// another system of record for managing images.
     /// "{\"meta\": \"metaID\"}"
     Map<String, dynamic>? metadata,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -369,6 +404,7 @@ class ImageAPI
           contentFromFile: content,
           requireSignedURLs: requireSignedURLs,
           metadata: metadata,
+          cancelToken: cancelToken,
         );
         responses.add(response);
       }
@@ -378,6 +414,7 @@ class ImageAPI
           contentFromBytes: content,
           requireSignedURLs: requireSignedURLs,
           metadata: metadata,
+          cancelToken: cancelToken,
         );
         responses.add(response);
       }
@@ -387,6 +424,7 @@ class ImageAPI
           contentFromUrl: content,
           requireSignedURLs: requireSignedURLs,
           metadata: metadata,
+          cancelToken: cancelToken,
         );
         responses.add(response);
       }
@@ -402,6 +440,10 @@ class ImageAPI
     /// Only [id], [requireSignedURLs] and [meta] properties will be taken into
     /// account when updating image.
     required CloudflareImage image,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await parseResponse(
@@ -411,6 +453,7 @@ class ImageAPI
         metadata: image.meta?.map(
           (key, value) => MapEntry<String, dynamic>(key.toString(), value),
         ),
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
     );
 
@@ -446,6 +489,10 @@ class ImageAPI
     /// Default value: Now + 30 minutes.
     /// e.g: "2021-01-02T02:20:00Z"
     DateTime? expiry,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
@@ -453,6 +500,7 @@ class ImageAPI
         requireSignedURLs: requireSignedURLs,
         metadata: metadata,
         expiry: expiry?.toJson(),
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
       dataType: DataUploadDraft(),
     );
@@ -476,10 +524,18 @@ class ImageAPI
     /// Max value: 100
     /// Default value: 50
     int? size,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await parseResponseAsList(
-      service.getAll(page: page, size: size),
+      service.getAll(
+        page: page,
+        size: size,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
     );
 
     return response;
@@ -494,6 +550,10 @@ class ImageAPI
 
     /// Image with the required identifier
     CloudflareImage? image,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -501,7 +561,12 @@ class ImageAPI
       'One of id or image must not be empty.',
     );
     id ??= image?.id;
-    final response = await parseResponse(service.get(id: id!));
+    final response = await parseResponse(
+      service.get(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
+    );
     return response;
   }
 
@@ -516,6 +581,10 @@ class ImageAPI
 
     /// Image with the required identifier
     CloudflareImage? image,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -524,7 +593,10 @@ class ImageAPI
     );
     id ??= image?.id;
     final response = await genericParseResponse<Uint8List>(
-      service.getBase(id: id!),
+      service.getBase(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
 
@@ -541,12 +613,19 @@ class ImageAPI
 
     /// Image with the required identifier
     CloudflareImage? image,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(id != null || image != null, 'One of id or image must not be null.');
     id ??= image?.id;
     final response = await getSaveResponse(
-      service.delete(id: id!),
+      service.delete(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
     return response;
@@ -560,6 +639,10 @@ class ImageAPI
 
     /// List of images with their required identifiers
     List<CloudflareImage>? images,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -571,7 +654,7 @@ class ImageAPI
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(id: id);
+      final response = await delete(id: id, cancelToken: cancelToken);
       responses.add(response);
     }
     return responses;
@@ -580,10 +663,16 @@ class ImageAPI
   /// Fetch details of Cloudflare Images usage statistics
   ///
   /// Documentation: https://api.cloudflare.com/#cloudflare-images-images-usage-statistics
-  Future<CloudflareHTTPResponse<ImageStats?>> getStats() async {
+  Future<CloudflareHTTPResponse<ImageStats?>> getStats({
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
+  }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
-      service.getStats(),
+      service.getStats(
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       dataType: ImageStats(),
     );
     return response;

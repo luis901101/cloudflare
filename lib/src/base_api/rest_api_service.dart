@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/model/cloudflare_error_response.dart';
@@ -51,7 +49,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     bool parseCloudflareResponse = true,
   }) async {
     CloudflareHTTPResponse response = CloudflareHTTPResponse(
-      http.Response('', HttpStatus.notFound),
+      http.Response('', 404),
       null,
     );
 
@@ -76,7 +74,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
       return CloudflareHTTPResponse(
         http.Response(
           '',
-          response.response.statusCode ?? HttpStatus.notFound,
+          response.response.statusCode ?? 404,
           headers: MapUtils.parseHeaders(response.response.headers) ?? {},
           isRedirect: response.response.isRedirect,
           request: http.Request(
@@ -95,7 +93,7 @@ abstract class RestAPIService<I, DataType extends Jsonable, ErrorType> {
     ) => CloudflareHTTPResponse(
       http.Response(
         '',
-        error.response?.statusCode ?? HttpStatus.notFound,
+        error.response?.statusCode ?? 404,
         headers: MapUtils.parseHeaders(error.response?.headers) ?? {},
         isRedirect: error.response?.isRedirect ?? false,
         request: http.Request(

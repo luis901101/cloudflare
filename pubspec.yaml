@@ -1,6 +1,6 @@
 name: cloudflare
 description: This is a dart package for Cloudflare API to allow easy Image, Stream and Live Input api management.
-version: 6.0.0
+version: 7.0.0
 homepage: https://github.com/luis901101/cloudflare
 
 environment:

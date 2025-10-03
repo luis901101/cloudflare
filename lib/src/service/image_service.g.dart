@@ -190,6 +190,7 @@ class _ImageService implements ImageService {
     required String id,
     bool? requireSignedURLs,
     Map<String, dynamic>? metadata,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -207,6 +208,7 @@ class _ImageService implements ImageService {
             '/v1/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -229,6 +231,7 @@ class _ImageService implements ImageService {
     bool? requireSignedURLs,
     Map<String, dynamic>? metadata,
     String? expiry,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -256,6 +259,7 @@ class _ImageService implements ImageService {
             '/v2/direct_upload',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -277,6 +281,7 @@ class _ImageService implements ImageService {
   Future<HttpResponse<CloudflareResponse?>> getAll({
     int? page,
     int? size,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'page': page, r'per_page': size};
@@ -290,6 +295,7 @@ class _ImageService implements ImageService {
             '/v1',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -308,9 +314,13 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -320,6 +330,7 @@ class _ImageService implements ImageService {
             '/v1/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -338,9 +349,13 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getBase({required String id}) async {
+  Future<HttpResponse<dynamic>> getBase({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -355,6 +370,7 @@ class _ImageService implements ImageService {
             '/v1/${id}/blob',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -365,9 +381,13 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required String id}) async {
+  Future<HttpResponse<dynamic>> delete({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -377,6 +397,7 @@ class _ImageService implements ImageService {
             '/v1/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -387,9 +408,12 @@ class _ImageService implements ImageService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> getStats() async {
+  Future<HttpResponse<CloudflareResponse?>> getStats({
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -399,6 +423,7 @@ class _ImageService implements ImageService {
             '/v1/stats',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );

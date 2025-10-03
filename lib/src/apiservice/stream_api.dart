@@ -2,15 +2,14 @@ import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:cloudflare/cloudflare.dart';
-import 'package:tusc/tusc.dart' as tus;
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/stream_service.dart';
+import 'package:cloudflare/src/utils/custom_parser_error_logger.dart';
 import 'package:cloudflare/src/utils/date_time_utils.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:cloudflare/src/utils/platform_utils.dart';
 import 'package:cross_file/cross_file.dart' show XFile;
-import 'package:dio/dio.dart';
-import 'package:retrofit/dio.dart';
+import 'package:tusc/tusc.dart' as tus;
 
 class StreamAPI
     extends
@@ -20,13 +19,20 @@ class StreamAPI
           CloudflareErrorResponse
         > {
   final String tusUploadUrl;
-  StreamAPI({required super.restAPI, required super.accountId})
-    : tusUploadUrl =
-          'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
-      super(
-        service: StreamService(dio: restAPI.dio, accountId: accountId),
-        dataType: CloudflareStreamVideo(),
-      );
+  StreamAPI({
+    required super.restAPI,
+    required super.accountId,
+    ParseErrorLogger? errorLogger,
+  }) : tusUploadUrl =
+           'https://api.cloudflare.com/client/v4/accounts/$accountId/stream',
+       super(
+         service: StreamService(
+           dio: restAPI.dio,
+           accountId: accountId,
+           errorLogger: errorLogger ?? CustomParseErrorLogger(),
+         ),
+         dataType: CloudflareStreamVideo(),
+       );
 
   /// A video up to 200 MegaBytes can be uploaded using a single
   /// HTTP POST (multipart/form-data) request.
@@ -95,6 +101,12 @@ class StreamAPI
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -129,7 +141,10 @@ class StreamAPI
               service.streamFromFile(
                 file: contentFromFile.data,
                 onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: contentFromFile.cancelToken,
+                cancelToken:
+                    cancelToken ??
+                    contentFromFile.cancelToken ??
+                    restAPI.cancelTokenCallback?.call(),
               ),
             )
           : parseResponse(
@@ -139,7 +154,7 @@ class StreamAPI
                   filename: fileName,
                 ),
                 onUploadProgress: contentFromFile.progressCallback,
-                cancelToken: contentFromFile.cancelToken,
+                cancelToken: cancelToken ?? contentFromFile.cancelToken,
               ),
             ));
     } else if (contentFromBytes != null) {
@@ -148,7 +163,10 @@ class StreamAPI
               service.streamFromBytes(
                 bytes: contentFromBytes.data,
                 onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: contentFromBytes.cancelToken,
+                cancelToken:
+                    cancelToken ??
+                    contentFromBytes.cancelToken ??
+                    restAPI.cancelTokenCallback?.call(),
               ),
             )
           : parseResponse(
@@ -158,7 +176,7 @@ class StreamAPI
                   filename: fileName,
                 ),
                 onUploadProgress: contentFromBytes.progressCallback,
-                cancelToken: contentFromBytes.cancelToken,
+                cancelToken: cancelToken ?? contentFromBytes.cancelToken,
               ),
             ));
     } else {
@@ -176,7 +194,10 @@ class StreamAPI
                     value == null || (value is List && value.isEmpty),
               ),
           onUploadProgress: contentFromUrl.progressCallback,
-          cancelToken: contentFromUrl.cancelToken,
+          cancelToken:
+              cancelToken ??
+              contentFromUrl.cancelToken ??
+              restAPI.cancelTokenCallback?.call(),
         ),
       );
     }
@@ -187,6 +208,9 @@ class StreamAPI
     MultipartFile? multipartFile,
     String? url,
     ProgressCallback? onUploadProgress,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
     CancelToken? cancelToken,
   }) async {
     assert(multipartFile != null || url != null);
@@ -229,7 +253,7 @@ class StreamAPI
               '',
               queryParameters: queryParameters,
               data: data,
-              cancelToken: cancelToken,
+              cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
               onSendProgress: onUploadProgress,
             )
             .copyWith(baseUrl: baseUrl),
@@ -380,6 +404,12 @@ class StreamAPI
 
     /// To specify a filename for the content to be uploaded.
     String? fileName,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(
       contentFromFile != null ||
@@ -408,10 +438,9 @@ class StreamAPI
 
     final dio = restAPI.dio;
     final formData = FormData();
-    CancelToken? cancelToken;
     ProgressCallback? progressCallback;
     if (contentFromFile != null) {
-      cancelToken = contentFromFile.cancelToken;
+      cancelToken ??= contentFromFile.cancelToken;
       final file = contentFromFile.data;
       progressCallback = contentFromFile.progressCallback;
       formData.files.add(
@@ -424,8 +453,8 @@ class StreamAPI
         ),
       );
     } else {
-      cancelToken = contentFromBytes!.cancelToken;
-      final bytes = contentFromBytes.data;
+      cancelToken ??= contentFromBytes!.cancelToken;
+      final bytes = contentFromBytes!.data;
       progressCallback = contentFromBytes.progressCallback;
       formData.files.add(
         MapEntry(
@@ -636,6 +665,12 @@ class StreamAPI
     /// A Watermark object with the id of an existing watermark profile
     /// e.g: Watermark(id: "ea95132c15732412d22c1476fa83f27a")
     Watermark? watermark,
+
+    /// Used to cancel the request, if not specified, the cancelToken from
+    /// [contentFromFile], [contentFromPath], [contentFromBytes] or [contentFromUrl]
+    /// will be used. If none of the mentioned provides a [cancelToken] then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -661,12 +696,18 @@ class StreamAPI
     }
     if (contentFromFiles?.isNotEmpty ?? false) {
       for (final content in contentFromFiles!) {
-        final response = await stream(contentFromFile: content);
+        final response = await stream(
+          contentFromFile: content,
+          cancelToken: cancelToken,
+        );
         responses.add(response);
       }
     } else if (contentFromBytes?.isNotEmpty ?? false) {
       for (final content in contentFromBytes!) {
-        final response = await stream(contentFromBytes: content);
+        final response = await stream(
+          contentFromBytes: content,
+          cancelToken: cancelToken,
+        );
         responses.add(response);
       }
     } else {
@@ -677,6 +718,7 @@ class StreamAPI
           allowedOrigins: allowedOrigins,
           requireSignedURLs: requireSignedURLs,
           watermark: watermark,
+          cancelToken: cancelToken,
         );
         responses.add(response);
       }
@@ -748,6 +790,10 @@ class StreamAPI
     /// Default value: Now + 30 minutes.
     /// e.g: "2021-01-02T02:20:00Z"
     DateTime? expiry,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await genericParseResponse(
@@ -764,6 +810,7 @@ class StreamAPI
             }..removeWhere(
               (key, value) => value == null || (value is List && value.isEmpty),
             ),
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
       dataType: DataUploadDraft(),
     );
@@ -849,6 +896,10 @@ class StreamAPI
     /// Default value: Now + 30 minutes.
     /// e.g: "2021-01-02T02:20:00Z"
     DateTime? expiry,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final metadataMap = {
@@ -863,7 +914,11 @@ class StreamAPI
     };
     final metadata = TusAPI.generateMetadata(metadataMap);
     final rawResponse = await getSaveResponse(
-      service.createTusDirectUpload(size: size, metadata: metadata),
+      service.createTusDirectUpload(
+        size: size,
+        metadata: metadata,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
     final id = rawResponse.headers[Params.streamMediaIdKC];
@@ -937,6 +992,10 @@ class StreamAPI
     ///   MediaProcessingState.error
     /// ]
     List<MediaProcessingState>? status,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await parseResponseAsList(
@@ -949,6 +1008,7 @@ class StreamAPI
         limit: limit,
         asc: asc,
         status: status?.map((e) => e.name).toList(),
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
     );
 
@@ -963,6 +1023,10 @@ class StreamAPI
 
     /// CloudflareStreamVideo with the required identifier
     CloudflareStreamVideo? video,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -970,7 +1034,12 @@ class StreamAPI
       'One of id or video must not be empty.',
     );
     id ??= video?.id;
-    final response = await parseResponse(service.get(id: id!));
+    final response = await parseResponse(
+      service.get(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
+    );
     return response;
   }
 
@@ -983,12 +1052,19 @@ class StreamAPI
 
     /// CloudflareStreamVideo with the required identifier
     CloudflareStreamVideo? video,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(id != null || video != null, 'One of id or video must not be null.');
     id ??= video?.id;
     final response = await getSaveResponse(
-      service.delete(id: id!),
+      service.delete(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
     return response;
@@ -1002,6 +1078,10 @@ class StreamAPI
 
     /// CloudflareStreamVideo with their required identifiers
     List<CloudflareStreamVideo>? videos,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -1013,7 +1093,7 @@ class StreamAPI
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(id: id);
+      final response = await delete(id: id, cancelToken: cancelToken);
       responses.add(response);
     }
     return responses;

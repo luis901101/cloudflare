@@ -10,11 +10,15 @@ part 'image_service.g.dart';
 
 @RestApi()
 abstract class ImageService {
-  factory ImageService({required Dio dio, required String accountId}) {
+  factory ImageService({
+    required Dio dio,
+    required String accountId,
+    ParseErrorLogger? errorLogger,
+  }) {
     return _ImageService(
       dio,
       baseUrl: '${dio.options.baseUrl}/accounts/$accountId/images',
-      errorLogger: null,
+      errorLogger: errorLogger,
     );
   }
 
@@ -58,6 +62,7 @@ abstract class ImageService {
     @Path() required String id,
     @Field() bool? requireSignedURLs,
     @Field() Map<String, dynamic>? metadata,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('/v2/direct_upload')
@@ -67,6 +72,7 @@ abstract class ImageService {
     @Part() bool? requireSignedURLs,
     @Part() Map<String, dynamic>? metadata,
     @Part() String? expiry,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @GET('/v1')
@@ -74,22 +80,34 @@ abstract class ImageService {
   Future<HttpResponse<CloudflareResponse?>> getAll({
     @Query(Params.page) int? page,
     @Query(Params.perPage) int? size,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @GET('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> get({@Path() required String id});
+  Future<HttpResponse<CloudflareResponse?>> get({
+    @Path() required String id,
+    @CancelRequest() CancelToken? cancelToken,
+  });
 
   @GET('/v1/{id}/blob')
   @DioResponseType(ResponseType.bytes)
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> getBase({@Path() required String id});
+  Future<HttpResponse> getBase({
+    @Path() required String id,
+    @CancelRequest() CancelToken? cancelToken,
+  });
 
   @DELETE('/v1/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> delete({@Path() required String id});
+  Future<HttpResponse> delete({
+    @Path() required String id,
+    @CancelRequest() CancelToken? cancelToken,
+  });
 
   @GET('/v1/stats')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> getStats();
+  Future<HttpResponse<CloudflareResponse?>> getStats({
+    @CancelRequest() CancelToken? cancelToken,
+  });
 }

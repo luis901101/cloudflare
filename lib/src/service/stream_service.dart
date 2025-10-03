@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:cloudflare/cloudflare.dart';
+import 'package:cloudflare/src/apiservice/tus_api.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
+import 'package:cloudflare/src/entity/cloudflare_response.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart' hide Headers;
@@ -9,11 +10,15 @@ part 'stream_service.g.dart';
 
 @RestApi()
 abstract class StreamService {
-  factory StreamService({required Dio dio, required String accountId}) {
+  factory StreamService({
+    required Dio dio,
+    required String accountId,
+    ParseErrorLogger? errorLogger,
+  }) {
     return _StreamService(
       dio,
       baseUrl: '${dio.options.baseUrl}/accounts/$accountId/stream',
-      errorLogger: null,
+      errorLogger: errorLogger,
     );
   }
 
@@ -48,6 +53,7 @@ abstract class StreamService {
   @Headers(RestAPIService.defaultHeaders)
   Future<HttpResponse<CloudflareResponse?>> createDirectUpload({
     @Body() required Map<String, dynamic> data,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @POST('?direct_user=true')
@@ -55,6 +61,7 @@ abstract class StreamService {
   Future<HttpResponse> createTusDirectUpload({
     @Header(RestAPIService.uploadLengthKey) required int size,
     @Header(RestAPIService.uploadMetadataKey) String? metadata,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @GET('')
@@ -68,13 +75,20 @@ abstract class StreamService {
     @Query(Params.limit) int? limit,
     @Query(Params.asc) bool? asc,
     @Query(Params.status) List<String>? status,
+    @CancelRequest() CancelToken? cancelToken,
   });
 
   @GET('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse<CloudflareResponse?>> get({@Path() required String id});
+  Future<HttpResponse<CloudflareResponse?>> get({
+    @Path() required String id,
+    @CancelRequest() CancelToken? cancelToken,
+  });
 
   @DELETE('/{id}')
   @Headers(RestAPIService.defaultHeaders)
-  Future<HttpResponse> delete({@Path() required String id});
+  Future<HttpResponse> delete({
+    @Path() required String id,
+    @CancelRequest() CancelToken? cancelToken,
+  });
 }

@@ -51,11 +51,13 @@ void main() async {
       apiUrl: apiUrl,
       accountId: accountId,
       token: token,
+      // ignore: deprecated_member_use
       apiKey: apiKey,
+      // ignore: deprecated_member_use
       accountEmail: accountEmail,
+      // ignore: deprecated_member_use
       userServiceKey: userServiceKey,
     );
-    await cloudflare.init();
   } catch (e) {
     cloudflareInitMessage = '''
     Check your environment definitions for Cloudflare.

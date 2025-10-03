@@ -1,6 +1,7 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/service/live_input_service.dart';
+import 'package:cloudflare/src/utils/custom_parser_error_logger.dart';
 import 'package:cloudflare/src/utils/params.dart';
 
 class LiveInputAPI
@@ -10,11 +11,18 @@ class LiveInputAPI
           CloudflareLiveInput,
           CloudflareErrorResponse
         > {
-  LiveInputAPI({required super.restAPI, required super.accountId})
-    : super(
-        service: LiveInputService(dio: restAPI.dio, accountId: accountId),
-        dataType: CloudflareLiveInput(),
-      );
+  LiveInputAPI({
+    required super.restAPI,
+    required super.accountId,
+    ParseErrorLogger? errorLogger,
+  }) : super(
+         service: LiveInputService(
+           dio: restAPI.dio,
+           accountId: accountId,
+           errorLogger: errorLogger ?? CustomParseErrorLogger(),
+         ),
+         dataType: CloudflareLiveInput(),
+       );
 
   /// Creates a live input that can be streamed to. Add an output in order to
   /// direct traffic.
@@ -24,9 +32,18 @@ class LiveInputAPI
     /// Only [meta] and [recording] properties will be taken into account when
     /// creating a live input.
     CloudflareLiveInput? data,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    return parseResponse(service.create(data: data));
+    return parseResponse(
+      service.create(
+        data: data,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
+    );
   }
 
   /// View the live inputs that have been created on this account. Some
@@ -34,9 +51,17 @@ class LiveInputAPI
   /// to. To get that information, request a single live input.
   ///
   /// Documentation: https://api.cloudflare.com/#stream-live-inputs-list-live-inputs
-  Future<CloudflareHTTPResponse<List<CloudflareLiveInput>?>> getAll() async {
+  Future<CloudflareHTTPResponse<List<CloudflareLiveInput>?>> getAll({
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
+  }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
-    final response = await parseResponseAsList(service.getAll());
+    final response = await parseResponseAsList(
+      service.getAll(
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
+    );
     return response;
   }
 
@@ -48,6 +73,10 @@ class LiveInputAPI
 
     /// CloudflareLiveInput with the required identifier
     CloudflareLiveInput? liveInput,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -55,7 +84,12 @@ class LiveInputAPI
       'One of id or liveInput must not be empty.',
     );
     id ??= liveInput?.id;
-    final response = await parseResponse(service.get(id: id!));
+    final response = await parseResponse(
+      service.get(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
+    );
     return response;
   }
 
@@ -68,6 +102,10 @@ class LiveInputAPI
 
     /// CloudflareLiveInput with the required identifier
     CloudflareLiveInput? liveInput,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -76,7 +114,10 @@ class LiveInputAPI
     );
     id ??= liveInput?.id;
     return genericParseResponseAsList(
-      service.getVideos(id: id!),
+      service.getVideos(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       dataType: CloudflareStreamVideo(),
     );
   }
@@ -88,10 +129,18 @@ class LiveInputAPI
     /// Only [id], [meta] and [recording] properties will be taken into account
     /// when updating a live input.
     required CloudflareLiveInput liveInput,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     final response = await parseResponse(
-      service.update(id: liveInput.id, data: liveInput),
+      service.update(
+        id: liveInput.id,
+        data: liveInput,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
     );
     return response;
   }
@@ -106,6 +155,10 @@ class LiveInputAPI
 
     /// CloudflareLiveInput with the required identifier
     CloudflareLiveInput? liveInput,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -114,7 +167,10 @@ class LiveInputAPI
     );
     id ??= liveInput?.id;
     final response = await getSaveResponse(
-      service.delete(id: id!),
+      service.delete(
+        id: id!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
     return response;
@@ -128,6 +184,10 @@ class LiveInputAPI
 
     /// List of CloudflareLiveInput with their related ids
     List<CloudflareLiveInput>? liveInputs,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -139,7 +199,10 @@ class LiveInputAPI
 
     List<CloudflareHTTPResponse> responses = [];
     for (final id in ids!) {
-      final response = await delete(id: id);
+      final response = await delete(
+        id: id,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      );
       responses.add(response);
     }
     return responses;
@@ -158,6 +221,10 @@ class LiveInputAPI
     /// Only [url] and [streamKey] properties will be taken into account when
     /// adding an output to a live input.
     required LiveInputOutput data,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -169,6 +236,7 @@ class LiveInputAPI
       service.addOutput(
         liveInputId: liveInputId!,
         data: data.toJson()..removeWhere((key, value) => key == Params.id),
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
       ),
       dataType: LiveInputOutput(),
     );
@@ -183,6 +251,10 @@ class LiveInputAPI
 
     /// CloudflareLiveInput with the required identifier
     CloudflareLiveInput? liveInput,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -191,7 +263,10 @@ class LiveInputAPI
     );
     liveInputId ??= liveInput?.id;
     return genericParseResponseAsList(
-      service.getOutputs(liveInputId: liveInputId!),
+      service.getOutputs(
+        liveInputId: liveInputId!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       dataType: LiveInputOutput(),
     );
   }
@@ -211,6 +286,10 @@ class LiveInputAPI
 
     /// LiveInputOutput with the required identifier
     LiveInputOutput? output,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -224,7 +303,11 @@ class LiveInputAPI
     liveInputId ??= liveInput?.id;
     outputId ??= output?.id;
     final response = await getSaveResponse(
-      service.removeOutput(liveInputId: liveInputId!, outputId: outputId!),
+      service.removeOutput(
+        liveInputId: liveInputId!,
+        outputId: outputId!,
+        cancelToken: cancelToken ?? restAPI.cancelTokenCallback?.call(),
+      ),
       parseCloudflareResponse: false,
     );
     return response;
@@ -243,6 +326,10 @@ class LiveInputAPI
 
     /// List of LiveInputOutput with their related ids
     List<LiveInputOutput>? outputs,
+
+    /// Used to cancel the request, if not specified then the
+    /// default [cancelToken] of the [restAPI] will be used.
+    CancelToken? cancelToken,
   }) async {
     assert(!isBasic, RestAPIService.authorizedRequestAssertMessage);
     assert(
@@ -262,6 +349,7 @@ class LiveInputAPI
       final response = await removeOutput(
         liveInputId: liveInputId,
         outputId: outputId,
+        cancelToken: cancelToken,
       );
       responses.add(response);
     }

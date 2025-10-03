@@ -159,9 +159,11 @@ class _StreamService implements StreamService {
   @override
   Future<HttpResponse<CloudflareResponse?>> createDirectUpload({
     required Map<String, dynamic> data,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(data);
@@ -172,6 +174,7 @@ class _StreamService implements StreamService {
             '/direct_upload',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -193,6 +196,7 @@ class _StreamService implements StreamService {
   Future<HttpResponse<dynamic>> createTusDirectUpload({
     required int size,
     String? metadata,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -211,6 +215,7 @@ class _StreamService implements StreamService {
             '?direct_user=true',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -230,6 +235,7 @@ class _StreamService implements StreamService {
     int? limit,
     bool? asc,
     List<String>? status,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -252,6 +258,7 @@ class _StreamService implements StreamService {
             '',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -270,9 +277,13 @@ class _StreamService implements StreamService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -282,6 +293,7 @@ class _StreamService implements StreamService {
             '/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -300,9 +312,13 @@ class _StreamService implements StreamService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required String id}) async {
+  Future<HttpResponse<dynamic>> delete({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -312,6 +328,7 @@ class _StreamService implements StreamService {
             '/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );

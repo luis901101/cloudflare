@@ -22,6 +22,7 @@ class _LiveInputService implements LiveInputService {
   @override
   Future<HttpResponse<CloudflareResponse?>> create({
     CloudflareLiveInput? data,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -36,6 +37,7 @@ class _LiveInputService implements LiveInputService {
             '',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -54,9 +56,12 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> getAll() async {
+  Future<HttpResponse<CloudflareResponse?>> getAll({
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -66,6 +71,7 @@ class _LiveInputService implements LiveInputService {
             '',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -84,9 +90,13 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<CloudflareResponse?>> get({required String id}) async {
+  Future<HttpResponse<CloudflareResponse?>> get({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -96,6 +106,7 @@ class _LiveInputService implements LiveInputService {
             '/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -116,9 +127,11 @@ class _LiveInputService implements LiveInputService {
   @override
   Future<HttpResponse<CloudflareResponse?>> getVideos({
     required String id,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -128,6 +141,7 @@ class _LiveInputService implements LiveInputService {
             '/${id}/videos',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -149,6 +163,7 @@ class _LiveInputService implements LiveInputService {
   Future<HttpResponse<CloudflareResponse?>> update({
     required String id,
     CloudflareLiveInput? data,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -163,6 +178,7 @@ class _LiveInputService implements LiveInputService {
             '/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -181,9 +197,13 @@ class _LiveInputService implements LiveInputService {
   }
 
   @override
-  Future<HttpResponse<dynamic>> delete({required String id}) async {
+  Future<HttpResponse<dynamic>> delete({
+    required String id,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -193,6 +213,7 @@ class _LiveInputService implements LiveInputService {
             '/${id}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -206,9 +227,11 @@ class _LiveInputService implements LiveInputService {
   Future<HttpResponse<CloudflareResponse?>> addOutput({
     required String liveInputId,
     required Map<String, dynamic> data,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(data);
@@ -219,6 +242,7 @@ class _LiveInputService implements LiveInputService {
             '/${liveInputId}/outputs',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -239,9 +263,11 @@ class _LiveInputService implements LiveInputService {
   @override
   Future<HttpResponse<CloudflareResponse?>> getOutputs({
     required String liveInputId,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<CloudflareResponse?>>(
@@ -251,6 +277,7 @@ class _LiveInputService implements LiveInputService {
             '/${liveInputId}/outputs',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -272,9 +299,11 @@ class _LiveInputService implements LiveInputService {
   Future<HttpResponse<dynamic>> removeOutput({
     required String liveInputId,
     required String outputId,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -284,6 +313,7 @@ class _LiveInputService implements LiveInputService {
             '/${liveInputId}/outputs/${outputId}',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );

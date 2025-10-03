@@ -8,7 +8,7 @@ import 'utils/matchers.dart';
 /// LiveInputAPI tests on each Cloudflare LiveInput API endpoint.
 /// These tests ensures that every created test live input gets deleted.
 void main() async {
-  await init();
+  init();
   Set<String> cacheIds = {};
   Set<String> outputCacheIds = {};
   void addId(String? id) {

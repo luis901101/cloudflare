@@ -11,7 +11,7 @@ import 'utils/matchers.dart';
 /// ImageAPI tests on each Cloudflare Image API endpoint.
 /// These tests ensures that every uploaded test image gets deleted.
 void main() async {
-  await init();
+  init();
   Set<String> cacheIds = {};
   void addId(String? id) {
     if (id != null) cacheIds.add(id);

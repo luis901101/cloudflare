@@ -9,6 +9,16 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 7.0.0
+### Added
+- Added `interceptors` to allow adding Dio interceptors globally.
+- Added `cancelTokenCallback` to allow cancelling requests on any request globally.
+- Added `cancelToken` to each individual API request.
+
+### Changed
+- Cloudflare instance initialization improved to avoid required call to `init()` function.
+- Changed `HttpClient httpClient` for `HttpClientAdapter? httpClientAdapter` to allow more customization of Dio client.
+
 ## 6.0.0
 ### Changed
 - Sdk constraint updated to: `sdk: '>=3.8.0 <4.0.0'`

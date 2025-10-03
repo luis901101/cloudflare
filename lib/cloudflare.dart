@@ -3,18 +3,22 @@
 library;
 
 //Imports
-import 'dart:io';
 import 'package:cloudflare/src/apiservice/image_api.dart';
 import 'package:cloudflare/src/apiservice/live_input_api.dart';
 import 'package:cloudflare/src/apiservice/stream_api.dart';
 import 'package:cloudflare/src/base_api/rest_api.dart';
+import 'package:cloudflare/src/base_api/rest_api_service.dart';
 import 'package:cloudflare/src/utils/callbacks.dart';
+import 'package:dio/dio.dart';
+import 'package:retrofit/retrofit.dart' hide Headers;
 
-//Exports
+// Exports
 // APIs
 export 'package:cloudflare/src/apiservice/image_api.dart';
 export 'package:cloudflare/src/apiservice/stream_api.dart';
 export 'package:cloudflare/src/apiservice/tus_api.dart';
+export 'package:dio/dio.dart';
+export 'package:retrofit/retrofit.dart' hide Headers;
 
 // Entities
 export 'package:cloudflare/src/entity/cloudflare_image.dart';
@@ -57,80 +61,85 @@ class Cloudflare {
   static const xAuthEmailHeader = 'X-Auth-Email';
   static const xAuthUserServiceKeyHeader = 'X-Auth-User-Service-Key';
 
-  /// Cloudflare api url, at the moment of writing this: https://api.cloudflare.com/client/v4
-  final String apiUrl;
-
-  /// Cloudflare account id
-  final String accountId;
-
-  /// Cloudflare API token.
-  /// API Tokens provide a new way to authenticate with the Cloudflare API.
-  /// They allow for scoped and permissioned access to resources and use the RFC
-  /// compliant Authorization Bearer Token Header.
-  final String? token;
-
-  /// Callback to asynchronously get Cloudflare API token
-  final TokenCallback tokenCallback;
-
-  /// Check https://api.cloudflare.com/#getting-started-requests to know how
-  /// to authenticate requests
-  /// To use legacy authentication there is two ways:
-  /// Including `X-Auth-Key` and `X-Auth-Email`.
-  /// Requests that usecan use that instead of the Auth-Key and Auth-Email headers.
-  /// To be used as `X-Auth-Key` header. API key generated on the "My Account" page
-  @Deprecated('Use token authentication instead.')
-  final String? apiKey;
-
-  /// To be used as `X-Auth-Email`. Email address associated with your account
-  @Deprecated('Use token authentication instead.')
-  final String? accountEmail;
-  @Deprecated('Use token authentication instead.')
-  /// To be used as `X-Auth-User-Service-Key`. A special Cloudflare API key good
-  /// for a restricted set of endpoints. Always begins with "v1.0-", may vary in length.
-  final String? userServiceKey;
-
-  /// Timeout for requests.
-  final Duration? connectTimeout;
-
-  /// Timeout for receiving data.
-  final Duration? receiveTimeout;
-
-  /// Timeout for sending data, like when using stream upload or Tus protocol.
-  final Duration? sendTimeout;
-
   final RestAPI restAPI = RestAPI();
-
-  /// Set this if you need control over http requests like validating certificates and so.
-  /// Not supported in Web
-  final HttpClient? httpClient;
 
   /// APIs
   late final ImageAPI imageAPI;
   late final StreamAPI streamAPI;
   late final LiveInputAPI liveInputAPI;
-  bool _initialized = false;
 
   /// Cloudflare brings you full access to different apis like ImageAPI and
   /// StreamAPI.
+  /// The [accountId] is required as well as one of ([token] or [tokenCallback])
+  /// or in a legacy case ([apiKey] and [accountEmail]) or [userServiceKey]
   ///
-  /// By default cloudflare [api url v4](https://api.cloudflare.com/client/v4)
-  /// will be used unless you set a specific [apiUrl].
+  /// [accountId] Your Cloudflare account ID. You can find it on the link when
+  /// you log in to Cloudflare dashboard: `https://dash.cloudflare.com/<[account_id]>/home/domains`
   ///
-  /// The `accountId` is required as well as one of (`token` or `tokenCallback`)
-  /// or (`apiKey` and `accountEmail`) or `userServiceKey`
+  /// [apiKey] (Legacy) Global API key is the previous authorization scheme for
+  /// interacting with the Cloudflare API. When possible, use API tokens instead
+  /// of Global API key.
+  /// Check https://developers.cloudflare.com/fundamentals/api/get-started/keys/ for more info.
+  ///
+  /// [accountEmail] (Legacy) To be used as `X-Auth-Email`.
+  /// Email address associated with your account.
+  /// When possible, use API tokens instead.
+  ///
+  /// [userServiceKey] (Legacy) To be used as `X-Auth-User-Service-Key`.
+  /// A special Cloudflare API key good for a restricted set of endpoints.
+  /// Always begins with "v1.0-", may vary in length.
+  /// When possible, use API tokens instead.
+  ///
+  /// [apiUrl] The Cloudflare api url to request, if not specified this one will be used: https://api.cloudflare.com/client/v4
+  ///
+  /// [token] Cloudflare API tokens provide a new way to authenticate with the Cloudflare API.
+  /// They allow for scoped and permissioned access to resources and use the RFC
+  /// compliant Authorization Bearer Token Header.
+  ///
+  /// [tokenCallback] is a callback that returns the token to be used in the requests,
+  /// it is an async way to provide the token, if you use this callback you don't have to provide the [token].
+  ///
+  /// [connectTimeout] is the maximum amount of time in milliseconds that the request
+  /// can take to establish a connection.
+  ///
+  /// [receiveTimeout] is the maximum amount of time in milliseconds that the request
+  /// can take to receive data.
+  ///
+  /// [sendTimeout] is the maximum amount of time in milliseconds that the request
+  /// can take to send data.
+  ///
+  /// [httpClientAdapter] is the client adapter if you need to customize how http
+  /// requests are made, note you should use either [IOHttpClientAdapter] on
+  /// `dart:io` native platforms or [BrowserHttpClientAdapter] on `dart:html`
+  /// web platforms.
+  ///
+  /// [parseErrorLogger] is a logger for errors that occur during parsing of response data.
+  ///
+  /// [headers] allows adding global HTTP headers for all requests.
+  ///
+  /// [cancelTokenCallback] enables programmatically cancelling in-flight requests for this API.
+  /// When cancelling a cancel token all current and future requests using the token
+  /// will be cancelled. So make sure you reset the token returned by the [CancelTokenCallback]
+  /// if you want to continue using the API.
+  ///
+  /// [interceptors] enables advanced customization like logging, retries and rate limiting.
   Cloudflare({
+    required String accountId,
+    @Deprecated('Use token authentication instead.') String? apiKey,
+    @Deprecated('Use token authentication instead.') String? accountEmail,
+    @Deprecated('Use token authentication instead.') String? userServiceKey,
+
     String? apiUrl,
-    required this.accountId,
-    this.token,
-    TokenCallback? tokenCallback,
-    this.apiKey,
-    this.accountEmail,
-    this.userServiceKey,
-    @Deprecated('Use connectTimeout instead') Duration? timeout,
     Duration? connectTimeout,
-    this.receiveTimeout,
-    this.sendTimeout,
-    this.httpClient,
+    Duration? receiveTimeout,
+    Duration? sendTimeout,
+    HttpClientAdapter? httpClientAdapter,
+    Map<String, dynamic>? headers,
+    String? token,
+    TokenCallback? tokenCallback,
+    CancelTokenCallback? cancelTokenCallback,
+    List<Interceptor>? interceptors,
+    ParseErrorLogger? parseErrorLogger,
   }) : assert(
          (((token?.isNotEmpty ?? false) && tokenCallback == null) ||
                  ((token?.isEmpty ?? true) && tokenCallback != null)) ||
@@ -140,10 +149,44 @@ class Cloudflare {
          '\n\nA token or tokenCallback must be specified, only one of both. '
          '\nOtherwise an apiKey and accountEmail must be specified. '
          '\nOtherwise a userServiceKey must be specified.',
-       ),
-       apiUrl = apiUrl ?? defaultApiUrl,
-       tokenCallback = tokenCallback ?? (() async => token),
-       connectTimeout = connectTimeout ?? timeout;
+       ) {
+    apiUrl ??= defaultApiUrl;
+    (headers ??= <String, dynamic>{}).addAll({
+      if (token != null) RestAPIService.authorizationKey: 'Bearer $token',
+      if (apiKey != null) xAuthKeyHeader: apiKey,
+      if (accountEmail != null) xAuthEmailHeader: accountEmail,
+      if (userServiceKey != null) xAuthUserServiceKeyHeader: userServiceKey,
+    });
+
+    restAPI.init(
+      apiUrl: apiUrl,
+      connectTimeout: connectTimeout,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      httpClientAdapter: httpClientAdapter,
+      headers: headers,
+      tokenCallback:
+          tokenCallback ?? (token == null ? null : (() async => token)),
+      cancelTokenCallback: cancelTokenCallback,
+      interceptors: interceptors,
+    );
+
+    imageAPI = ImageAPI(
+      restAPI: restAPI,
+      accountId: accountId,
+      errorLogger: parseErrorLogger,
+    );
+    streamAPI = StreamAPI(
+      restAPI: restAPI,
+      accountId: accountId,
+      errorLogger: parseErrorLogger,
+    );
+    liveInputAPI = LiveInputAPI(
+      restAPI: restAPI,
+      accountId: accountId,
+      errorLogger: parseErrorLogger,
+    );
+  }
 
   /// Use this constructor when you don't need to make authorized requests
   /// to Cloudflare apis, like when you just need to do image or stream
@@ -153,42 +196,19 @@ class Cloudflare {
     Duration? connectTimeout,
     Duration? receiveTimeout,
     Duration? sendTimeout,
-    HttpClient? httpClient,
+    HttpClientAdapter? httpClientAdapter,
+    Map<String, dynamic>? headers,
+    CancelTokenCallback? cancelTokenCallback,
+    List<Interceptor>? interceptors,
   }) => Cloudflare(
+    accountId: '',
     apiUrl: apiUrl,
     connectTimeout: connectTimeout,
     receiveTimeout: receiveTimeout,
     sendTimeout: sendTimeout,
-    accountId: '',
-    tokenCallback: () async => '',
-    httpClient: httpClient,
+    httpClientAdapter: httpClientAdapter,
+    headers: headers,
+    cancelTokenCallback: cancelTokenCallback,
+    interceptors: interceptors,
   );
-
-  bool get isInitialized => _initialized;
-
-  /// Call this function before using Cloudflare APIs
-  Future<void> init() async {
-    if (isInitialized) return;
-    String? token = await tokenCallback();
-    Map<String, dynamic> headers = {
-      if (token != null) HttpHeaders.authorizationHeader: 'Bearer $token',
-      if (apiKey != null) xAuthKeyHeader: apiKey,
-      if (accountEmail != null) xAuthEmailHeader: accountEmail,
-      if (userServiceKey != null) xAuthUserServiceKeyHeader: userServiceKey,
-    };
-
-    restAPI.init(
-      httpClient: httpClient,
-      apiUrl: apiUrl,
-      connectTimeout: connectTimeout,
-      receiveTimeout: receiveTimeout,
-      sendTimeout: sendTimeout,
-      headers: headers,
-    );
-
-    imageAPI = ImageAPI(restAPI: restAPI, accountId: accountId);
-    streamAPI = StreamAPI(restAPI: restAPI, accountId: accountId);
-    liveInputAPI = LiveInputAPI(restAPI: restAPI, accountId: accountId);
-    _initialized = true;
-  }
 }
