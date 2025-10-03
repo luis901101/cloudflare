@@ -78,32 +78,55 @@ Finally you just have to run:
 ### **Signed api access:**
 For server side apps where you can securely store `accountId`, `token` or any cloudflare credential, you can use the full `Cloudflare` constructor.
 ```dart
-cloudflare = Cloudflare(  
+cloudflare = Cloudflare(
+  accountId:  accountId,
+  apiKey: apiKey,
+  accountEmail: accountEmail,
+  userServiceKey: userServiceKey,
   apiUrl: apiUrl,
-  accountId: accountId,
+  connectTimeout: connectTimeout,
+  receiveTimeout: receiveTimeout,
+  sendTimeout: sendTimeout,
+  httpClientAdapter: httpClientAdapter,
+  headers: headers,
   token: token,
-  apiKey: apiKey, 
-  accountEmail: accountEmail,  
-  userServiceKey: userServiceKey,  
-  timeout: timeout,
-  httpClient: httpClient,
+  tokenCallback: tokenCallback,
+  cancelTokenCallback: cancelTokenCallback,
+  interceptors: interceptors,
+  parseErrorLogger: parseErrorLogger,
 );
 ```
-`apiUrl`: **Optional**. This is the base url for Cloudflare APIs, at the time of writing this, the url is: https://api.cloudflare.com/client/v4, which is used by default.
 
-`accountId`: **Required**. The accountId that identifies your Cloudflare account, you can find this id on your Developer Resources at your [Cloudflare Dash](https://dash.cloudflare.com/) or simply copying from the url when you select the account at Cloudflare Dash; something like https://dash.cloudflare.com/xxxxxxxxxxxxxxx/images/images.
+- `accountId`: **Required** Your Cloudflare account ID. You can find it on the link when you log in to Cloudflare dashboard: `https://dash.cloudflare.com/<`account_id`>/home/domains`
 
-`token`: **Optional**. The API Token provide a new way to authenticate with the Cloudflare API. It allows for scoped and permissioned access to resources. This token can be generated from [User Profile 'API Tokens' page](https://dash.cloudflare.com/profile/api-tokens)
+- `apiKey`: **Optional** (Legacy) Global API key is the previous authorization scheme for interacting with the Cloudflare API. When possible, use API tokens instead of Global API key. Check https://developers.cloudflare.com/fundamentals/api/get-started/keys/ for more info.
 
-`apiKey`: **Optional**. API key generated on the "My Account" page
+- `accountEmail`: **Optional** (Legacy) To be used as `X-Auth-Email`. Email address associated with your account. When possible, use API tokens instead.
 
-`accountEmail`: **Optional**. Email address associated with your account
+- `userServiceKey`: **Optional** (Legacy) To be used as `X-Auth-User-Service-Key`. A special Cloudflare API key good for a restricted set of endpoints. Always begins with "v1.0-", may vary in length. When possible, use API tokens instead.
 
-`userServiceKey`: **Optional**. A special Cloudflare API key good for a restricted set of endpoints. Always begins with "v1.0-", may vary in length.
+- `apiUrl`: **Optional** The Cloudflare api url to request, if not specified this one will be used: https://api.cloudflare.com/client/v4
 
-`timeout`: **Optional**. The duration to wait until an api request should timeout.
+- `token`: **Optional** Cloudflare API tokens provide a new way to authenticate with the Cloudflare API. They allow for scoped and permissioned access to resources and use the RFC compliant Authorization Bearer Token Header.
 
-`httpClient`: **Optional**. Set this if you need control over http requests like validating certificates and so. Not supported in Web.
+- `tokenCallback`: **Optional** is a callback that returns the token to be used in the requests, it is an async way to provide the token, if you use this callback you don't have to provide the `token`.
+
+- `connectTimeout`: **Optional** is the maximum amount of time in milliseconds that the request can take to establish a connection.
+
+- `receiveTimeout`: **Optional** is the maximum amount of time in milliseconds that the request can take to receive data.
+
+- `sendTimeout`: **Optional** is the maximum amount of time in milliseconds that the request can take to send data.
+
+- `httpClientAdapter`: **Optional** is the client adapter if you need to customize how http requests are made, note you should use either `IOHttpClientAdapter` on `dart:io` native platforms or `BrowserHttpClientAdapter` on `dart:html` web platforms.
+
+- `parseErrorLogger`: **Optional** is a logger for errors that occur during parsing of response data.
+
+- `headers`: **Optional** allows adding global HTTP headers for all requests.
+
+- `cancelTokenCallback`: **Optional** enables programmatically cancelling in-flight requests for this API. When cancelling a cancel token all current and future requests using the token will be cancelled. So make sure you reset the token returned by the `CancelTokenCallback` if you want to continue using the API.
+
+- `interceptors`: **Optional** enables advanced customization like logging, retries and rate limiting.
+
 
 ### **Authorization Important Note**
 For authorized requests to Cloudflare API you just need a `token` or `apiKey/accountEmail` or `userServiceKey` not all. Cloudflare's recommended authorization way is to use **`token`** authorization. So a valid Cloudflare full access api instance could be as simple as:
@@ -138,14 +161,7 @@ For client side apps like flutter apps where you can't securely store `accountId
 cloudflare = Cloudflare.basic(apiUrl: apiUrl); //apiUrl is optional
 ```
 
-
-## Once Cloudflare instance is created then initialize it like this:
-```dart
-await cloudflare.init();
-```
-Done, you can now access Cloudflare API.
-
-## Some important clases
+## Some important notes
 
 - `CloudflareHTTPResponse`: Contains the HTTP response from a network call to a Cloudflare API endpoint.
 - `CloudflareResponse`: It's the body content of a `CloudflareHTTPResponse`. [Check here](https://api.cloudflare.com/#getting-started-responses)
@@ -154,6 +170,8 @@ Done, you can now access Cloudflare API.
 - `CloudflareStreamVideo`: It's the representation of Stream Video data. [Check here](https://api.cloudflare.com/#stream-videos-properties) and [here](https://developers.cloudflare.com/stream)
 - `CloudflareLiveInput`: It's the representation of Stream Live Input data. [Check here](https://api.cloudflare.com/#stream-live-inputs-properties) and [here](https://developers.cloudflare.com/stream/stream-live/)
 - `DataTransmit`: It's the representation of the data that will be uploaded to Cloudflare, data could be a `File`, a `String` file path, or a byte array `List<Uint8List>`. This class allows you to listen for data transmit progress, by using its `progressCallback` and also allows you to cancel a data transmit ongoing request by using the `cancelToken`.
+- `CancelTokenCallback`: It's a callback that returns a `CancelToken` instance to be used in all requests, this allows you to programmatically cancel in-flight requests for the whole Cloudflare apis. When cancelling a cancel token all current and future requests using the token will be cancelled. So make sure you reset the token returned by the `CancelTokenCallback` if you want to continue using the API.
+- Each API request has an optional `cancelToken` parameter that allows you to cancel individual requests.
 
 ## How to use ImageAPI
 
@@ -163,37 +181,30 @@ You can upload an image from **file**, **file path** or directly from it's binar
 ```dart
 //From file
 CloudflareHTTPResponse<CloudflareImage?> responseFromFile = await cloudflare.imageAPI.upload(  
-  contentFromFile: DataTransmit<File>(data: imageFile, progressCallback: (count, total) {  
+  contentFromFile: DataTransmit<XFile>(data: imageFile, progressCallback: (count, total) {  
     print('Upload progress: $count/$total');  
   })  
 );
 
 //From path
-CloudflareHTTPResponse<CloudflareImage?> responseFromPath = await cloudflare.imageAPI.upload(  
-  contentFromPath: DataTransmit<String>(data: imagePath, progressCallback: (count, total) {  
+CloudflareHTTPResponse<CloudflareImage?> responseFromPath = await cloudflare.imageAPI.upload(
+  contentFromFile: DataTransmit<XFile>(data: XFile(imagePath), progressCallback: (count, total) {  
     print('Upload progress: $count/$total');  
   })  
 );
 
 //From bytes
-CloudflareHTTPResponse<CloudflareImage?> responseFromBytes = await cloudflare.imageAPI.upload(  
-  contentFromBytes: DataTransmit<Uint8List>(data: imageBytes, progressCallback: (count, total) {  
+CloudflareHTTPResponse<CloudflareImage?> responseFromBytes = await cloudflare.imageAPI.upload(
+  contentFromFile: DataTransmit<XFile>(data: XFile.fromData(imageBytes), progressCallback: (count, total) {  
     print('Upload progress: $count/$total');  
   })  
 );
 ```
 
 ### Upload multiple images
-Just like you upload an image you can also upload multiple images from **files**, **file paths** or **byte arrays**.
+Just like you upload an image you can also upload multiple images from **files**, **file paths** or **byte arrays**, even a mix of it, just by passing the respective list of `DataTransmit<XFile>`.
 ```dart
-//From files
 List<CloudflareHTTPResponse<CloudflareImage?>> responseFromFiles = await cloudflare.imageAPI.uploadMultiple(contentFromFiles: contentFromFiles);
-
-//From paths
-List<CloudflareHTTPResponse<CloudflareImage?>> responseFromPaths = await cloudflare.imageAPI.uploadMultiple(contentFromPaths: contentFromPaths);
-
-//From bytes
-List<CloudflareHTTPResponse<CloudflareImage?>> responseFromBytes = await cloudflare.imageAPI.uploadMultiple(contentFromBytes: contentFromBytes);
 ```
 
 ### Create a direct upload
@@ -212,7 +223,7 @@ For image direct upload without API key or token. This function is to be used sp
 ```dart
 final response = await cloudflare.imageAPI.directUpload(  
   dataUploadDraft: dataUploadDraft!,  
-  contentFromFile: DataTransmit<File>(  
+  contentFromFile: DataTransmit<XFile>(  
 	data: imageFile,  
 	progressCallback: (count, total) {  
 		print('Image upload to direct upload URL from file: $count/$total');  
@@ -274,7 +285,7 @@ for (final response in responses) {
 ```
 ## How to use StreamAPI
 ### Stream upload
-A video up to 200 MegaBytes can be uploaded using a single HTTP POST (multipart/form-data) request.  For larger file sizes, please upload using the TUS protocol.
+A video up to 200 MegaBytes can be uploaded using a single HTTP POST (multipart/form-data) request. For larger file sizes, please upload using the TUS protocol.
 You can upload a video from **url**, **file**, **file path** or directly from it’s binary representation as a **byte array**
 [Official documentation here](https://api.cloudflare.com/#stream-videos-upload-a-video-using-a-single-http-request) and [here](https://api.cloudflare.com/#stream-videos-upload-a-video-from-a-url)
 ```dart
@@ -290,7 +301,7 @@ CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.strea
   
 //From file
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-  contentFromFile: DataTransmit<File>(  
+  contentFromFile: DataTransmit<XFile>(  
     data: videoFile,  
     progressCallback: (count, total) {  
       print('Stream video progress: $count/$total');  
@@ -300,8 +311,8 @@ CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.strea
 
 //From path
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-  contentFromFile: DataTransmit<String>(  
-    data: videoFile.path,  
+  contentFromFile: DataTransmit<XFile>(  
+    data: XFile(videoPath),
     progressCallback: (count, total) {  
       print('Stream video progress: $count/$total');  
     }
@@ -310,8 +321,8 @@ CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.strea
 
 //From bytes
 CloudflareHTTPResponse<CloudflareStreamVideo?> response = await cloudflare.streamAPI.stream(  
-  contentFromFile: DataTransmit<Uint8List>(  
-    data: videoFile.readAsBytesSync(),  
+  contentFromFile: DataTransmit<XFile>(  
+    data: XFile.fromData(videoBytes),
     progressCallback: (count, total) {  
       print('Stream video progress: $count/$total');  
     }
@@ -328,12 +339,6 @@ List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromUrls = await cl
 
 //From files
 List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromFiles = await cloudflare.streamAPI.streamMultiple(contentFromFiles: contentFromFiles);
-
-//From paths
-List<CloudflareHTTPResponse<CloudflareStreamVideo?>> responseFromPaths = await cloudflare.streamAPI.streamMultiple(contentFromPaths: contentFromPaths);
-
-//From bytes
-List<CloudflareHTTPResponse<CloudflareImageCloudflareStreamVideo?>> responseFromBytes = await cloudflare.streamAPI.streamMultiple(contentFromBytes: contentFromBytes);
 ```
 
 ### Create a direct stream upload
@@ -359,7 +364,7 @@ For video direct stream upload without API key or token. This function is to be 
 ```dart
 final response = await cloudflare.imageAPI.directStreamUpload(  
   dataUploadDraft: dataUploadDraft!,  
-  contentFromFile: DataTransmit<File>(  
+  contentFromFile: DataTransmit<XFile>(  
 	data: imageFile,  
 	progressCallback: (count, total) {  
       print('Stream video to direct upload URL from file: $count/$total');  
@@ -410,7 +415,7 @@ Direct upload using tus(https://tus.io) protocol. Direct uploads allow users to 
 [Official documentation here](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/#using-tus-recommended-for-videos-over-200mb)
 ```dart
 final response = await cloudflare.imageAPI.createTusDirectStreamUpload(
-  size: File(dataVideo!.dataTransmit.data).lengthSync(),  
+  size: await file.length(),  
   maxDurationSeconds: videoPlayerController.value.duration.inSeconds,
   name: 'tus-video-direct-upload',
 );  
@@ -587,4 +592,4 @@ final responses = await cloudflare.liveInputAPI.removeMultipleOutputs(
 ### Final notes:
 - Every class, property and function is documented and references Cloudfare's official documentation.
 - Check the example project to see how to use this package from a flutter app.
-- Check the unit tests to see how to use each api in details.
+- Check the unit and integration tests to see how to use each api in details.
