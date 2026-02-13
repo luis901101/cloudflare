@@ -9,6 +9,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 8.0.0
+### Changed
+- Updated `CustomParseErrorLogger` with optional `Response` parameter as per new Retrofit version. 
+- Updated dependencies to latest breaking change versions. 
+
 ## 7.0.0
 ### Added
 - Added support for Web, this required several breaking changes due to the replace of `File` usage by `XFile`.

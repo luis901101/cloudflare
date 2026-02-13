@@ -153,9 +153,9 @@ class Cloudflare {
     apiUrl ??= defaultApiUrl;
     (headers ??= <String, dynamic>{}).addAll({
       if (token != null) RestAPIService.authorizationKey: 'Bearer $token',
-      if (apiKey != null) xAuthKeyHeader: apiKey,
-      if (accountEmail != null) xAuthEmailHeader: accountEmail,
-      if (userServiceKey != null) xAuthUserServiceKeyHeader: userServiceKey,
+      xAuthKeyHeader: ?apiKey,
+      xAuthEmailHeader: ?accountEmail,
+      xAuthUserServiceKeyHeader: ?userServiceKey,
     });
 
     restAPI.init(
