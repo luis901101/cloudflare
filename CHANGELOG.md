@@ -9,6 +9,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 9.0.0
+### Changed
+- Dependency breaking change version updated to `tusc: ^3.0.0`.
+- Updated dart sdk constraints to `sdk: '>=3.10.0 <4.0.0'`
+
 ## 8.0.0
 ### Changed
 - Updated `CustomParseErrorLogger` with optional `Response` parameter as per new Retrofit version. 
