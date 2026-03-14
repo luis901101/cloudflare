@@ -92,3 +92,26 @@ class OutputMatcher extends ResponseMatcher {
         response.body!.streamKey.isNotEmpty;
   }
 }
+
+class R2BucketMatcher extends ResponseMatcher {
+  R2BucketMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    super.matches(response, matchState);
+    if (response is! CloudflareHTTPResponse<R2Bucket?>) return false;
+    return response.body != null && response.body!.name.isNotEmpty;
+  }
+}
+
+class R2ObjectMatcher extends ResponseMatcher {
+  R2ObjectMatcher() : super();
+
+  @override
+  bool matches(response, Map matchState) {
+    super.matches(response, matchState);
+    if (response is! CloudflareHTTPResponse<R2Object?>) return false;
+    return response.body != null && response.body!.key.isNotEmpty;
+  }
+}
+

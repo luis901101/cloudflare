@@ -11,6 +11,7 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
 | [Cloudflare Images](https://api.cloudflare.com/#cloudflare-images-properties) | :white_check_mark: |
 | [Stream Videos](https://api.cloudflare.com/#stream-videos-properties) | :white_check_mark: |
 | [Stream Live Inputs](https://api.cloudflare.com/#stream-live-inputs-properties) | :white_check_mark: |
+| [R2 Object Storage](https://developers.cloudflare.com/r2/api/s3/api/) | :white_check_mark: |
 
 - [Installation](#installation)
 - [How to use](#how-to-use)
@@ -55,6 +56,22 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
     - [Get outputs of a live input](#get-outputs-of-a-live-input)
     - [Remove output](#remove-output)
     - [Delete multiple live inputs](#delete-multiple-live-inputs)
+  - [R2CloudflareAPI](#how-to-use-r2cloudflareapi)
+    - [Initialization](#r2-initialization)
+    - [List buckets](#list-buckets)
+    - [Create bucket](#create-bucket)
+    - [Head bucket](#head-bucket)
+    - [Delete bucket](#delete-bucket)
+    - [List objects](#list-objects)
+    - [Put object](#put-object)
+    - [Get object](#get-object)
+    - [Get object range](#get-object-range)
+    - [Head object](#head-object)
+    - [Copy object](#copy-object)
+    - [Delete object](#delete-object)
+    - [Delete multiple objects](#delete-multiple-objects)
+    - [Presigned URL](#presigned-url)
+    - [Multipart upload](#multipart-upload)
 - [Final notes](#final-notes)
 
 
@@ -588,6 +605,187 @@ final responses = await cloudflare.liveInputAPI.removeMultipleOutputs(
   outputs: outputs,  
 );
 ```
+-------------
+## How to use R2CloudflareAPI
+
+`R2CloudflareAPI` provides a full S3-compatible client for [Cloudflare R2 object storage](https://developers.cloudflare.com/r2/). It is **independent of the main `Cloudflare` class** — R2 uses AWS Signature Version 4 authentication with a dedicated R2 API token pair, not the Cloudflare Bearer token.
+
+> Generate R2 API tokens at:  
+> `https://dash.cloudflare.com/<accountId>/r2/api-tokens`
+
+### R2 Initialization
+```dart
+final r2 = R2CloudflareAPI(
+  accountId: 'my-account-id',
+  credentials: R2Credentials(
+    accessKeyId: 'r2-access-key-id',
+    secretAccessKey: 'r2-secret-access-key',
+  ),
+);
+```
+
+Optional parameters:
+
+- `s3ApiUrl` — override the default S3-compatible endpoint (`https://<accountId>.r2.cloudflarestorage.com`). Useful for jurisdiction-specific endpoints or local mocks.
+- `r2Region` — override the SigV4 signing region (default: `'auto'`). Use `'eu'` for the EU jurisdiction or `'fedramp'` for the FedRAMP-compliant endpoint.
+
+Dispose the underlying HTTP client when done:
+```dart
+r2.dispose();
+```
+
+### List buckets
+```dart
+final CloudflareHTTPResponse<List<R2Bucket>?> response = await r2.listBuckets();
+if (response.isSuccessful) {
+  for (final bucket in response.body!) {
+    print('${bucket.name} — created: ${bucket.creationDate}');
+  }
+}
+```
+
+### Create bucket
+```dart
+final CloudflareHTTPResponse<R2Bucket?> response = await r2.createBucket('my-bucket');
+```
+
+### Head bucket
+Returns `true` when the bucket exists, `false` on 404.
+```dart
+final CloudflareHTTPResponse<bool?> response = await r2.headBucket('my-bucket');
+print(response.body); // true or false
+```
+
+### Delete bucket
+The bucket must be empty before deletion.
+```dart
+final CloudflareHTTPResponse<bool?> response = await r2.deleteBucket('my-bucket');
+```
+
+### List objects
+Uses ListObjectsV2. Supports prefix filtering, delimiter for virtual directories, and continuation-token pagination.
+```dart
+final CloudflareHTTPResponse<R2ListObjectsResult?> response = await r2.listObjects(
+  'my-bucket',
+  prefix: 'images/',
+  maxKeys: 100,
+);
+
+final result = response.body!;
+for (final obj in result.objects) {
+  print('${obj.key}  ${obj.size} bytes  etag: ${obj.etag}');
+}
+
+// Page through all results
+String? token = result.nextContinuationToken;
+while (token != null) {
+  final next = await r2.listObjects('my-bucket', continuationToken: token);
+  token = next.body?.nextContinuationToken;
+}
+```
+
+### Put object
+Upload any file as a `DataTransmit<XFile>`:
+```dart
+final CloudflareHTTPResponse<R2Object?> response = await r2.putObject(
+  'my-bucket',
+  'documents/report.pdf',
+  content: DataTransmit<XFile>(data: xFile),
+  contentType: 'application/pdf',
+);
+print(response.body?.etag);
+```
+
+### Get object
+Download the full object as raw bytes:
+```dart
+final CloudflareHTTPResponse<Uint8List?> response = await r2.getObject('my-bucket', 'documents/report.pdf');
+final bytes = response.body!;
+```
+
+### Get object range
+Download a byte range (HTTP Range header):
+```dart
+// Fetch bytes 0–1023 (first 1 KB)
+final CloudflareHTTPResponse<Uint8List?> response = await r2.getObjectRange(
+  'my-bucket',
+  'documents/report.pdf',
+  start: 0,
+  end: 1023,
+);
+```
+
+### Head object
+Fetch metadata without downloading the body:
+```dart
+final CloudflareHTTPResponse<R2Object?> response = await r2.headObject('my-bucket', 'documents/report.pdf');
+print('size: ${response.body?.size}, etag: ${response.body?.etag}');
+```
+
+### Copy object
+```dart
+final CloudflareHTTPResponse<R2Object?> response = await r2.copyObject(
+  sourceBucket: 'my-bucket',
+  sourceKey: 'documents/report.pdf',
+  destBucket: 'my-bucket',
+  destKey: 'documents/report-copy.pdf',
+);
+```
+
+### Delete object
+```dart
+final CloudflareHTTPResponse<bool?> response = await r2.deleteObject('my-bucket', 'documents/report.pdf');
+```
+
+### Delete multiple objects
+Delete up to 1 000 keys in a single request:
+```dart
+final CloudflareHTTPResponse<List<String>?> response = await r2.deleteObjects(
+  'my-bucket',
+  ['key1.pdf', 'key2.pdf', 'key3.pdf'],
+);
+// response.body contains any keys that *failed* to delete (empty = all OK)
+```
+
+### Presigned URL
+Generate a time-limited URL that can be shared with unauthenticated clients (max 7 days):
+```dart
+final Uri url = await r2.presignedUrl(
+  'my-bucket',
+  'documents/report.pdf',
+  expiresIn: Duration(hours: 1),          // default: 1 h
+  method: AWSHttpMethod.get,              // default: GET
+);
+// Hand `url` to the client — no credentials required to access it.
+```
+
+### Multipart upload
+Recommended for files larger than ~5 GB. Each part (except the last) must be ≥ 5 MB.
+```dart
+// 1. Initiate
+final initRes = await r2.createMultipartUpload('my-bucket', 'videos/big.mp4',
+    contentType: 'video/mp4');
+final uploadId = initRes.body!;
+
+// 2. Upload parts (collect ETags)
+final Map<int, String> parts = {};
+int partNumber = 1;
+for (final chunk in chunks) {           // chunks: List<Uint8List>
+  final partRes = await r2.uploadPart('my-bucket', 'videos/big.mp4', uploadId, partNumber, chunk);
+  parts[partNumber] = partRes.body!;    // ETag returned by R2
+  partNumber++;
+}
+
+// 3. Complete
+final completeRes = await r2.completeMultipartUpload(
+  'my-bucket', 'videos/big.mp4', uploadId, parts,
+);
+print(completeRes.body?.etag);
+
+// Abort if something goes wrong instead of completing
+await r2.abortMultipartUpload('my-bucket', 'videos/big.mp4', uploadId);
+```
+
 -------------
 ### Final notes:
 - Every class, property and function is documented and references Cloudfare's official documentation.

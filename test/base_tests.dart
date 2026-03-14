@@ -32,6 +32,11 @@ import 'utils/matchers.dart';
 /// export CLOUDFLARE_VIDEO_FILE_3=/Users/user/Desktop/video-test-3.mp4
 /// export CLOUDFLARE_VIDEO_URL=http://clips.vorwaerts-gmbh.de/VfE_html5.mp4
 ///
+/// export CLOUDFLARE_R2_ACCESS_KEY_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+/// export CLOUDFLARE_R2_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+/// export CLOUDFLARE_R2_BUCKET=my-existing-bucket  (optional)
+/// export CLOUDFLARE_PDF_FILE=/Users/user/Desktop/document-test.pdf
+///
 final String? apiUrl = Platform.environment['CLOUDFLARE_API_URL'];
 final String? accountId = Platform.environment['CLOUDFLARE_ACCOUNT_ID'];
 final String? token = Platform.environment['CLOUDFLARE_TOKEN'];
@@ -53,6 +58,16 @@ final XFile videoFile = XFile(
     videoFile2 = XFile(Platform.environment['CLOUDFLARE_VIDEO_FILE_2'] ?? ''),
     videoFile3 = XFile(Platform.environment['CLOUDFLARE_VIDEO_FILE_3'] ?? '');
 final String videoUrl = Platform.environment['CLOUDFLARE_VIDEO_URL'] ?? '';
+
+final String? r2AccessKeyId =
+    Platform.environment['CLOUDFLARE_R2_ACCESS_KEY_ID'];
+final String? r2SecretAccessKey =
+    Platform.environment['CLOUDFLARE_R2_SECRET_ACCESS_KEY'];
+
+/// An existing R2 bucket name to run object tests against.
+/// When null the R2 test suite creates a temporary bucket and deletes it afterwards.
+final String? r2ExistingBucket = Platform.environment['CLOUDFLARE_R2_BUCKET'];
+final XFile pdfFile = XFile(Platform.environment['CLOUDFLARE_PDF_FILE'] ?? '');
 
 Cloudflare cloudflare = Cloudflare.basic();
 

@@ -9,6 +9,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 10.0.0
+### Added
+- `R2CloudflareAPI` — full S3-compatible Cloudflare R2 object-storage API, authenticated with AWS Signature Version 4 via `R2Credentials` (separate from the Cloudflare Bearer token used by the other APIs).
+
 ## 9.0.0
 ### Changed
 - Dependency breaking change version updated to `tusc: ^3.0.0`.

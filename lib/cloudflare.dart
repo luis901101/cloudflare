@@ -15,6 +15,7 @@ import 'package:retrofit/retrofit.dart' hide Headers;
 // Exports
 // APIs
 export 'package:cloudflare/src/apiservice/image_api.dart';
+export 'package:cloudflare/src/apiservice/r2_api.dart';
 export 'package:cloudflare/src/apiservice/stream_api.dart';
 export 'package:cloudflare/src/apiservice/tus_api.dart';
 export 'package:dio/dio.dart' hide Response;
@@ -30,6 +31,8 @@ export 'package:cloudflare/src/entity/image_stats.dart';
 export 'package:cloudflare/src/entity/live_input_output.dart';
 export 'package:cloudflare/src/entity/live_input_recording.dart';
 export 'package:cloudflare/src/entity/media_nft.dart';
+export 'package:cloudflare/src/entity/r2_bucket.dart';
+export 'package:cloudflare/src/entity/r2_object.dart';
 export 'package:cloudflare/src/entity/rtmps.dart';
 export 'package:cloudflare/src/entity/srt.dart';
 export 'package:cloudflare/src/entity/video_playback_info.dart';
@@ -51,6 +54,9 @@ export 'package:cloudflare/src/model/cloudflare_stream_videos_error_codes.dart';
 export 'package:cloudflare/src/model/data_transmit.dart';
 export 'package:cloudflare/src/model/error_info.dart';
 export 'package:cloudflare/src/model/pagination.dart';
+export 'package:cloudflare/src/model/r2_credentials.dart';
+export 'package:cloudflare/src/model/r2_error_response.dart';
+export 'package:cloudflare/src/model/r2_list_objects_result.dart';
 
 // Utils
 export 'package:cloudflare/src/utils/callbacks.dart';
