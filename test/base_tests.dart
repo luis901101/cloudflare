@@ -68,6 +68,9 @@ final String? r2SecretAccessKey =
 /// When null the R2 test suite creates a temporary bucket and deletes it afterwards.
 final String? r2ExistingBucket = Platform.environment['CLOUDFLARE_R2_BUCKET'];
 final XFile pdfFile = XFile(Platform.environment['CLOUDFLARE_PDF_FILE'] ?? '');
+final XFile pdfBigFile = XFile(
+  Platform.environment['CLOUDFLARE_PDF_BIG_FILE'] ?? '',
+);
 
 Cloudflare cloudflare = Cloudflare.basic();
 

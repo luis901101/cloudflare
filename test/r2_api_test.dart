@@ -626,9 +626,9 @@ void main() {
     test(
       'directPutObject uploads a file via presigned PUT URL without credentials',
       () async {
-        if (!pdfFile.existsSync()) {
+        if (!pdfBigFile.existsSync()) {
           fail(
-            'No PDF file available – set CLOUDFLARE_PDF_FILE to a local PDF path',
+            'No PDF file available – set CLOUDFLARE_PDF_BIG_FILE to a local PDF path',
           );
         }
 
@@ -650,7 +650,7 @@ void main() {
         final res = await r2basic.directPutObject(
           urlData: signedUrl,
           content: DataTransmit<XFile>(
-            data: pdfFile,
+            data: pdfBigFile,
             progressCallback: (count, total) {
               lastCount = count;
               lastTotal = total;
@@ -681,7 +681,7 @@ void main() {
           key: directPutKey,
         );
         expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
-        expect(headRes.body?.size, await pdfFile.length());
+        expect(headRes.body?.size, await pdfBigFile.length());
 
         r2basic.dispose();
       },
@@ -700,8 +700,8 @@ void main() {
         const minSize = 5 * 1024 * 1024 + 1; // 5 MB + 1 byte
 
         final XFile testFile;
-        if (pdfFile.existsSync() && await pdfFile.length() >= minSize) {
-          testFile = pdfFile;
+        if (pdfBigFile.existsSync() && await pdfBigFile.length() >= minSize) {
+          testFile = pdfBigFile;
         } else {
           // Synthesise an in-memory file large enough for two parts.
           testFile = XFile.fromData(
