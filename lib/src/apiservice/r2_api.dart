@@ -5,6 +5,7 @@ import 'package:aws_common/aws_common.dart';
 import 'package:aws_signature_v4/aws_signature_v4.dart';
 import 'package:cloudflare/src/entity/r2_bucket.dart';
 import 'package:cloudflare/src/entity/r2_object.dart';
+import 'package:cloudflare/src/entity/r2_signed_url.dart';
 import 'package:cloudflare/src/model/cloudflare_http_response.dart';
 import 'package:cloudflare/src/model/data_transmit.dart';
 import 'package:cloudflare/src/model/r2_credentials.dart';
@@ -12,6 +13,7 @@ import 'package:cloudflare/src/model/r2_error_response.dart';
 import 'package:cloudflare/src/model/r2_list_objects_result.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:cloudflare/src/utils/xml_utils.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:http/http.dart' as http;
 
 /// Cloudflare R2 object-storage API (S3-compatible).
@@ -81,19 +83,16 @@ class R2CloudflareAPI {
     required R2Credentials credentials,
     String? s3ApiUrl,
     String? r2Region,
-  })  : region = r2Region ?? R2CloudflareAPI.r2Region,
-        s3ApiUri = Uri.parse(
-          s3ApiUrl ?? 'https://$accountId.r2.cloudflarestorage.com',
-        ),
-        _signer = AWSSigV4Signer(
-          credentialsProvider: AWSCredentialsProvider(
-            AWSCredentials(
-              credentials.accessKeyId,
-              credentials.secretAccessKey,
-            ),
-          ),
-        ),
-        _httpClient = AWSHttpClient();
+  }) : region = r2Region ?? R2CloudflareAPI.r2Region,
+       s3ApiUri = Uri.parse(
+         s3ApiUrl ?? 'https://$accountId.r2.cloudflarestorage.com',
+       ),
+       _signer = AWSSigV4Signer(
+         credentialsProvider: AWSCredentialsProvider(
+           AWSCredentials(credentials.accessKeyId, credentials.secretAccessKey),
+         ),
+       ),
+       _httpClient = AWSHttpClient();
 
   // ── Internal helpers ────────────────────────────────────────────────────
 
@@ -122,7 +121,6 @@ class R2CloudflareAPI {
     http.Response('', statusCode, headers: headers),
     body,
   );
-
 
   /// Signs and executes an HTTP request against the R2 S3 endpoint.
   Future<({int statusCode, Uint8List body, Map<String, String> headers})>
@@ -369,7 +367,11 @@ class R2CloudflareAPI {
         );
       }
 
-      return _successResp(result.statusCode, result.body, headers: result.headers);
+      return _successResp(
+        result.statusCode,
+        result.body,
+        headers: result.headers,
+      );
     } catch (e) {
       return _errorResp(500, R2ErrorResponse(message: e.toString()));
     }
@@ -401,7 +403,11 @@ class R2CloudflareAPI {
         );
       }
 
-      return _successResp(result.statusCode, result.body, headers: result.headers);
+      return _successResp(
+        result.statusCode,
+        result.body,
+        headers: result.headers,
+      );
     } catch (e) {
       return _errorResp(500, R2ErrorResponse(message: e.toString()));
     }
@@ -558,7 +564,10 @@ class R2CloudflareAPI {
     List<String> keys,
   ) async {
     assert(keys.isNotEmpty, 'keys must not be empty');
-    assert(keys.length <= 1000, 'A maximum of 1000 keys can be deleted per call');
+    assert(
+      keys.length <= 1000,
+      'A maximum of 1000 keys can be deleted per call',
+    );
     try {
       final buffer = StringBuffer()
         ..write('<?xml version="1.0" encoding="UTF-8"?>')
@@ -573,12 +582,17 @@ class R2CloudflareAPI {
 
       final body = utf8.encode(buffer.toString());
 
+      // S3/R2 batch-delete requires a Content-MD5 header (base64-encoded MD5
+      // of the request body). Without it R2 returns InvalidArgument.
+      final contentMd5 = base64.encode(crypto.md5.convert(body).bytes);
+
       final result = await _execute(
         method: AWSHttpMethod.post,
         path: '/$bucket',
         queryParams: {'delete': ''},
         body: body,
         contentType: 'application/xml',
+        headers: {'Content-MD5': contentMd5},
       );
 
       final responseStr = utf8.decode(result.body);
@@ -651,14 +665,56 @@ class R2CloudflareAPI {
 
   // ── Presigned URLs ───────────────────────────────────────────────────────
 
-  /// Generates a presigned URL for [bucket]/[key].
+  /// Generates a presigned URL for [bucket]/[key] and returns an
+  /// [R2SignedUrl] describing it.
   ///
-  /// The URL embeds SigV4 credentials in query parameters, so it can be shared
-  /// with unauthenticated clients for a limited time window.
+  /// The returned URL embeds SigV4 credentials in its query parameters so it
+  /// can be handed directly to an unauthenticated client.  No extra headers
+  /// are required to use it — the authority is encoded in the URL itself.
   ///
-  /// [expiresIn] – validity period (max 7 days for R2).
-  /// [method]    – HTTP method allowed by the URL (default: GET).
-  Future<Uri> presignedUrl(
+  /// ### Returned [R2SignedUrl] fields
+  /// | Field | Description |
+  /// |---|---|
+  /// | `url` | The full presigned URL string to share with the client. |
+  /// | `bucket` | The R2 bucket the object lives in. |
+  /// | `key` | The object key within the bucket. |
+  /// | `type` | The HTTP method the URL permits — uppercase, e.g. `"GET"` or `"PUT"`. |
+  /// | `expiresAt` | UTC instant the URL expires (locally computed approximation). |
+  /// | `isExpired` | Convenience getter: `true` once `expiresAt` is in the past. |
+  ///
+  /// ### Parameters
+  /// - [expiresIn] — validity period; maximum 7 days for R2 (default: 1 hour).
+  /// - [method] — HTTP method the URL will permit (default: `GET` for
+  ///   downloads). Pass `AWSHttpMethod.put` to allow client-side uploads.
+  ///
+  /// ### Download example
+  /// ```dart
+  /// final signed = await r2.presignedUrl('my-bucket', 'docs/report.pdf');
+  /// // Share signed.url — client can GET it without credentials.
+  /// print(signed.type);      // "GET"
+  /// print(signed.expiresAt); // e.g. 2026-03-16T12:00:00.000Z
+  /// ```
+  ///
+  /// ### Client-side upload example
+  /// ```dart
+  /// // Backend: generate a presigned PUT URL.
+  /// final signed = await r2.presignedUrl(
+  ///   'my-bucket',
+  ///   'uploads/document.pdf',
+  ///   method: AWSHttpMethod.put,
+  ///   expiresIn: Duration(minutes: 15),
+  /// );
+  ///
+  /// // Client: upload directly — no credentials required.
+  /// final response = await http.put(
+  ///   Uri.parse(signed.url),
+  ///   headers: {'content-type': 'application/pdf'},
+  ///   body: pdfBytes,
+  /// );
+  /// ```
+  ///
+  /// R2 API docs: https://developers.cloudflare.com/r2/api/s3/presigned-urls/
+  Future<R2SignedUrl> presignedUrl(
     String bucket,
     String key, {
     Duration expiresIn = const Duration(hours: 1),
@@ -672,11 +728,19 @@ class R2CloudflareAPI {
     final uri = s3ApiUri.replace(path: '/$bucket/$key');
     final request = AWSHttpRequest(method: method, uri: uri);
 
-    return _signer.presign(
+    final presignedUri = await _signer.presign(
       request,
       credentialScope: _scope,
       serviceConfiguration: S3ServiceConfiguration(signPayload: false),
       expiresIn: expiresIn,
+    );
+
+    return R2SignedUrl(
+      url: presignedUri.toString(),
+      bucket: bucket,
+      key: key,
+      type: method.value,
+      expiresAt: DateTime.now().toUtc().add(expiresIn),
     );
   }
 
@@ -743,7 +807,10 @@ class R2CloudflareAPI {
     int partNumber,
     Uint8List data,
   ) async {
-    assert(partNumber >= 1 && partNumber <= 10000, 'partNumber must be between 1 and 10000');
+    assert(
+      partNumber >= 1 && partNumber <= 10000,
+      'partNumber must be between 1 and 10000',
+    );
     try {
       final result = await _execute(
         method: AWSHttpMethod.put,
@@ -780,7 +847,8 @@ class R2CloudflareAPI {
   ) async {
     assert(parts.isNotEmpty, 'parts must not be empty');
     try {
-      final sorted = parts.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+      final sorted = parts.entries.toList()
+        ..sort((a, b) => a.key.compareTo(b.key));
 
       final buffer = StringBuffer()
         ..write('<?xml version="1.0" encoding="UTF-8"?>')
@@ -816,7 +884,11 @@ class R2CloudflareAPI {
 
       return _successResp(
         result.statusCode,
-        R2Object(key: key, bucket: bucket, etag: XmlUtils.parseCompleteMultipartEtag(responseStr)),
+        R2Object(
+          key: key,
+          bucket: bucket,
+          etag: XmlUtils.parseCompleteMultipartEtag(responseStr),
+        ),
         headers: result.headers,
       );
     } catch (e) {

@@ -114,4 +114,3 @@ class R2ObjectMatcher extends ResponseMatcher {
     return response.body != null && response.body!.key.isNotEmpty;
   }
 }
-

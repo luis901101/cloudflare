@@ -189,6 +189,7 @@ cloudflare = Cloudflare.basic(apiUrl: apiUrl); //apiUrl is optional
 - `DataTransmit`: It's the representation of the data that will be uploaded to Cloudflare, data could be a `File`, a `String` file path, or a byte array `List<Uint8List>`. This class allows you to listen for data transmit progress, by using its `progressCallback` and also allows you to cancel a data transmit ongoing request by using the `cancelToken`.
 - `CancelTokenCallback`: It's a callback that returns a `CancelToken` instance to be used in all requests, this allows you to programmatically cancel in-flight requests for the whole Cloudflare apis. When cancelling a cancel token all current and future requests using the token will be cancelled. So make sure you reset the token returned by the `CancelTokenCallback` if you want to continue using the API.
 - Each API request has an optional `cancelToken` parameter that allows you to cancel individual requests.
+- `R2SignedUrl`: Represents a presigned R2/S3 URL returned by `R2CloudflareAPI.presignedUrl`. Contains the ready-to-use `url` string, the `bucket`, the object `key`, the HTTP method `type` (e.g. `"GET"` or `"PUT"`), and the `expiresAt` UTC timestamp. Use `isExpired` to check validity before sharing.
 
 ## How to use ImageAPI
 
@@ -748,15 +749,51 @@ final CloudflareHTTPResponse<List<String>?> response = await r2.deleteObjects(
 ```
 
 ### Presigned URL
-Generate a time-limited URL that can be shared with unauthenticated clients (max 7 days):
+Generate a time-limited URL that can be shared with unauthenticated clients (max 7 days).  
+`presignedUrl` returns an [`R2SignedUrl`](#some-important-notes) with the full URL string and metadata about it.
+
+| Field | Type | Description |
+|---|---|---|
+| `url` | `String` | The full presigned URL to share with the client. |
+| `bucket` | `String` | The R2 bucket the object lives in. |
+| `key` | `String` | The object key within the bucket. |
+| `type` | `String` | HTTP method the URL permits — uppercase, e.g. `"GET"` or `"PUT"`. |
+| `expiresAt` | `DateTime` | UTC instant at which the URL expires (locally computed). |
+| `isExpired` | `bool` | `true` once `expiresAt` is in the past. |
+
+#### Download (presigned GET URL)
 ```dart
-final Uri url = await r2.presignedUrl(
+final R2SignedUrl signed = await r2.presignedUrl(
   'my-bucket',
   'documents/report.pdf',
-  expiresIn: Duration(hours: 1),          // default: 1 h
-  method: AWSHttpMethod.get,              // default: GET
+  expiresIn: Duration(hours: 1),   // default: 1 h
+  method: AWSHttpMethod.get,       // default: GET
 );
-// Hand `url` to the client — no credentials required to access it.
+// Share signed.url — no credentials required to download.
+print(signed.type);      // "GET"
+print(signed.expiresAt); // 2026-03-16T13:00:00.000Z
+print(signed.isExpired); // false
+```
+
+#### Client-side upload (presigned PUT URL)
+The common pattern for browser or mobile apps that must upload directly to R2 without exposing credentials:
+```dart
+// Backend: generate a presigned PUT URL valid for 15 minutes.
+final R2SignedUrl signed = await r2.presignedUrl(
+  'my-bucket',
+  'uploads/document.pdf',
+  method: AWSHttpMethod.put,
+  expiresIn: Duration(minutes: 15),
+);
+print(signed.type); // "PUT"
+
+// Client: upload directly to R2 — no R2 credentials required.
+final response = await http.put(
+  Uri.parse(signed.url),
+  headers: {'content-type': 'application/pdf'},
+  body: pdfBytes,
+);
+// HTTP 200 or 204 → upload succeeded.
 ```
 
 ### Multipart upload

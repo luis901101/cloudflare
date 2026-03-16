@@ -49,7 +49,7 @@ class _$CloudflareResponseCWProxyImpl implements _$CloudflareResponseCWProxy {
       result: result == const $CopyWithPlaceholder()
           ? _value.result
           // ignore: cast_nullable_to_non_nullable
-          : result,
+          : result as Object?,
       success: success == const $CopyWithPlaceholder()
           ? _value.success
           // ignore: cast_nullable_to_non_nullable

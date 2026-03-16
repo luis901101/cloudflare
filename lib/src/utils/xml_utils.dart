@@ -98,10 +98,7 @@ class XmlUtils {
   /// [R2ListObjectsResult].
   ///
   /// [bucket] is attached to each returned [R2Object] for convenience.
-  static R2ListObjectsResult parseListObjectsResult(
-    String xml,
-    String bucket,
-  ) {
+  static R2ListObjectsResult parseListObjectsResult(String xml, String bucket) {
     final doc = XmlDocument.parse(xml);
 
     final objects = doc.findAllElements('Contents').map((el) {
@@ -110,10 +107,11 @@ class XmlUtils {
         key: el.findElements('Key').firstOrNull?.innerText ?? '',
         bucket: bucket,
         size: sizeStr != null ? int.tryParse(sizeStr) : null,
-        etag: el.findElements('ETag').firstOrNull?.innerText.replaceAll(
-          '"',
-          '',
-        ),
+        etag: el
+            .findElements('ETag')
+            .firstOrNull
+            ?.innerText
+            .replaceAll('"', ''),
         lastModified: parseDate(
           el.findElements('LastModified').firstOrNull?.innerText,
         ),
@@ -129,10 +127,11 @@ class XmlUtils {
 
     final isTruncated =
         doc.findAllElements('IsTruncated').firstOrNull?.innerText == 'true';
-    final nextToken =
-        doc.findAllElements('NextContinuationToken').firstOrNull?.innerText;
-    final keyCountStr =
-        doc.findAllElements('KeyCount').firstOrNull?.innerText;
+    final nextToken = doc
+        .findAllElements('NextContinuationToken')
+        .firstOrNull
+        ?.innerText;
+    final keyCountStr = doc.findAllElements('KeyCount').firstOrNull?.innerText;
 
     return R2ListObjectsResult(
       objects: objects,
@@ -185,11 +184,7 @@ class XmlUtils {
 
   /// Parses a `CompleteMultipartUploadResult` response and returns the final
   /// ETag of the assembled object.
-  static String? parseCompleteMultipartEtag(String xml) =>
-      XmlDocument.parse(xml)
-          .findAllElements('ETag')
-          .firstOrNull
-          ?.innerText
-          .replaceAll('"', '');
+  static String? parseCompleteMultipartEtag(String xml) => XmlDocument.parse(
+    xml,
+  ).findAllElements('ETag').firstOrNull?.innerText.replaceAll('"', '');
 }
-

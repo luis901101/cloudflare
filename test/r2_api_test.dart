@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:aws_common/aws_common.dart' show AWSHttpMethod;
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import 'base_tests.dart';
@@ -24,14 +25,20 @@ import 'utils/matchers.dart';
 R2CloudflareAPI? _r2;
 
 R2CloudflareAPI get r2 {
-  if (_r2 == null) throw StateError('r2 is not initialised – did initR2() run?');
+  if (_r2 == null) {
+    throw StateError('r2 is not initialised – did initR2() run?');
+  }
   return _r2!;
 }
 
 void initR2() {
   if (accountId == null) throw Exception("accountId can't be null");
-  if (r2AccessKeyId == null) throw Exception("CLOUDFLARE_R2_ACCESS_KEY_ID can't be null");
-  if (r2SecretAccessKey == null) throw Exception("CLOUDFLARE_R2_SECRET_ACCESS_KEY can't be null");
+  if (r2AccessKeyId == null) {
+    throw Exception("CLOUDFLARE_R2_ACCESS_KEY_ID can't be null");
+  }
+  if (r2SecretAccessKey == null) {
+    throw Exception("CLOUDFLARE_R2_SECRET_ACCESS_KEY can't be null");
+  }
 
   _r2 = R2CloudflareAPI(
     accountId: accountId!,
@@ -110,7 +117,9 @@ void main() {
         true,
         reason: 'Test bucket "$testBucket" should appear in bucket list',
       );
-      print('Buckets (${res.body!.length}): ${res.body!.map((b) => b.name).join(', ')}');
+      print(
+        'Buckets (${res.body!.length}): ${res.body!.map((b) => b.name).join(', ')}',
+      );
     });
 
     test('Head bucket – existing bucket returns true', () async {
@@ -167,7 +176,10 @@ void main() {
     tearDownAll(() async {
       // Best-effort cleanup of any objects left behind by failed tests.
       try {
-        final listRes = await r2.listObjects(testBucket, prefix: 'test-object/');
+        final listRes = await r2.listObjects(
+          testBucket,
+          prefix: 'test-object/',
+        );
         if (listRes.isSuccessful &&
             (listRes.body?.objects.isNotEmpty ?? false)) {
           final keys = listRes.body!.objects.map((o) => o.key).toList();
@@ -252,27 +264,35 @@ void main() {
       print('headObject size=${res.body?.size} etag=${res.body?.etag}');
     });
 
-    test('Get object returns bytes matching original file', () async {
-      if (!pdfFile.existsSync()) {
-        fail('No PDF file available – set CLOUDFLARE_PDF_FILE');
-      }
-      final originalBytes = await pdfFile.readAsBytes();
-      final res = await r2.getObject(testBucket, testKey);
-      expect(res, ResponseMatcher(), reason: res.error?.toString());
-      expect(res.body, isNotNull);
-      expect(res.body, isA<Uint8List>());
-      expect(
-        res.body!.length,
-        originalBytes.length,
-        reason: 'Downloaded size should match uploaded file size',
-      );
-    }, timeout: Timeout(Duration(minutes: 2)));
+    test(
+      'Get object returns bytes matching original file',
+      () async {
+        if (!pdfFile.existsSync()) {
+          fail('No PDF file available – set CLOUDFLARE_PDF_FILE');
+        }
+        final originalBytes = await pdfFile.readAsBytes();
+        final res = await r2.getObject(testBucket, testKey);
+        expect(res, ResponseMatcher(), reason: res.error?.toString());
+        expect(res.body, isNotNull);
+        expect(res.body, isA<Uint8List>());
+        expect(
+          res.body!.length,
+          originalBytes.length,
+          reason: 'Downloaded size should match uploaded file size',
+        );
+      },
+      timeout: Timeout(Duration(minutes: 2)),
+    );
 
     test('Get object range returns partial content', () async {
       const start = 0;
       const end = 99; // first 100 bytes
-      final res =
-          await r2.getObjectRange(testBucket, testKey, start: start, end: end);
+      final res = await r2.getObjectRange(
+        testBucket,
+        testKey,
+        start: start,
+        end: end,
+      );
       expect(res, ResponseMatcher(), reason: res.error?.toString());
       expect(res.body, isNotNull);
       expect(res.body!.length, lessThanOrEqualTo(end - start + 1));
@@ -318,6 +338,7 @@ void main() {
     late String testBucket;
     bool createdBucket = false;
     const testKey = 'presign-test/object.txt';
+    const unsignedUploadKey = 'presign-test/unsigned-upload.txt';
 
     setUpAll(() async {
       if (r2ExistingBucket != null) {
@@ -345,34 +366,100 @@ void main() {
     });
 
     tearDownAll(() async {
-      await r2.deleteObject(testBucket, testKey);
+      await r2.deleteObjects(testBucket, [testKey, unsignedUploadKey]);
       if (createdBucket) await r2.deleteBucket(testBucket);
     });
 
     test('Presigned GET URL contains SigV4 query parameters', () async {
-      final uri = await r2.presignedUrl(
+      final signedUrl = await r2.presignedUrl(
         testBucket,
         testKey,
         expiresIn: Duration(hours: 1),
       );
-      expect(uri, isA<Uri>());
+      expect(signedUrl, isA<R2SignedUrl>());
+      expect(signedUrl.bucket, testBucket);
+      expect(signedUrl.key, testKey);
+      expect(signedUrl.type, 'GET');
+      expect(signedUrl.isExpired, isFalse);
+      final uri = Uri.parse(signedUrl.url);
       expect(uri.queryParameters, contains('X-Amz-Signature'));
       expect(uri.queryParameters, contains('X-Amz-Credential'));
       expect(uri.queryParameters, contains('X-Amz-Expires'));
       expect(uri.path, endsWith(testKey));
-      print('Presigned GET URL: $uri');
+      print('Presigned GET URL: ${signedUrl.url}');
+      print('Expires at: ${signedUrl.expiresAt}');
     });
 
     test('Presigned PUT URL is valid', () async {
-      final uri = await r2.presignedUrl(
+      final signedUrl = await r2.presignedUrl(
         testBucket,
         'presign-test/new-object.txt',
         method: AWSHttpMethod.put,
         expiresIn: Duration(minutes: 30),
       );
-      expect(uri, isA<Uri>());
+      expect(signedUrl, isA<R2SignedUrl>());
+      expect(signedUrl.bucket, testBucket);
+      expect(signedUrl.type, 'PUT');
+      expect(signedUrl.isExpired, isFalse);
+      final uri = Uri.parse(signedUrl.url);
       expect(uri.queryParameters, contains('X-Amz-Signature'));
       expect(uri.queryParameters['X-Amz-Credential'], isNotEmpty);
+    });
+
+    test('Presigned PUT URL allows unsigned client-side upload', () async {
+      // Simulate the backend-generates / client-consumes flow:
+      //  1. Backend (authenticated) generates a presigned PUT URL.
+      //  2. Client (no credentials) uses the URL to upload directly to R2.
+      //  3. Verify the object landed correctly via the authenticated API.
+
+      final payload = Uint8List.fromList(
+        'unsigned upload via presigned url'.codeUnits,
+      );
+
+      // 1 – Backend generates the presigned PUT URL.
+      final signedUrl = await r2.presignedUrl(
+        testBucket,
+        unsignedUploadKey,
+        method: AWSHttpMethod.put,
+        expiresIn: Duration(minutes: 15),
+      );
+      expect(signedUrl, isA<R2SignedUrl>());
+      expect(signedUrl.bucket, testBucket);
+      expect(signedUrl.key, unsignedUploadKey);
+      expect(signedUrl.type, 'PUT');
+      expect(signedUrl.isExpired, isFalse);
+      final presignedUri = Uri.parse(signedUrl.url);
+      expect(presignedUri.queryParameters, contains('X-Amz-Signature'));
+      print('Presigned PUT URL (unsigned upload): ${signedUrl.url}');
+      print('Expires at: ${signedUrl.expiresAt}');
+
+      // 2 – Client uploads using the presigned URL — no auth headers needed.
+      final uploadResponse = await http.put(
+        presignedUri,
+        headers: {'content-type': 'text/plain'},
+        body: payload,
+      );
+      expect(
+        uploadResponse.statusCode,
+        anyOf(200, 204),
+        reason:
+            'Presigned PUT upload failed (${uploadResponse.statusCode}): '
+            '${uploadResponse.body}',
+      );
+
+      // 3 – Verify the object is accessible via the authenticated API.
+      final headRes = await r2.headObject(testBucket, unsignedUploadKey);
+      expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
+      expect(headRes.body?.key, unsignedUploadKey);
+      expect(
+        headRes.body?.size,
+        payload.length,
+        reason: 'Object size should match the uploaded payload',
+      );
+      print(
+        'Unsigned upload verified – size=${headRes.body?.size} '
+        'etag=${headRes.body?.etag}',
+      );
     });
   });
 
@@ -491,9 +578,3 @@ void main() {
     });
   });
 }
-
-
-
-
-
-
