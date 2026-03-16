@@ -32,6 +32,7 @@ export 'package:cloudflare/src/entity/live_input_output.dart';
 export 'package:cloudflare/src/entity/live_input_recording.dart';
 export 'package:cloudflare/src/entity/media_nft.dart';
 export 'package:cloudflare/src/entity/r2_bucket.dart';
+export 'package:cloudflare/src/entity/r2_multipart_draft.dart';
 export 'package:cloudflare/src/entity/r2_object.dart';
 export 'package:cloudflare/src/entity/r2_signed_url.dart';
 export 'package:cloudflare/src/entity/rtmps.dart';

@@ -69,7 +69,7 @@ void main() {
         testBucket = r2ExistingBucket!;
       } else {
         testBucket = _tmpBucketName();
-        final res = await r2.createBucket(testBucket);
+        final res = await r2.createBucket(name: testBucket);
         if (!res.isSuccessful) {
           fail('Could not create test bucket "$testBucket": ${res.error}');
         }
@@ -80,30 +80,30 @@ void main() {
     tearDownAll(() async {
       if (createdBucket) {
         // Ensure bucket is empty before deleting.
-        final listRes = await r2.listObjects(testBucket);
+        final listRes = await r2.listObjects(bucket: testBucket);
         if (listRes.isSuccessful &&
             (listRes.body?.objects.isNotEmpty ?? false)) {
           final keys = listRes.body!.objects.map((o) => o.key).toList();
-          await r2.deleteObjects(testBucket, keys);
+          await r2.deleteObjects(bucket: testBucket, keys: keys);
         }
-        await r2.deleteBucket(testBucket);
+        await r2.deleteBucket(name: testBucket);
       }
     });
 
     test('Create bucket', () async {
       if (createdBucket) {
         // Already created in setUpAll; just assert it exists.
-        final headRes = await r2.headBucket(testBucket);
+        final headRes = await r2.headBucket(name: testBucket);
         expect(headRes, ResponseMatcher(), reason: headRes.error?.toString());
         expect(headRes.body, true);
       } else {
         // Create a separate temporary bucket for the create-test only.
         final tmpName = _tmpBucketName();
-        final res = await r2.createBucket(tmpName);
+        final res = await r2.createBucket(name: tmpName);
         expect(res, R2BucketMatcher(), reason: res.error?.toString());
         expect(res.body?.name, tmpName);
         // Clean up immediately.
-        await r2.deleteBucket(tmpName);
+        await r2.deleteBucket(name: tmpName);
       }
     });
 
@@ -123,13 +123,13 @@ void main() {
     });
 
     test('Head bucket – existing bucket returns true', () async {
-      final res = await r2.headBucket(testBucket);
+      final res = await r2.headBucket(name: testBucket);
       expect(res, ResponseMatcher(), reason: res.error?.toString());
       expect(res.body, true);
     });
 
     test('Head bucket – non-existent bucket returns false', () async {
-      final res = await r2.headBucket('this-bucket-does-not-exist-xyz-9');
+      final res = await r2.headBucket(name: 'this-bucket-does-not-exist-xyz-9');
       expect(res.isSuccessful, true);
       expect(res.body, false);
     });
@@ -137,15 +137,15 @@ void main() {
     test('Delete bucket', () async {
       // Create a fresh temporary bucket exclusively for the delete test.
       final tmpName = _tmpBucketName();
-      final createRes = await r2.createBucket(tmpName);
+      final createRes = await r2.createBucket(name: tmpName);
       expect(createRes, R2BucketMatcher(), reason: createRes.error?.toString());
 
-      final deleteRes = await r2.deleteBucket(tmpName);
+      final deleteRes = await r2.deleteBucket(name: tmpName);
       expect(deleteRes, ResponseMatcher(), reason: deleteRes.error?.toString());
       expect(deleteRes.body, true);
 
       // Confirm it is gone.
-      final headRes = await r2.headBucket(tmpName);
+      final headRes = await r2.headBucket(name: tmpName);
       expect(headRes.body, false);
     });
   });
@@ -165,7 +165,7 @@ void main() {
         testBucket = r2ExistingBucket!;
       } else {
         testBucket = _tmpBucketName();
-        final res = await r2.createBucket(testBucket);
+        final res = await r2.createBucket(name: testBucket);
         if (!res.isSuccessful) {
           fail('Could not create test bucket "$testBucket": ${res.error}');
         }
@@ -177,24 +177,24 @@ void main() {
       // Best-effort cleanup of any objects left behind by failed tests.
       try {
         final listRes = await r2.listObjects(
-          testBucket,
+          bucket: testBucket,
           prefix: 'test-object/',
         );
         if (listRes.isSuccessful &&
             (listRes.body?.objects.isNotEmpty ?? false)) {
           final keys = listRes.body!.objects.map((o) => o.key).toList();
-          await r2.deleteObjects(testBucket, keys);
+          await r2.deleteObjects(bucket: testBucket, keys: keys);
         }
       } catch (_) {}
 
       if (createdBucket) {
-        final listRes = await r2.listObjects(testBucket);
+        final listRes = await r2.listObjects(bucket: testBucket);
         if (listRes.isSuccessful &&
             (listRes.body?.objects.isNotEmpty ?? false)) {
           final keys = listRes.body!.objects.map((o) => o.key).toList();
-          await r2.deleteObjects(testBucket, keys);
+          await r2.deleteObjects(bucket: testBucket, keys: keys);
         }
-        await r2.deleteBucket(testBucket);
+        await r2.deleteBucket(name: testBucket);
       }
     });
 
@@ -203,8 +203,8 @@ void main() {
         fail('No PDF file available – set CLOUDFLARE_PDF_FILE');
       }
       final res = await r2.putObject(
-        testBucket,
-        testKey,
+        bucket: testBucket,
+        key: testKey,
         content: DataTransmit<XFile>(data: pdfFile),
         contentType: 'application/pdf',
       );
@@ -217,8 +217,8 @@ void main() {
     test('Put object with custom content-type and metadata', () async {
       final bytes = Uint8List.fromList('hello r2'.codeUnits);
       final res = await r2.putObject(
-        testBucket,
-        metaKey,
+        bucket: testBucket,
+        key: metaKey,
         content: DataTransmit<XFile>(
           data: XFile.fromData(bytes, mimeType: 'text/plain'),
         ),
@@ -229,7 +229,7 @@ void main() {
     });
 
     test('List objects', () async {
-      final res = await r2.listObjects(testBucket);
+      final res = await r2.listObjects(bucket: testBucket);
       expect(res, ResponseMatcher(), reason: res.error?.toString());
       expect(res.body, isNotNull);
       expect(res.body, isA<R2ListObjectsResult>());
@@ -243,7 +243,7 @@ void main() {
 
     test('List objects with prefix filter', () async {
       final res = await r2.listObjects(
-        testBucket,
+        bucket: testBucket,
         prefix: 'test-object/',
         maxKeys: 10,
       );
@@ -255,7 +255,7 @@ void main() {
     });
 
     test('Head object returns metadata', () async {
-      final res = await r2.headObject(testBucket, testKey);
+      final res = await r2.headObject(bucket: testBucket, key: testKey);
       expect(res, R2ObjectMatcher(), reason: res.error?.toString());
       expect(res.body?.key, testKey);
       expect(res.body?.bucket, testBucket);
@@ -271,7 +271,7 @@ void main() {
           fail('No PDF file available – set CLOUDFLARE_PDF_FILE');
         }
         final originalBytes = await pdfFile.readAsBytes();
-        final res = await r2.getObject(testBucket, testKey);
+        final res = await r2.getObject(bucket: testBucket, key: testKey);
         expect(res, ResponseMatcher(), reason: res.error?.toString());
         expect(res.body, isNotNull);
         expect(res.body, isA<Uint8List>());
@@ -288,8 +288,8 @@ void main() {
       const start = 0;
       const end = 99; // first 100 bytes
       final res = await r2.getObjectRange(
-        testBucket,
-        testKey,
+        bucket: testBucket,
+        key: testKey,
         start: start,
         end: end,
       );
@@ -310,18 +310,21 @@ void main() {
       expect(res.body?.key, copyKey);
 
       // Verify copy is accessible.
-      final headRes = await r2.headObject(testBucket, copyKey);
+      final headRes = await r2.headObject(bucket: testBucket, key: copyKey);
       expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
     });
 
     test('Delete single object', () async {
-      final res = await r2.deleteObject(testBucket, copyKey);
+      final res = await r2.deleteObject(bucket: testBucket, key: copyKey);
       expect(res, ResponseMatcher(), reason: res.error?.toString());
       expect(res.body, true);
     });
 
     test('Delete multiple objects', () async {
-      final res = await r2.deleteObjects(testBucket, [testKey, metaKey]);
+      final res = await r2.deleteObjects(
+        bucket: testBucket,
+        keys: [testKey, metaKey],
+      );
       expect(res, ResponseMatcher(), reason: res.error?.toString());
       expect(res.body, isNotNull);
       expect(
@@ -345,7 +348,7 @@ void main() {
         testBucket = r2ExistingBucket!;
       } else {
         testBucket = _tmpBucketName();
-        final res = await r2.createBucket(testBucket);
+        final res = await r2.createBucket(name: testBucket);
         if (!res.isSuccessful) {
           fail('Could not create test bucket: ${res.error}');
         }
@@ -353,8 +356,8 @@ void main() {
       }
       // Upload a small object to generate presigned GET URLs for.
       await r2.putObject(
-        testBucket,
-        testKey,
+        bucket: testBucket,
+        key: testKey,
         content: DataTransmit<XFile>(
           data: XFile.fromData(
             Uint8List.fromList('presign payload'.codeUnits),
@@ -366,14 +369,17 @@ void main() {
     });
 
     tearDownAll(() async {
-      await r2.deleteObjects(testBucket, [testKey, unsignedUploadKey]);
-      if (createdBucket) await r2.deleteBucket(testBucket);
+      await r2.deleteObjects(
+        bucket: testBucket,
+        keys: [testKey, unsignedUploadKey],
+      );
+      if (createdBucket) await r2.deleteBucket(name: testBucket);
     });
 
     test('Presigned GET URL contains SigV4 query parameters', () async {
       final signedUrl = await r2.presignedUrl(
-        testBucket,
-        testKey,
+        bucket: testBucket,
+        key: testKey,
         expiresIn: Duration(hours: 1),
       );
       expect(signedUrl, isA<R2SignedUrl>());
@@ -392,8 +398,8 @@ void main() {
 
     test('Presigned PUT URL is valid', () async {
       final signedUrl = await r2.presignedUrl(
-        testBucket,
-        'presign-test/new-object.txt',
+        bucket: testBucket,
+        key: 'presign-test/new-object.txt',
         method: AWSHttpMethod.put,
         expiresIn: Duration(minutes: 30),
       );
@@ -418,8 +424,8 @@ void main() {
 
       // 1 – Backend generates the presigned PUT URL.
       final signedUrl = await r2.presignedUrl(
-        testBucket,
-        unsignedUploadKey,
+        bucket: testBucket,
+        key: unsignedUploadKey,
         method: AWSHttpMethod.put,
         expiresIn: Duration(minutes: 15),
       );
@@ -448,7 +454,10 @@ void main() {
       );
 
       // 3 – Verify the object is accessible via the authenticated API.
-      final headRes = await r2.headObject(testBucket, unsignedUploadKey);
+      final headRes = await r2.headObject(
+        bucket: testBucket,
+        key: unsignedUploadKey,
+      );
       expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
       expect(headRes.body?.key, unsignedUploadKey);
       expect(
@@ -475,7 +484,7 @@ void main() {
         testBucket = r2ExistingBucket!;
       } else {
         testBucket = _tmpBucketName();
-        final res = await r2.createBucket(testBucket);
+        final res = await r2.createBucket(name: testBucket);
         if (!res.isSuccessful) {
           fail('Could not create test bucket: ${res.error}');
         }
@@ -486,9 +495,9 @@ void main() {
     tearDownAll(() async {
       if (createdBucket) {
         try {
-          await r2.deleteObject(testBucket, mpKey);
+          await r2.deleteObject(bucket: testBucket, key: mpKey);
         } catch (_) {}
-        await r2.deleteBucket(testBucket);
+        await r2.deleteBucket(name: testBucket);
       }
     });
 
@@ -500,8 +509,8 @@ void main() {
 
         // 1. Initiate.
         final initRes = await r2.createMultipartUpload(
-          testBucket,
-          mpKey,
+          bucket: testBucket,
+          key: mpKey,
           contentType: 'application/octet-stream',
         );
         expect(initRes, ResponseMatcher(), reason: initRes.error?.toString());
@@ -514,31 +523,31 @@ void main() {
         final part2Data = Uint8List(1024); // 1 KB last part
 
         final part1Res = await r2.uploadPart(
-          testBucket,
-          mpKey,
-          uploadId,
-          1,
-          part1Data,
+          bucket: testBucket,
+          key: mpKey,
+          uploadId: uploadId,
+          partNumber: 1,
+          data: part1Data,
         );
         expect(part1Res, ResponseMatcher(), reason: part1Res.error?.toString());
         expect(part1Res.body, isNotEmpty);
 
         final part2Res = await r2.uploadPart(
-          testBucket,
-          mpKey,
-          uploadId,
-          2,
-          part2Data,
+          bucket: testBucket,
+          key: mpKey,
+          uploadId: uploadId,
+          partNumber: 2,
+          data: part2Data,
         );
         expect(part2Res, ResponseMatcher(), reason: part2Res.error?.toString());
         expect(part2Res.body, isNotEmpty);
 
         // 3. Complete.
         final completeRes = await r2.completeMultipartUpload(
-          testBucket,
-          mpKey,
-          uploadId,
-          {1: part1Res.body!, 2: part2Res.body!},
+          bucket: testBucket,
+          key: mpKey,
+          uploadId: uploadId,
+          parts: {1: part1Res.body!, 2: part2Res.body!},
         );
         expect(
           completeRes,
@@ -550,7 +559,7 @@ void main() {
         print('completeMultipartUpload etag: ${completeRes.body?.etag}');
 
         // 4. Verify assembled object.
-        final headRes = await r2.headObject(testBucket, mpKey);
+        final headRes = await r2.headObject(bucket: testBucket, key: mpKey);
         expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
         expect(
           headRes.body?.size,
@@ -564,17 +573,208 @@ void main() {
     test('Abort multipart upload', () async {
       const abortKey = 'multipart-test/abort-object.bin';
 
-      final initRes = await r2.createMultipartUpload(testBucket, abortKey);
+      final initRes = await r2.createMultipartUpload(
+        bucket: testBucket,
+        key: abortKey,
+      );
       expect(initRes, ResponseMatcher(), reason: initRes.error?.toString());
       expect(initRes.body, isNotEmpty);
 
       final abortRes = await r2.abortMultipartUpload(
-        testBucket,
-        abortKey,
-        initRes.body!,
+        bucket: testBucket,
+        key: abortKey,
+        uploadId: initRes.body!,
       );
       expect(abortRes, ResponseMatcher(), reason: abortRes.error?.toString());
       expect(abortRes.body, true);
     });
+  });
+
+  // ── Direct upload tests ───────────────────────────────────────────────────
+
+  group('Direct upload tests (credential-free via presigned URLs)', () {
+    late String testBucket;
+    bool createdBucket = false;
+    const directPutKey = 'direct-upload-test/put-object.pdf';
+    const directMpKey = 'direct-upload-test/multipart-object.bin';
+
+    setUpAll(() async {
+      if (r2ExistingBucket != null) {
+        testBucket = r2ExistingBucket!;
+      } else {
+        testBucket = _tmpBucketName();
+        final res = await r2.createBucket(name: testBucket);
+        if (!res.isSuccessful) {
+          fail('Could not create test bucket: ${res.error}');
+        }
+        createdBucket = true;
+      }
+    });
+
+    tearDownAll(() async {
+      try {
+        await r2.deleteObjects(
+          bucket: testBucket,
+          keys: [directPutKey, directMpKey],
+        );
+      } catch (_) {}
+      if (createdBucket) await r2.deleteBucket(name: testBucket);
+    });
+
+    // ── directPutObject ─────────────────────────────────────────────────────
+
+    test(
+      'directPutObject uploads a file via presigned PUT URL without credentials',
+      () async {
+        if (!pdfFile.existsSync()) {
+          fail(
+            'No PDF file available – set CLOUDFLARE_PDF_FILE to a local PDF path',
+          );
+        }
+
+        // 1. Backend (authenticated): generate a presigned PUT URL.
+        final signedUrl = await r2.presignedUrl(
+          bucket: testBucket,
+          key: directPutKey,
+          method: AWSHttpMethod.put,
+          expiresIn: Duration(minutes: 15),
+        );
+        expect(signedUrl.type, 'PUT');
+        expect(signedUrl.isExpired, isFalse);
+        print('directPutObject presigned URL: ${signedUrl.url}');
+
+        // 2. Client (no credentials): upload via R2CloudflareAPI.basic().
+        final r2basic = R2CloudflareAPI.basic();
+        int lastCount = 0, lastTotal = 0;
+
+        final res = await r2basic.directPutObject(
+          urlData: signedUrl,
+          content: DataTransmit<XFile>(
+            data: pdfFile,
+            progressCallback: (count, total) {
+              lastCount = count;
+              lastTotal = total;
+              print('directPutObject progress: $count / $total');
+            },
+          ),
+        );
+
+        expect(res, R2ObjectMatcher(), reason: res.error?.toString());
+        expect(res.body?.key, directPutKey);
+        expect(
+          lastTotal,
+          greaterThan(0),
+          reason: 'Progress callback must fire',
+        );
+        expect(
+          lastCount,
+          lastTotal,
+          reason: 'Final progress count must equal total',
+        );
+        print(
+          'directPutObject done – size=${res.body?.size} etag=${res.body?.etag}',
+        );
+
+        // 3. Verify via authenticated API.
+        final headRes = await r2.headObject(
+          bucket: testBucket,
+          key: directPutKey,
+        );
+        expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
+        expect(headRes.body?.size, await pdfFile.length());
+
+        r2basic.dispose();
+      },
+      timeout: Timeout(Duration(minutes: 5)),
+    );
+
+    // ── directMultipartUpload ───────────────────────────────────────────────
+
+    test(
+      'directMultipartUpload uploads a large file via presigned part URLs without credentials',
+      () async {
+        // R2/S3 requires every part except the last to be >= 5 MB, so we
+        // need a file that is at least 5 MB + 1 byte to exercise two parts.
+        // We reuse the PDF file if it is large enough, otherwise synthesise
+        // a byte array.
+        const minSize = 5 * 1024 * 1024 + 1; // 5 MB + 1 byte
+
+        final XFile testFile;
+        if (pdfFile.existsSync() && await pdfFile.length() >= minSize) {
+          testFile = pdfFile;
+        } else {
+          // Synthesise an in-memory file large enough for two parts.
+          testFile = XFile.fromData(
+            Uint8List(minSize + 1024),
+            mimeType: 'application/octet-stream',
+            name: 'synthetic-large-file.bin',
+          );
+        }
+
+        final fileSize = await testFile.length();
+        const chunkSize = 5 * 1024 * 1024; // 5 MB
+        print(
+          'directMultipartUpload: fileSize=$fileSize, chunkSize=$chunkSize',
+        );
+
+        // 1. Backend (authenticated): create the multipart draft.
+        final draftRes = await r2.createDirectMultipartUpload(
+          bucket: testBucket,
+          key: directMpKey,
+          fileSize: fileSize,
+          chunkSize: chunkSize,
+          contentType: testFile.mimeType ?? 'application/octet-stream',
+          expiresIn: Duration(minutes: 30),
+        );
+        expect(draftRes, ResponseMatcher(), reason: draftRes.error?.toString());
+        final draft = draftRes.body!;
+        expect(draft.uploadId, isNotEmpty);
+        expect(draft.partUrls, isNotEmpty);
+        print(
+          'createDirectMultipartUpload: uploadId=${draft.uploadId}, '
+          'parts=${draft.partUrls.length}',
+        );
+
+        // 2. Client (no credentials): upload via R2CloudflareAPI.basic().
+        final r2basic = R2CloudflareAPI.basic();
+        int lastCount = 0;
+
+        final res = await r2basic.directMultipartUpload(
+          draft: draft,
+          content: DataTransmit<XFile>(
+            data: testFile,
+            progressCallback: (count, total) {
+              lastCount = count;
+              print('directMultipartUpload progress: $count / $total');
+            },
+          ),
+        );
+
+        expect(res, R2ObjectMatcher(), reason: res.error?.toString());
+        expect(res.body?.key, directMpKey);
+        expect(res.body?.etag, isNotEmpty);
+        expect(
+          lastCount,
+          greaterThan(0),
+          reason: 'Progress callback must fire',
+        );
+        print('directMultipartUpload done – etag=${res.body?.etag}');
+
+        // 3. Verify via authenticated API.
+        final headRes = await r2.headObject(
+          bucket: testBucket,
+          key: directMpKey,
+        );
+        expect(headRes, R2ObjectMatcher(), reason: headRes.error?.toString());
+        expect(
+          headRes.body?.size,
+          fileSize,
+          reason: 'Assembled object size must match original file',
+        );
+
+        r2basic.dispose();
+      },
+      timeout: Timeout(Duration(minutes: 10)),
+    );
   });
 }

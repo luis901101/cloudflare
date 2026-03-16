@@ -58,6 +58,7 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
     - [Delete multiple live inputs](#delete-multiple-live-inputs)
   - [R2CloudflareAPI](#how-to-use-r2cloudflareapi)
     - [Initialization](#r2-initialization)
+    - [Credential-free initialization](#r2-credential-free-initialization)
     - [List buckets](#list-buckets)
     - [Create bucket](#create-bucket)
     - [Head bucket](#head-bucket)
@@ -71,6 +72,9 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
     - [Delete object](#delete-object)
     - [Delete multiple objects](#delete-multiple-objects)
     - [Presigned URL](#presigned-url)
+    - [Direct PUT upload](#direct-put-upload)
+    - [Create a direct multipart upload](#create-a-direct-multipart-upload)
+    - [Doing a direct multipart upload](#doing-a-direct-multipart-upload)
     - [Multipart upload](#multipart-upload)
 - [Final notes](#final-notes)
 
@@ -190,6 +194,7 @@ cloudflare = Cloudflare.basic(apiUrl: apiUrl); //apiUrl is optional
 - `CancelTokenCallback`: It's a callback that returns a `CancelToken` instance to be used in all requests, this allows you to programmatically cancel in-flight requests for the whole Cloudflare apis. When cancelling a cancel token all current and future requests using the token will be cancelled. So make sure you reset the token returned by the `CancelTokenCallback` if you want to continue using the API.
 - Each API request has an optional `cancelToken` parameter that allows you to cancel individual requests.
 - `R2SignedUrl`: Represents a presigned R2/S3 URL returned by `R2CloudflareAPI.presignedUrl`. Contains the ready-to-use `url` string, the `bucket`, the object `key`, the HTTP method `type` (e.g. `"GET"` or `"PUT"`), and the `expiresAt` UTC timestamp. Use `isExpired` to check validity before sharing.
+- `R2MultipartDraft`: A server-generated multipart upload session that can be handed to a credential-free client. Created by `R2CloudflareAPI.createDirectMultipartUpload`, it bundles the `uploadId`, the target `bucket` and `key`, a list of presigned PUT part URLs (`partUrls`), a presigned POST completion URL (`completeUrl`), and the `chunkSize` used to generate the part URLs. Pass it to `R2CloudflareAPI.basic().directMultipartUpload` on the client side.
 
 ## How to use ImageAPI
 
@@ -635,6 +640,28 @@ Dispose the underlying HTTP client when done:
 r2.dispose();
 ```
 
+### R2 Credential-free initialization
+For client-side apps (mobile, browser) that must upload to R2 **without storing any credentials**, use `R2CloudflareAPI.basic()`.  
+Only [`directPutObject`](#direct-put-upload) and [`directMultipartUpload`](#doing-a-direct-multipart-upload) are available on a `basic()` instance — every other method requires credentials and will throw a `StateError`.
+
+```dart
+final r2basic = R2CloudflareAPI.basic();
+```
+
+The common flow is:
+1. Your **backend** (authenticated instance) generates a `R2SignedUrl` or a `R2MultipartDraft`.
+2. Your **client** (credential-free `basic()` instance) uses that URL / draft to upload directly to R2.
+
+```dart
+print(r2basic.isBasic); // true
+
+// Only direct-upload methods are available:
+await r2basic.directPutObject(urlData: signedUrl, content: DataTransmit<XFile>(data: file));
+await r2basic.directMultipartUpload(draft: draft, content: DataTransmit<XFile>(data: largeFile));
+
+r2basic.dispose();
+```
+
 ### List buckets
 ```dart
 final CloudflareHTTPResponse<List<R2Bucket>?> response = await r2.listBuckets();
@@ -647,27 +674,27 @@ if (response.isSuccessful) {
 
 ### Create bucket
 ```dart
-final CloudflareHTTPResponse<R2Bucket?> response = await r2.createBucket('my-bucket');
+final CloudflareHTTPResponse<R2Bucket?> response = await r2.createBucket(name: 'my-bucket');
 ```
 
 ### Head bucket
 Returns `true` when the bucket exists, `false` on 404.
 ```dart
-final CloudflareHTTPResponse<bool?> response = await r2.headBucket('my-bucket');
+final CloudflareHTTPResponse<bool?> response = await r2.headBucket(name: 'my-bucket');
 print(response.body); // true or false
 ```
 
 ### Delete bucket
 The bucket must be empty before deletion.
 ```dart
-final CloudflareHTTPResponse<bool?> response = await r2.deleteBucket('my-bucket');
+final CloudflareHTTPResponse<bool?> response = await r2.deleteBucket(name: 'my-bucket');
 ```
 
 ### List objects
 Uses ListObjectsV2. Supports prefix filtering, delimiter for virtual directories, and continuation-token pagination.
 ```dart
 final CloudflareHTTPResponse<R2ListObjectsResult?> response = await r2.listObjects(
-  'my-bucket',
+  bucket: 'my-bucket',
   prefix: 'images/',
   maxKeys: 100,
 );
@@ -680,7 +707,7 @@ for (final obj in result.objects) {
 // Page through all results
 String? token = result.nextContinuationToken;
 while (token != null) {
-  final next = await r2.listObjects('my-bucket', continuationToken: token);
+  final next = await r2.listObjects(bucket: 'my-bucket', continuationToken: token);
   token = next.body?.nextContinuationToken;
 }
 ```
@@ -689,8 +716,8 @@ while (token != null) {
 Upload any file as a `DataTransmit<XFile>`:
 ```dart
 final CloudflareHTTPResponse<R2Object?> response = await r2.putObject(
-  'my-bucket',
-  'documents/report.pdf',
+  bucket: 'my-bucket',
+  key: 'documents/report.pdf',
   content: DataTransmit<XFile>(data: xFile),
   contentType: 'application/pdf',
 );
@@ -700,7 +727,7 @@ print(response.body?.etag);
 ### Get object
 Download the full object as raw bytes:
 ```dart
-final CloudflareHTTPResponse<Uint8List?> response = await r2.getObject('my-bucket', 'documents/report.pdf');
+final CloudflareHTTPResponse<Uint8List?> response = await r2.getObject(bucket: 'my-bucket', key: 'documents/report.pdf');
 final bytes = response.body!;
 ```
 
@@ -709,8 +736,8 @@ Download a byte range (HTTP Range header):
 ```dart
 // Fetch bytes 0–1023 (first 1 KB)
 final CloudflareHTTPResponse<Uint8List?> response = await r2.getObjectRange(
-  'my-bucket',
-  'documents/report.pdf',
+  bucket: 'my-bucket',
+  key: 'documents/report.pdf',
   start: 0,
   end: 1023,
 );
@@ -719,7 +746,7 @@ final CloudflareHTTPResponse<Uint8List?> response = await r2.getObjectRange(
 ### Head object
 Fetch metadata without downloading the body:
 ```dart
-final CloudflareHTTPResponse<R2Object?> response = await r2.headObject('my-bucket', 'documents/report.pdf');
+final CloudflareHTTPResponse<R2Object?> response = await r2.headObject(bucket: 'my-bucket', key: 'documents/report.pdf');
 print('size: ${response.body?.size}, etag: ${response.body?.etag}');
 ```
 
@@ -735,15 +762,15 @@ final CloudflareHTTPResponse<R2Object?> response = await r2.copyObject(
 
 ### Delete object
 ```dart
-final CloudflareHTTPResponse<bool?> response = await r2.deleteObject('my-bucket', 'documents/report.pdf');
+final CloudflareHTTPResponse<bool?> response = await r2.deleteObject(bucket: 'my-bucket', key: 'documents/report.pdf');
 ```
 
 ### Delete multiple objects
 Delete up to 1 000 keys in a single request:
 ```dart
 final CloudflareHTTPResponse<List<String>?> response = await r2.deleteObjects(
-  'my-bucket',
-  ['key1.pdf', 'key2.pdf', 'key3.pdf'],
+  bucket: 'my-bucket',
+  keys: ['key1.pdf', 'key2.pdf', 'key3.pdf'],
 );
 // response.body contains any keys that *failed* to delete (empty = all OK)
 ```
@@ -764,8 +791,8 @@ Generate a time-limited URL that can be shared with unauthenticated clients (max
 #### Download (presigned GET URL)
 ```dart
 final R2SignedUrl signed = await r2.presignedUrl(
-  'my-bucket',
-  'documents/report.pdf',
+  bucket: 'my-bucket',
+  key: 'documents/report.pdf',
   expiresIn: Duration(hours: 1),   // default: 1 h
   method: AWSHttpMethod.get,       // default: GET
 );
@@ -780,8 +807,8 @@ The common pattern for browser or mobile apps that must upload directly to R2 wi
 ```dart
 // Backend: generate a presigned PUT URL valid for 15 minutes.
 final R2SignedUrl signed = await r2.presignedUrl(
-  'my-bucket',
-  'uploads/document.pdf',
+  bucket: 'my-bucket',
+  key: 'uploads/document.pdf',
   method: AWSHttpMethod.put,
   expiresIn: Duration(minutes: 15),
 );
@@ -796,31 +823,155 @@ final response = await http.put(
 // HTTP 200 or 204 → upload succeeded.
 ```
 
+### Direct PUT upload
+Upload a file **without any credentials** to a presigned PUT URL previously generated by your backend.  
+Uses Dio internally for real-time progress callbacks and cancellation support.  
+Mirrors `directStreamUpload` from `StreamAPI`.
+
+**Use this for files that fit in a single request (up to ~5 GB for R2).**
+
+```dart
+// ── Backend (authenticated) ──────────────────────────────────────────────
+final R2SignedUrl signed = await r2.presignedUrl(
+  bucket: 'my-bucket',
+  key: 'uploads/document.pdf',
+  method: AWSHttpMethod.put,
+  expiresIn: Duration(minutes: 15),
+);
+// Send `signed` to your client (e.g. as JSON via your REST API).
+
+// ── Client (no credentials) ──────────────────────────────────────────────
+final r2basic = R2CloudflareAPI.basic();
+
+final response = await r2basic.directPutObject(
+  urlData: signed,
+  content: DataTransmit<XFile>(
+    data: XFile('/path/to/document.pdf'),
+    progressCallback: (count, total) {
+      print('Upload progress: $count / $total bytes');
+    },
+  ),
+  cancelToken: myCancelToken, // optional — also available on DataTransmit
+);
+
+if (response.isSuccessful) {
+  print('Uploaded! etag: ${response.body?.etag}');
+} else {
+  print('Error: ${response.error}');
+}
+
+r2basic.dispose();
+```
+
+### Create a direct multipart upload
+**Server-side / authenticated step.**  
+Creates a multipart upload session and pre-generates all the presigned URLs the client needs — one PUT URL per chunk and one POST URL to complete the upload.  
+Mirrors `createTusDirectStreamUpload` from `StreamAPI`.
+
+**Use this for large files (> 5 GB or when progress and resumability matter).**
+
+```dart
+final CloudflareHTTPResponse<R2MultipartDraft?> res =
+    await r2.createDirectMultipartUpload(
+  bucket: 'my-bucket',
+  key: 'uploads/video.mp4',
+  fileSize: await videoFile.length(),  // required — determines part count
+  chunkSize: 10 * 1024 * 1024,         // optional, default 5 MB (S3 minimum)
+  contentType: 'video/mp4',
+  expiresIn: Duration(hours: 1),       // optional, default 1 h (max 7 days)
+);
+
+final R2MultipartDraft draft = res.body!;
+print('uploadId: ${draft.uploadId}');
+print('parts:    ${draft.partUrls.length}');
+// Send `draft` to your client (e.g. as JSON via your REST API —
+// R2MultipartDraft is fully JSON-serialisable).
+```
+
+`R2MultipartDraft` fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `uploadId` | `String` | S3 multipart upload session ID. |
+| `bucket` | `String` | Target R2 bucket. |
+| `key` | `String` | Target object key. |
+| `partUrls` | `List<R2SignedUrl>` | Presigned PUT URLs — one per chunk, in order. Index 0 → `partNumber=1`. |
+| `completeUrl` | `R2SignedUrl` | Presigned POST URL to finalise the upload. |
+| `chunkSize` | `int` | Byte size of each chunk used when the part URLs were generated. |
+
+### Doing a direct multipart upload
+**Client-side / credential-free step.**  
+Uses the `R2MultipartDraft` from the backend to upload the file in chunks, report aggregated progress, and complete the upload — no credentials required.  
+Mirrors `tusDirectStreamUpload` from `StreamAPI`.
+
+```dart
+// ── Client (no credentials) ──────────────────────────────────────────────
+final r2basic = R2CloudflareAPI.basic();
+
+final response = await r2basic.directMultipartUpload(
+  draft: draft,  // R2MultipartDraft received from your backend
+  content: DataTransmit<XFile>(
+    data: XFile('/path/to/video.mp4'),
+    progressCallback: (count, total) {
+      // Aggregated across all parts — count / total give overall byte progress.
+      print('Upload progress: $count / $total bytes');
+    },
+  ),
+  cancelToken: myCancelToken, // optional — also available on DataTransmit
+);
+
+if (response.isSuccessful) {
+  print('Uploaded! etag: ${response.body?.etag}');
+} else {
+  print('Error: ${response.error}');
+}
+
+r2basic.dispose();
+```
+
+> **Note on cancellation:** cancelling stops the current in-flight part. Already-uploaded parts remain in R2 until the session is explicitly aborted server-side via `r2.abortMultipartUpload(draft.bucket, draft.key, draft.uploadId)` or until the presigned URLs expire.
+
 ### Multipart upload
 Recommended for files larger than ~5 GB. Each part (except the last) must be ≥ 5 MB.
 ```dart
 // 1. Initiate
-final initRes = await r2.createMultipartUpload('my-bucket', 'videos/big.mp4',
-    contentType: 'video/mp4');
+final initRes = await r2.createMultipartUpload(
+  bucket: 'my-bucket',
+  key: 'videos/big.mp4',
+  contentType: 'video/mp4',
+);
 final uploadId = initRes.body!;
 
 // 2. Upload parts (collect ETags)
 final Map<int, String> parts = {};
 int partNumber = 1;
 for (final chunk in chunks) {           // chunks: List<Uint8List>
-  final partRes = await r2.uploadPart('my-bucket', 'videos/big.mp4', uploadId, partNumber, chunk);
+  final partRes = await r2.uploadPart(
+    bucket: 'my-bucket',
+    key: 'videos/big.mp4',
+    uploadId: uploadId,
+    partNumber: partNumber,
+    data: chunk,
+  );
   parts[partNumber] = partRes.body!;    // ETag returned by R2
   partNumber++;
 }
 
 // 3. Complete
 final completeRes = await r2.completeMultipartUpload(
-  'my-bucket', 'videos/big.mp4', uploadId, parts,
+  bucket: 'my-bucket',
+  key: 'videos/big.mp4',
+  uploadId: uploadId,
+  parts: parts,
 );
 print(completeRes.body?.etag);
 
 // Abort if something goes wrong instead of completing
-await r2.abortMultipartUpload('my-bucket', 'videos/big.mp4', uploadId);
+await r2.abortMultipartUpload(
+  bucket: 'my-bucket',
+  key: 'videos/big.mp4',
+  uploadId: uploadId,
+);
 ```
 
 -------------
