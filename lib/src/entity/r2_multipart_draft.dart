@@ -21,7 +21,7 @@ part 'r2_multipart_draft.g.dart';
 ///
 /// ### Client-side (credential-free)
 /// ```dart
-/// final r2basic = R2CloudflareAPI.basic();
+/// final r2basic = R2API.basic();
 /// final res = await r2basic.directMultipartUpload(
 ///   draft,
 ///   DataTransmit<XFile>(
@@ -56,7 +56,7 @@ class R2MultipartDraft extends Jsonable<R2MultipartDraft> {
   ///
   /// `partUrls[0]` corresponds to `partNumber=1`, `partUrls[1]` to
   /// `partNumber=2`, and so on.  The number of URLs determines how the file
-  /// will be split — [R2CloudflareAPI.directMultipartUpload] divides the file
+  /// will be split — [R2API.directMultipartUpload] divides the file
   /// into exactly `partUrls.length` equal-sized chunks (the last may be
   /// smaller).
   final List<R2SignedUrl> partUrls;
@@ -70,7 +70,7 @@ class R2MultipartDraft extends Jsonable<R2MultipartDraft> {
 
   /// Byte size of each chunk used when the presigned part URLs were generated.
   ///
-  /// [R2CloudflareAPI.directMultipartUpload] uses this value to split the file
+  /// [R2API.directMultipartUpload] uses this value to split the file
   /// into the exact same byte ranges the server signed.  The last chunk may be
   /// smaller than [chunkSize].
   final int chunkSize;

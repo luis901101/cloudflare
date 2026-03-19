@@ -11,7 +11,7 @@ Types of changes
 
 ## 10.0.0
 ### Added
-- `R2CloudflareAPI` — full S3-compatible Cloudflare R2 object-storage API, authenticated with AWS Signature Version 4 via `R2Credentials` (separate from the Cloudflare Bearer token used by the other APIs).
+- `R2API` — full S3-compatible Cloudflare R2 object-storage API, authenticated with AWS Signature Version 4 via `R2Credentials` (separate from the Cloudflare Bearer token used by the other APIs).
 
 ## 9.0.0
 ### Changed

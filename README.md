@@ -56,7 +56,7 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
     - [Get outputs of a live input](#get-outputs-of-a-live-input)
     - [Remove output](#remove-output)
     - [Delete multiple live inputs](#delete-multiple-live-inputs)
-  - [R2CloudflareAPI](#how-to-use-r2cloudflareapi)
+  - [R2API](#how-to-use-r2api)
     - [Initialization](#r2-initialization)
     - [Credential-free initialization](#r2-credential-free-initialization)
     - [List buckets](#list-buckets)
@@ -193,8 +193,8 @@ cloudflare = Cloudflare.basic(apiUrl: apiUrl); //apiUrl is optional
 - `DataTransmit`: It's the representation of the data that will be uploaded to Cloudflare, data could be a `File`, a `String` file path, or a byte array `List<Uint8List>`. This class allows you to listen for data transmit progress, by using its `progressCallback` and also allows you to cancel a data transmit ongoing request by using the `cancelToken`.
 - `CancelTokenCallback`: It's a callback that returns a `CancelToken` instance to be used in all requests, this allows you to programmatically cancel in-flight requests for the whole Cloudflare apis. When cancelling a cancel token all current and future requests using the token will be cancelled. So make sure you reset the token returned by the `CancelTokenCallback` if you want to continue using the API.
 - Each API request has an optional `cancelToken` parameter that allows you to cancel individual requests.
-- `R2SignedUrl`: Represents a presigned R2/S3 URL returned by `R2CloudflareAPI.presignedUrl`. Contains the ready-to-use `url` string, the `bucket`, the object `key`, the HTTP method `type` (e.g. `"GET"` or `"PUT"`), and the `expiresAt` UTC timestamp. Use `isExpired` to check validity before sharing.
-- `R2MultipartDraft`: A server-generated multipart upload session that can be handed to a credential-free client. Created by `R2CloudflareAPI.createDirectMultipartUpload`, it bundles the `uploadId`, the target `bucket` and `key`, a list of presigned PUT part URLs (`partUrls`), a presigned POST completion URL (`completeUrl`), and the `chunkSize` used to generate the part URLs. Pass it to `R2CloudflareAPI.basic().directMultipartUpload` on the client side.
+- `R2SignedUrl`: Represents a presigned R2/S3 URL returned by `R2API.presignedUrl`. Contains the ready-to-use `url` string, the `bucket`, the object `key`, the HTTP method `type` (e.g. `"GET"` or `"PUT"`), and the `expiresAt` UTC timestamp. Use `isExpired` to check validity before sharing.
+- `R2MultipartDraft`: A server-generated multipart upload session that can be handed to a credential-free client. Created by `R2API.createDirectMultipartUpload`, it bundles the `uploadId`, the target `bucket` and `key`, a list of presigned PUT part URLs (`partUrls`), a presigned POST completion URL (`completeUrl`), and the `chunkSize` used to generate the part URLs. Pass it to `R2API.basic().directMultipartUpload` on the client side.
 
 ## How to use ImageAPI
 
@@ -612,16 +612,16 @@ final responses = await cloudflare.liveInputAPI.removeMultipleOutputs(
 );
 ```
 -------------
-## How to use R2CloudflareAPI
+## How to use R2API
 
-`R2CloudflareAPI` provides a full S3-compatible client for [Cloudflare R2 object storage](https://developers.cloudflare.com/r2/). It is **independent of the main `Cloudflare` class** — R2 uses AWS Signature Version 4 authentication with a dedicated R2 API token pair, not the Cloudflare Bearer token.
+`R2API` provides a full S3-compatible client for [Cloudflare R2 object storage](https://developers.cloudflare.com/r2/). It is **independent of the main `Cloudflare` class** — R2 uses AWS Signature Version 4 authentication with a dedicated R2 API token pair, not the Cloudflare Bearer token.
 
 > Generate R2 API tokens at:  
 > `https://dash.cloudflare.com/<accountId>/r2/api-tokens`
 
 ### R2 Initialization
 ```dart
-final r2 = R2CloudflareAPI(
+final r2 = R2API(
   accountId: 'my-account-id',
   credentials: R2Credentials(
     accessKeyId: 'r2-access-key-id',
@@ -641,11 +641,11 @@ r2.dispose();
 ```
 
 ### R2 Credential-free initialization
-For client-side apps (mobile, browser) that must upload to R2 **without storing any credentials**, use `R2CloudflareAPI.basic()`.  
+For client-side apps (mobile, browser) that must upload to R2 **without storing any credentials**, use `R2API.basic()`.  
 Only [`directPutObject`](#direct-put-upload) and [`directMultipartUpload`](#doing-a-direct-multipart-upload) are available on a `basic()` instance — every other method requires credentials and will throw a `StateError`.
 
 ```dart
-final r2basic = R2CloudflareAPI.basic();
+final r2basic = R2API.basic();
 ```
 
 The common flow is:
@@ -841,7 +841,7 @@ final R2SignedUrl signed = await r2.presignedUrl(
 // Send `signed` to your client (e.g. as JSON via your REST API).
 
 // ── Client (no credentials) ──────────────────────────────────────────────
-final r2basic = R2CloudflareAPI.basic();
+final r2basic = R2API.basic();
 
 final response = await r2basic.directPutObject(
   urlData: signed,
@@ -906,7 +906,7 @@ Mirrors `tusDirectStreamUpload` from `StreamAPI`.
 
 ```dart
 // ── Client (no credentials) ──────────────────────────────────────────────
-final r2basic = R2CloudflareAPI.basic();
+final r2basic = R2API.basic();
 
 final response = await r2basic.directMultipartUpload(
   draft: draft,  // R2MultipartDraft received from your backend

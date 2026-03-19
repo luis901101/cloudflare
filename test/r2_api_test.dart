@@ -22,9 +22,9 @@ import 'utils/matchers.dart';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-R2CloudflareAPI? _r2;
+R2API? _r2;
 
-R2CloudflareAPI get r2 {
+R2API get r2 {
   if (_r2 == null) {
     throw StateError('r2 is not initialised – did initR2() run?');
   }
@@ -40,7 +40,7 @@ void initR2() {
     throw Exception("CLOUDFLARE_R2_SECRET_ACCESS_KEY can't be null");
   }
 
-  _r2 = R2CloudflareAPI(
+  _r2 = R2API(
     accountId: accountId!,
     credentials: R2Credentials(
       accessKeyId: r2AccessKeyId!,
@@ -643,8 +643,8 @@ void main() {
         expect(signedUrl.isExpired, isFalse);
         print('directPutObject presigned URL: ${signedUrl.url}');
 
-        // 2. Client (no credentials): upload via R2CloudflareAPI.basic().
-        final r2basic = R2CloudflareAPI.basic();
+        // 2. Client (no credentials): upload via R2API.basic().
+        final r2basic = R2API.basic();
         int lastCount = 0, lastTotal = 0;
 
         final res = await r2basic.directPutObject(
@@ -735,8 +735,8 @@ void main() {
           'parts=${draft.partUrls.length}',
         );
 
-        // 2. Client (no credentials): upload via R2CloudflareAPI.basic().
-        final r2basic = R2CloudflareAPI.basic();
+        // 2. Client (no credentials): upload via R2API.basic().
+        final r2basic = R2API.basic();
         int lastCount = 0;
 
         final res = await r2basic.directMultipartUpload(
