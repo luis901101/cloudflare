@@ -68,12 +68,6 @@ class R2API {
   final AWSSigV4Signer? _signer;
   final AWSHttpClient? _httpClient;
 
-  /// Plain Dio instance used exclusively by [directPutObject] and
-  /// [directMultipartUpload]. Only created on [R2API.basic()]
-  /// instances — authenticated instances use [_httpClient] instead and never
-  /// need Dio.
-  final Dio? _dio;
-
   // ── Constructors ─────────────────────────────────────────────────────────
 
   /// Private implementation constructor — fields are initialised here.
@@ -96,8 +90,7 @@ class R2API {
                ),
              )
            : null,
-       _httpClient = credentials != null ? AWSHttpClient() : null,
-       _dio = credentials == null ? Dio() : null;
+       _httpClient = credentials != null ? AWSHttpClient() : null;
 
   /// Creates an [R2API] instance.
   ///
@@ -162,7 +155,7 @@ class R2API {
   /// authenticated instance.  Direct uploads use presigned URLs and are
   /// intended for credential-free clients — create a [R2API.basic]
   /// instance to use [directPutObject] or [directMultipartUpload].
-  Never _throwNoDio() => throw StateError(
+  Never _throwNoDirectUpload() => throw StateError(
     'directPutObject and directMultipartUpload are only available on a '
     'credential-free R2API.basic() instance.',
   );
@@ -1314,14 +1307,15 @@ class R2API {
     String? contentType,
     CancelToken? cancelToken,
   }) async {
-    if (_dio == null) _throwNoDio();
+    if (!isBasic) _throwNoDirectUpload();
     cancelToken ??= content.cancelToken;
     final file = content.data;
+    final dio = Dio();
     try {
       final fileLength = await file.length();
       final mime = contentType ?? file.mimeType ?? 'application/octet-stream';
 
-      final response = await _dio.put<dynamic>(
+      final response = await dio.put<dynamic>(
         urlData.url,
         data: file.openRead(),
         options: Options(
@@ -1378,6 +1372,8 @@ class R2API {
         statusCode: 500,
         error: R2ErrorResponse(message: e.toString()),
       );
+    } finally {
+      dio.close();
     }
   }
 
@@ -1440,10 +1436,10 @@ class R2API {
     required DataTransmit<XFile> content,
     CancelToken? cancelToken,
   }) async {
-    if (_dio == null) _throwNoDio();
+    if (!isBasic) _throwNoDirectUpload();
     cancelToken ??= content.cancelToken;
     final file = content.data;
-
+    final dio = Dio();
     try {
       assert(draft.partUrls.isNotEmpty, 'draft.partUrls must not be empty');
 
@@ -1480,7 +1476,7 @@ class R2API {
         // for every new request so we add the already-sent bytes manually.
         final sentBefore = sentSoFar;
 
-        final partResponse = await _dio.put<dynamic>(
+        final partResponse = await dio.put<dynamic>(
           partUrl.url,
           // openRead(start, end) streams the byte range without buffering
           // the whole file in memory.
@@ -1547,7 +1543,7 @@ class R2API {
       }
       completionXml.write('</CompleteMultipartUpload>');
 
-      final completeResponse = await _dio.post<dynamic>(
+      final completeResponse = await dio.post<dynamic>(
         draft.completeUrl.url,
         data: completionXml.toString(),
         options: Options(
@@ -1596,6 +1592,8 @@ class R2API {
         statusCode: 500,
         error: R2ErrorResponse(message: e.toString()),
       );
+    } finally {
+      dio.close();
     }
   }
 
@@ -1603,14 +1601,13 @@ class R2API {
 
   bool _isSuccess(int code) => code >= 200 && code < 300;
 
-  /// Releases the underlying HTTP client(s). Call this when the
+  /// Releases the underlying HTTP client. Call this when the
   /// [R2API] instance is no longer needed.
   ///
-  /// Authenticated instances close [_httpClient]; [R2API.basic]
-  /// instances close [_dio]. Both calls are null-safe so this is always safe
-  /// to call regardless of which constructor was used.
+  /// Only relevant for authenticated instances — [R2API.basic] instances
+  /// create and dispose their own Dio client per call and require no
+  /// explicit cleanup.
   void dispose() {
     _httpClient?.close();
-    _dio?.close();
   }
 }
