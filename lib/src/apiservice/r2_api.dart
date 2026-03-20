@@ -47,6 +47,14 @@ import 'package:http/http.dart' as http;
 /// );
 /// ```
 class R2API {
+  static const maxObjectKeyLengthBytes = 1024;
+
+  /// Maximum validity window allowed by Cloudflare R2 for presigned URLs.
+  static const maxExpiresIn = Duration(days: 7);
+
+  /// Minimum part size enforced by the R2 / S3 multipart upload spec (5 MiB).
+  static const minChunkSize = 5 * 1024 * 1024;
+
   /// The default SigV4 region for Cloudflare R2.
   ///
   /// Pass a custom [r2Region] to the constructor to override this (e.g.
@@ -851,10 +859,7 @@ class R2API {
     AWSHttpMethod method = AWSHttpMethod.get,
   }) async {
     if (_signer == null) _throwNoCredentials();
-    assert(
-      expiresIn <= const Duration(days: 7),
-      'R2 presigned URLs cannot exceed 7 days',
-    );
+    assert(expiresIn <= maxExpiresIn, 'R2 presigned URLs cannot exceed 7 days');
 
     final uri = s3ApiUri.replace(path: '/$bucket/$key');
     final request = AWSHttpRequest(method: method, uri: uri);
@@ -1186,7 +1191,7 @@ class R2API {
     required String bucket,
     required String key,
     required int fileSize,
-    int chunkSize = 5 * 1024 * 1024,
+    int chunkSize = minChunkSize,
     String contentType = 'application/octet-stream',
     Duration expiresIn = const Duration(hours: 1),
     Map<String, String>? metadata,
@@ -1194,13 +1199,10 @@ class R2API {
     if (_signer == null) _throwNoCredentials();
     assert(fileSize > 0, 'fileSize must be > 0');
     assert(
-      chunkSize >= 5 * 1024 * 1024,
+      chunkSize >= minChunkSize,
       'chunkSize must be at least 5 MB (R2/S3 minimum per part)',
     );
-    assert(
-      expiresIn <= const Duration(days: 7),
-      'R2 presigned URLs cannot exceed 7 days',
-    );
+    assert(expiresIn <= maxExpiresIn, 'R2 presigned URLs cannot exceed 7 days');
 
     final initRes = await createMultipartUpload(
       bucket: bucket,
