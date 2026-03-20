@@ -47,6 +47,7 @@ import 'package:http/http.dart' as http;
 /// );
 /// ```
 class R2API {
+  /// Maximum object key length
   static const maxObjectKeyLengthBytes = 1024;
 
   /// Maximum validity window allowed by Cloudflare R2 for presigned URLs.
