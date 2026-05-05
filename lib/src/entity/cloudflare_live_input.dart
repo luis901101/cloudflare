@@ -4,7 +4,7 @@ import 'package:cloudflare/src/entity/rtmps.dart';
 import 'package:cloudflare/src/entity/srt.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
-import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:adeptannotations/adeptannotations.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_live_input.g.dart';

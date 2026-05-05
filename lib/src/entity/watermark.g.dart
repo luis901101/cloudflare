@@ -6,15 +6,9 @@ part of 'watermark.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$WatermarkCWProxy {
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// Watermark(...).copyWith(id: 12, name: "My name")
-  /// ```
-  Watermark call({
+/// This Extension on [Watermark] is to generate the code for a copyWith(...) function.
+extension $WatermarkCopyWithExtension on Watermark {
+  Watermark copyWith({
     String? id,
     int? size,
     int? width,
@@ -26,91 +20,21 @@ abstract class _$WatermarkCWProxy {
     double? padding,
     String? name,
     String? downloadedFrom,
-  });
-}
-
-/// Callable proxy for `copyWith` functionality.
-/// Use as `instanceOfWatermark.copyWith(...)`.
-class _$WatermarkCWProxyImpl implements _$WatermarkCWProxy {
-  const _$WatermarkCWProxyImpl(this._value);
-
-  final Watermark _value;
-
-  @override
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// Watermark(...).copyWith(id: 12, name: "My name")
-  /// ```
-  Watermark call({
-    Object? id = const $CopyWithPlaceholder(),
-    Object? size = const $CopyWithPlaceholder(),
-    Object? width = const $CopyWithPlaceholder(),
-    Object? height = const $CopyWithPlaceholder(),
-    Object? created = const $CopyWithPlaceholder(),
-    Object? position = const $CopyWithPlaceholder(),
-    Object? scale = const $CopyWithPlaceholder(),
-    Object? opacity = const $CopyWithPlaceholder(),
-    Object? padding = const $CopyWithPlaceholder(),
-    Object? name = const $CopyWithPlaceholder(),
-    Object? downloadedFrom = const $CopyWithPlaceholder(),
   }) {
     return Watermark(
-      id: id == const $CopyWithPlaceholder()
-          ? _value.id
-          // ignore: cast_nullable_to_non_nullable
-          : id as String?,
-      size: size == const $CopyWithPlaceholder()
-          ? _value.size
-          // ignore: cast_nullable_to_non_nullable
-          : size as int?,
-      width: width == const $CopyWithPlaceholder()
-          ? _value.width
-          // ignore: cast_nullable_to_non_nullable
-          : width as int?,
-      height: height == const $CopyWithPlaceholder()
-          ? _value.height
-          // ignore: cast_nullable_to_non_nullable
-          : height as int?,
-      created: created == const $CopyWithPlaceholder()
-          ? _value.created
-          // ignore: cast_nullable_to_non_nullable
-          : created as DateTime?,
-      position: position == const $CopyWithPlaceholder()
-          ? _value.position
-          // ignore: cast_nullable_to_non_nullable
-          : position as WatermarkPosition?,
-      scale: scale == const $CopyWithPlaceholder()
-          ? _value.scale
-          // ignore: cast_nullable_to_non_nullable
-          : scale as double?,
-      opacity: opacity == const $CopyWithPlaceholder()
-          ? _value.opacity
-          // ignore: cast_nullable_to_non_nullable
-          : opacity as double?,
-      padding: padding == const $CopyWithPlaceholder()
-          ? _value.padding
-          // ignore: cast_nullable_to_non_nullable
-          : padding as double?,
-      name: name == const $CopyWithPlaceholder()
-          ? _value.name
-          // ignore: cast_nullable_to_non_nullable
-          : name as String?,
-      downloadedFrom: downloadedFrom == const $CopyWithPlaceholder()
-          ? _value.downloadedFrom
-          // ignore: cast_nullable_to_non_nullable
-          : downloadedFrom as String?,
+      id: id ?? this.id,
+      size: size ?? this.size,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      created: created ?? this.created,
+      position: position ?? this.position,
+      scale: scale ?? this.scale,
+      opacity: opacity ?? this.opacity,
+      padding: padding ?? this.padding,
+      name: name ?? this.name,
+      downloadedFrom: downloadedFrom ?? this.downloadedFrom,
     );
   }
-}
-
-extension $WatermarkCopyWith on Watermark {
-  /// Returns a callable class used to build a new instance with modified fields.
-  /// Example: `instanceOfWatermark.copyWith(...)`.
-  // ignore: library_private_types_in_public_api
-  _$WatermarkCWProxy get copyWith => _$WatermarkCWProxyImpl(this);
 }
 
 // **************************************************************************

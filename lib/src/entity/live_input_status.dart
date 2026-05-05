@@ -1,6 +1,6 @@
 import 'package:cloudflare/src/entity/live_input_status_log.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
-import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:adeptannotations/adeptannotations.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'live_input_status.g.dart';

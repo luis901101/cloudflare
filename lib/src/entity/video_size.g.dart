@@ -6,54 +6,11 @@ part of 'video_size.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$VideoSizeCWProxy {
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// VideoSize(...).copyWith(id: 12, name: "My name")
-  /// ```
-  VideoSize call({int? width, int? height});
-}
-
-/// Callable proxy for `copyWith` functionality.
-/// Use as `instanceOfVideoSize.copyWith(...)`.
-class _$VideoSizeCWProxyImpl implements _$VideoSizeCWProxy {
-  const _$VideoSizeCWProxyImpl(this._value);
-
-  final VideoSize _value;
-
-  @override
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// VideoSize(...).copyWith(id: 12, name: "My name")
-  /// ```
-  VideoSize call({
-    Object? width = const $CopyWithPlaceholder(),
-    Object? height = const $CopyWithPlaceholder(),
-  }) {
-    return VideoSize(
-      width: width == const $CopyWithPlaceholder()
-          ? _value.width
-          // ignore: cast_nullable_to_non_nullable
-          : width as int?,
-      height: height == const $CopyWithPlaceholder()
-          ? _value.height
-          // ignore: cast_nullable_to_non_nullable
-          : height as int?,
-    );
+/// This Extension on [VideoSize] is to generate the code for a copyWith(...) function.
+extension $VideoSizeCopyWithExtension on VideoSize {
+  VideoSize copyWith({int? width, int? height}) {
+    return VideoSize(width: width ?? this.width, height: height ?? this.height);
   }
-}
-
-extension $VideoSizeCopyWith on VideoSize {
-  /// Returns a callable class used to build a new instance with modified fields.
-  /// Example: `instanceOfVideoSize.copyWith(...)`.
-  // ignore: library_private_types_in_public_api
-  _$VideoSizeCWProxy get copyWith => _$VideoSizeCWProxyImpl(this);
 }
 
 // **************************************************************************

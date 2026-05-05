@@ -6,7 +6,7 @@ import 'package:cloudflare/src/entity/video_status.dart';
 import 'package:cloudflare/src/entity/watermark.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
 import 'package:cloudflare/src/utils/params.dart';
-import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:adeptannotations/adeptannotations.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cloudflare_stream_video.g.dart';

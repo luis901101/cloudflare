@@ -1,6 +1,6 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
-import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:adeptannotations/adeptannotations.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'data_upload_draft.g.dart';

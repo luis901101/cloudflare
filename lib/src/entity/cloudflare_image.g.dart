@@ -6,15 +6,9 @@ part of 'cloudflare_image.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$CloudflareImageCWProxy {
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// CloudflareImage(...).copyWith(id: 12, name: "My name")
-  /// ```
-  CloudflareImage call({
+/// This Extension on [CloudflareImage] is to generate the code for a copyWith(...) function.
+extension $CloudflareImageCopyWithExtension on CloudflareImage {
+  CloudflareImage copyWith({
     String? id,
     String? imageDeliveryId,
     String? filename,
@@ -23,76 +17,19 @@ abstract class _$CloudflareImageCWProxy {
     List<String>? variants,
     DateTime? uploaded,
     bool? draft,
-  });
-}
-
-/// Callable proxy for `copyWith` functionality.
-/// Use as `instanceOfCloudflareImage.copyWith(...)`.
-class _$CloudflareImageCWProxyImpl implements _$CloudflareImageCWProxy {
-  const _$CloudflareImageCWProxyImpl(this._value);
-
-  final CloudflareImage _value;
-
-  @override
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// CloudflareImage(...).copyWith(id: 12, name: "My name")
-  /// ```
-  CloudflareImage call({
-    Object? id = const $CopyWithPlaceholder(),
-    Object? imageDeliveryId = const $CopyWithPlaceholder(),
-    Object? filename = const $CopyWithPlaceholder(),
-    Object? meta = const $CopyWithPlaceholder(),
-    Object? requireSignedURLs = const $CopyWithPlaceholder(),
-    Object? variants = const $CopyWithPlaceholder(),
-    Object? uploaded = const $CopyWithPlaceholder(),
-    Object? draft = const $CopyWithPlaceholder(),
   }) {
     return CloudflareImage(
-      id: id == const $CopyWithPlaceholder()
-          ? _value.id
-          // ignore: cast_nullable_to_non_nullable
-          : id as String?,
-      imageDeliveryId: imageDeliveryId == const $CopyWithPlaceholder()
-          ? _value.imageDeliveryId
-          // ignore: cast_nullable_to_non_nullable
-          : imageDeliveryId as String?,
-      filename: filename == const $CopyWithPlaceholder()
-          ? _value.filename
-          // ignore: cast_nullable_to_non_nullable
-          : filename as String?,
-      meta: meta == const $CopyWithPlaceholder()
-          ? _value.meta
-          // ignore: cast_nullable_to_non_nullable
-          : meta as Map<dynamic, dynamic>?,
-      requireSignedURLs: requireSignedURLs == const $CopyWithPlaceholder()
-          ? _value.requireSignedURLs
-          // ignore: cast_nullable_to_non_nullable
-          : requireSignedURLs as bool?,
-      variants: variants == const $CopyWithPlaceholder()
-          ? _value.variants
-          // ignore: cast_nullable_to_non_nullable
-          : variants as List<String>?,
-      uploaded: uploaded == const $CopyWithPlaceholder()
-          ? _value.uploaded
-          // ignore: cast_nullable_to_non_nullable
-          : uploaded as DateTime?,
-      draft: draft == const $CopyWithPlaceholder()
-          ? _value.draft
-          // ignore: cast_nullable_to_non_nullable
-          : draft as bool?,
+      id: id ?? this.id,
+      imageDeliveryId: imageDeliveryId ?? this.imageDeliveryId,
+      filename: filename ?? this.filename,
+      meta: ((meta?.isNotEmpty ?? false) ? meta : null) ?? this.meta,
+      requireSignedURLs: requireSignedURLs ?? this.requireSignedURLs,
+      variants:
+          ((variants?.isNotEmpty ?? false) ? variants : null) ?? this.variants,
+      uploaded: uploaded ?? this.uploaded,
+      draft: draft ?? this.draft,
     );
   }
-}
-
-extension $CloudflareImageCopyWith on CloudflareImage {
-  /// Returns a callable class used to build a new instance with modified fields.
-  /// Example: `instanceOfCloudflareImage.copyWith(...)`.
-  // ignore: library_private_types_in_public_api
-  _$CloudflareImageCWProxy get copyWith => _$CloudflareImageCWProxyImpl(this);
 }
 
 // **************************************************************************

@@ -1,6 +1,6 @@
 import 'package:cloudflare/src/model/error_info.dart';
 import 'package:cloudflare/src/utils/jsonable.dart';
-import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:adeptannotations/adeptannotations.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:cloudflare/src/utils/params.dart';
 import 'package:cloudflare/src/model/pagination.dart';

@@ -1,6 +1,6 @@
 name: cloudflare
 description: This is a dart package for Cloudflare APIs — Images, Stream, Live Inputs, and R2 object storage (S3-compatible).
-version: 10.0.0
+version: 10.1.0
 homepage: https://github.com/luis901101/cloudflare
 
 environment:
@@ -16,7 +16,7 @@ dependencies:
   tusc: ^3.0.0
 #    path: ../tusc
   meta: ^1.17.0 # meta is pinned to version 1.17.0 by flutter_test from the flutter SDK.
-  copy_with_extension: ^12.1.0
+  adeptannotations: ^7.0.0
   aws_common: ^0.7.12
   aws_signature_v4: ^0.6.10
   xml: ^6.0.0
@@ -28,5 +28,5 @@ dev_dependencies:
   test: ^1.30.0
   json_serializable: ^6.13.0
   retrofit_generator: ^10.2.3
-  copy_with_extension_gen: ^12.1.0
+  adeptgenerator: ^14.0.0
   build_runner: ^2.12.2 #flutter pub run build_runner build

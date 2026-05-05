@@ -6,57 +6,18 @@ part of 'live_input_status.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$LiveInputStatusCWProxy {
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// LiveInputStatus(...).copyWith(id: 12, name: "My name")
-  /// ```
-  LiveInputStatus call({
+/// This Extension on [LiveInputStatus] is to generate the code for a copyWith(...) function.
+extension $LiveInputStatusCopyWithExtension on LiveInputStatus {
+  LiveInputStatus copyWith({
     LiveInputStatusLog? current,
     List<LiveInputStatusLog>? history,
-  });
-}
-
-/// Callable proxy for `copyWith` functionality.
-/// Use as `instanceOfLiveInputStatus.copyWith(...)`.
-class _$LiveInputStatusCWProxyImpl implements _$LiveInputStatusCWProxy {
-  const _$LiveInputStatusCWProxyImpl(this._value);
-
-  final LiveInputStatus _value;
-
-  @override
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// LiveInputStatus(...).copyWith(id: 12, name: "My name")
-  /// ```
-  LiveInputStatus call({
-    Object? current = const $CopyWithPlaceholder(),
-    Object? history = const $CopyWithPlaceholder(),
   }) {
     return LiveInputStatus(
-      current: current == const $CopyWithPlaceholder()
-          ? _value.current
-          // ignore: cast_nullable_to_non_nullable
-          : current as LiveInputStatusLog?,
-      history: history == const $CopyWithPlaceholder()
-          ? _value.history
-          // ignore: cast_nullable_to_non_nullable
-          : history as List<LiveInputStatusLog>?,
+      current: current ?? this.current,
+      history:
+          ((history?.isNotEmpty ?? false) ? history : null) ?? this.history,
     );
   }
-}
-
-extension $LiveInputStatusCopyWith on LiveInputStatus {
-  /// Returns a callable class used to build a new instance with modified fields.
-  /// Example: `instanceOfLiveInputStatus.copyWith(...)`.
-  // ignore: library_private_types_in_public_api
-  _$LiveInputStatusCWProxy get copyWith => _$LiveInputStatusCWProxyImpl(this);
 }
 
 // **************************************************************************

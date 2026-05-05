@@ -6,70 +6,21 @@ part of 'live_input_status_log.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$LiveInputStatusLogCWProxy {
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
-  /// ```
-  LiveInputStatusLog call({
+/// This Extension on [LiveInputStatusLog] is to generate the code for a copyWith(...) function.
+extension $LiveInputStatusLogCopyWithExtension on LiveInputStatusLog {
+  LiveInputStatusLog copyWith({
     String? state,
     String? reason,
     DateTime? statusEnteredAt,
     DateTime? statusLastSeen,
-  });
-}
-
-/// Callable proxy for `copyWith` functionality.
-/// Use as `instanceOfLiveInputStatusLog.copyWith(...)`.
-class _$LiveInputStatusLogCWProxyImpl implements _$LiveInputStatusLogCWProxy {
-  const _$LiveInputStatusLogCWProxyImpl(this._value);
-
-  final LiveInputStatusLog _value;
-
-  @override
-  /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored.
-  ///
-  /// Example:
-  /// ```dart
-  /// LiveInputStatusLog(...).copyWith(id: 12, name: "My name")
-  /// ```
-  LiveInputStatusLog call({
-    Object? state = const $CopyWithPlaceholder(),
-    Object? reason = const $CopyWithPlaceholder(),
-    Object? statusEnteredAt = const $CopyWithPlaceholder(),
-    Object? statusLastSeen = const $CopyWithPlaceholder(),
   }) {
     return LiveInputStatusLog(
-      state: state == const $CopyWithPlaceholder()
-          ? _value.state
-          // ignore: cast_nullable_to_non_nullable
-          : state as String?,
-      reason: reason == const $CopyWithPlaceholder()
-          ? _value.reason
-          // ignore: cast_nullable_to_non_nullable
-          : reason as String?,
-      statusEnteredAt: statusEnteredAt == const $CopyWithPlaceholder()
-          ? _value.statusEnteredAt
-          // ignore: cast_nullable_to_non_nullable
-          : statusEnteredAt as DateTime?,
-      statusLastSeen: statusLastSeen == const $CopyWithPlaceholder()
-          ? _value.statusLastSeen
-          // ignore: cast_nullable_to_non_nullable
-          : statusLastSeen as DateTime?,
+      state: state ?? this.state,
+      reason: reason ?? this.reason,
+      statusEnteredAt: statusEnteredAt ?? this.statusEnteredAt,
+      statusLastSeen: statusLastSeen ?? this.statusLastSeen,
     );
   }
-}
-
-extension $LiveInputStatusLogCopyWith on LiveInputStatusLog {
-  /// Returns a callable class used to build a new instance with modified fields.
-  /// Example: `instanceOfLiveInputStatusLog.copyWith(...)`.
-  // ignore: library_private_types_in_public_api
-  _$LiveInputStatusLogCWProxy get copyWith =>
-      _$LiveInputStatusLogCWProxyImpl(this);
 }
 
 // **************************************************************************
