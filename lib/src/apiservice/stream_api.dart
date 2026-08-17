@@ -213,6 +213,16 @@ class StreamAPI
     /// Video file to stream
     required XFile file,
 
+    /// The upload URI of an upload created by a previous `tusStream`, as
+    /// reported by [TusAPI.uploadURI] or by the `onUploadCreated` callback of
+    /// [TusAPI.startUpload].
+    ///
+    /// Given one, the upload creation request is skipped and the upload
+    /// continues from the offset the server reports, so an upload interrupted
+    /// by the process being killed picks up where it left off instead of
+    /// starting over.
+    String? uploadUrl,
+
     /// The name of the video in the dashboard.
     String? name,
 
@@ -264,11 +274,41 @@ class StreamAPI
     /// e.g: For reliable connections you can use 52428800 bytes which is 50 MB
     int? chunkSize,
 
-    /// Sets the storage to be used to allow resuming uploads
-    /// See [TusMemoryStore] or [TusPersistentStore]
+    /// How often the upload progress is notified while a chunk is being sent,
+    /// in bytes.
     ///
-    /// Default value: [TusMemoryStore]
+    /// Default value: 65536 bytes which is 64 KB
+    /// Set it to [chunkSize] or more to get a single progress notification per
+    /// chunk instead.
+    int? progressSliceSize,
+
+    /// Sets the storage to be used to allow resuming uploads
+    /// See [tus.TusMemoryCache] or [tus.TusPersistentCache]
+    ///
+    /// Default value: [tus.TusMemoryCache]
+    ///
+    /// An upload is cached under a fingerprint built from the stream upload
+    /// url, the file name and the file size, so streaming the same file again
+    /// resumes the upload previously started for it instead of creating a new
+    /// video, as long as that upload has not completed. Use
+    /// [fingerprintGenerator] to key uploads differently.
     tus.TusCache? cache,
+
+    /// How long to wait before each retry of a request that failed on a
+    /// transport error or on 408, 429 or a 5xx.
+    ///
+    /// The length of the list is the number of retries. Defaults to three
+    /// retries, after 1, 3 and 5 seconds. Pass an empty list to fail on the
+    /// first error instead.
+    List<Duration>? retryDelays,
+
+    /// Builds the key the upload is stored under in [cache]. It has to be
+    /// stable for the same file across attempts and app restarts, and unique
+    /// per file and destination.
+    ///
+    /// Only needed to key uploads by something other than the default, such as
+    /// the id of a video in your own database.
+    String Function()? fingerprintGenerator,
 
     /// Timeout duration for upload chunks
     ///
@@ -279,9 +319,13 @@ class StreamAPI
 
     final tusAPI = TusAPI(
       dataUploadDraft: DataUploadDraft(uploadURL: tusUploadUrl),
+      uploadUrl: uploadUrl,
       file: file,
       cache: cache,
       chunkSize: chunkSize,
+      progressSliceSize: progressSliceSize,
+      retryDelays: retryDelays,
+      fingerprintGenerator: fingerprintGenerator,
       headers: restAPI.headers,
       metadata: {
         Params.name: name,
@@ -373,12 +417,38 @@ class StreamAPI
   /// tus(https://tus.io) protocol without API key or token.
   /// This function is to be used specifically after a video
   /// [createTusDirectStreamUpload] has been requested.
+  ///
+  /// To resume an upload started by a previous run, and possibly by a process
+  /// that is long gone, pass the [uploadUrl] it reported instead of requesting
+  /// a new [dataUploadDraft], which would create a new video and upload it from
+  /// the beginning.
   Future<TusAPI> tusDirectStreamUpload({
-    /// Information on where to stream upload the video without an API key or token
-    required DataUploadDraft dataUploadDraft,
-
     /// Video file to stream
     required XFile file,
+
+    /// Information on where to stream upload the video without an API key or
+    /// token.
+    ///
+    /// Optional when [uploadUrl] is given, since an upload that is being
+    /// resumed has already been created and the draft that created it may well
+    /// be gone by then. Its `id` is still worth passing, when known, as it
+    /// identifies the video the upload produces.
+    DataUploadDraft? dataUploadDraft,
+
+    /// The upload URI of an upload created by a previous `tusDirectStreamUpload`,
+    /// as reported by [TusAPI.uploadURI] or by the `onUploadCreated` callback of
+    /// [TusAPI.startUpload].
+    ///
+    /// Given one, the upload creation request is skipped and the upload
+    /// continues from the offset the server reports, so an upload interrupted
+    /// by the process being killed picks up where it left off instead of
+    /// starting over.
+    ///
+    /// Note Cloudflare releases the reservation of a direct upload that is not
+    /// completed before the `expiry` given to [createTusDirectStreamUpload], 30
+    /// minutes after creation by default and 6 hours at most, after which
+    /// resuming fails and a new direct upload has to be requested.
+    String? uploadUrl,
 
     /// ONLY AVAILABLE FOR STREAMING CONTENT FROM URL
     /// Timestamp location of thumbnail image calculated as a percentage value
@@ -428,11 +498,43 @@ class StreamAPI
     /// e.g: For reliable connections you can use 52428800 bytes which is 50 MB
     int? chunkSize,
 
-    /// Sets the storage to be used to allow resuming uploads
-    /// See [TusMemoryStore] or [TusPersistentStore]
+    /// How often the upload progress is notified while a chunk is being sent,
+    /// in bytes.
     ///
-    /// Default value: [TusMemoryStore]
+    /// Default value: 65536 bytes which is 64 KB
+    /// Set it to [chunkSize] or more to get a single progress notification per
+    /// chunk instead.
+    int? progressSliceSize,
+
+    /// Sets the storage to be used to allow resuming uploads
+    /// See [tus.TusMemoryCache] or [tus.TusPersistentCache]
+    ///
+    /// Default value: [tus.TusMemoryCache]
+    ///
+    /// An upload is cached under a fingerprint built from
+    /// [dataUploadDraft.uploadURL], the file name and the file size, so
+    /// resuming an interrupted direct upload after an app restart requires
+    /// reusing the very same [dataUploadDraft]. Requesting a new one with
+    /// [createTusDirectStreamUpload] creates a new video to upload to and
+    /// therefore starts over. Use [fingerprintGenerator] to key uploads
+    /// differently.
     tus.TusCache? cache,
+
+    /// How long to wait before each retry of a request that failed on a
+    /// transport error or on 408, 429 or a 5xx.
+    ///
+    /// The length of the list is the number of retries. Defaults to three
+    /// retries, after 1, 3 and 5 seconds. Pass an empty list to fail on the
+    /// first error instead.
+    List<Duration>? retryDelays,
+
+    /// Builds the key the upload is stored under in [cache]. It has to be
+    /// stable for the same file across attempts and app restarts, and unique
+    /// per file and destination.
+    ///
+    /// Only needed to key uploads by something other than the default, such as
+    /// the id of a video in your own database.
+    String Function()? fingerprintGenerator,
 
     /// Timeout duration for upload chunks
     ///
@@ -441,9 +543,13 @@ class StreamAPI
   }) async {
     final tusAPI = TusAPI(
       dataUploadDraft: dataUploadDraft,
+      uploadUrl: uploadUrl,
       file: file,
       cache: cache,
       chunkSize: chunkSize,
+      progressSliceSize: progressSliceSize,
+      retryDelays: retryDelays,
+      fingerprintGenerator: fingerprintGenerator,
       metadata: {
         Params.thumbnailTimestampPct: thumbnailTimestampPct,
         Params.allowedOrigins: allowedOrigins,

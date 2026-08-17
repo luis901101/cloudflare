@@ -356,10 +356,14 @@ void main() async {
         if (!videoFile.existsSync()) {
           fail('No video file available to stream');
         }
+        // A cached upload is now resumed instead of a new one being created, so
+        // an upload left over by a previous run would be continued here.
+        final cache = TusPersistentCache('');
+        await cache.clear();
         final tusAPI = await cloudflare.streamAPI.tusStream(
           file: videoFile,
           name: 'test-video-upload-authenticated',
-          cache: TusPersistentCache(''),
+          cache: cache,
           timeout: Duration(minutes: 5),
         );
         bool isComplete = false;
@@ -387,14 +391,16 @@ void main() async {
             },
           );
         } on ProtocolException catch (e) {
-          print('Response status code: ${e.response.statusCode}');
-          print('Response status reasonPhrase: ${e.response.reasonPhrase}');
-          print('Response body: ${e.response.body}');
-          print('Response headers: ${e.response.headers}');
+          print('Response status code: ${e.statusCode}');
+          print('Response status reasonPhrase: ${e.response?.reasonPhrase}');
+          print('Response body: ${e.response?.body}');
+          print('Response headers: ${e.response?.headers}');
           rethrow;
         } catch (e) {
           print(e);
           rethrow;
+        } finally {
+          tusAPI.close();
         }
       },
       timeout: Timeout(Duration(minutes: 20)),
@@ -469,7 +475,41 @@ void main() async {
           onProgress,
           () => isComplete,
         );
-        tusAPI.startUpload(
+        String? resolvedUploadUrl;
+        final upload = tusAPI.startUpload(
+          onProgress: testProgressCallback,
+          onUploadCreated: (uploadUrl) => resolvedUploadUrl = uploadUrl,
+          onTimeout: () {
+            print('Request timeout');
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+        print('Upload paused');
+        await tusAPI.pauseUpload();
+        // Pausing only asks the upload loop to stop, the chunk in flight still
+        // has to land, so this is what waits for the upload to really be idle.
+        await upload;
+        // As if the process that started the upload was gone, leaving nothing
+        // but the upload URI and the video id behind.
+        tusAPI.close();
+
+        expect(
+          resolvedUploadUrl,
+          isNotEmpty,
+          reason: 'The upload URI is what makes the upload resumable',
+        );
+        print('Upload resumed from $resolvedUploadUrl');
+
+        final resumedTusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
+          // The direct upload URL is spent by now, the draft is only kept for
+          // the id of the video the upload produces.
+          dataUploadDraft: DataUploadDraft(id: dataUploadDraft!.id),
+          uploadUrl: resolvedUploadUrl,
+          file: videoFile3,
+          timeout: Duration(minutes: 5),
+        );
+        await resumedTusAPI.startUpload(
           onProgress: testProgressCallback,
           onComplete: (cloudflareStreamVideo) {
             addId(cloudflareStreamVideo?.id);
@@ -491,20 +531,13 @@ void main() async {
                   'CloudFlareStreamVideo id must not be empty after tus stream upload',
             );
           },
-          onTimeout: () {
-            print('Request timeout');
-          },
         );
-
-        await Future.delayed(const Duration(seconds: 2), () {
-          print('Upload paused');
-          tusAPI.pauseUpload();
-        });
-
-        await Future.delayed(const Duration(seconds: 5), () {
-          print('Upload resumed');
-          tusAPI.resumeUpload();
-        });
+        expect(
+          resumedTusAPI.offset,
+          await videoFile3.length(),
+          reason: 'The resumed upload must have uploaded the whole file',
+        );
+        resumedTusAPI.close();
       },
       timeout: Timeout(Duration(minutes: 20)),
     );

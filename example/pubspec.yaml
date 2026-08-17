@@ -31,15 +31,15 @@ dependencies:
     sdk: flutter
   cloudflare:
     path: ../
-  image_picker: ^1.2.2
-  chewie: ^1.14.0
+  image_picker: ^1.2.3
+  chewie: ^1.15.0
   apivideo_live_stream: 1.0.2 #Version > 1.1.0 has breaking changes, so example project requires migration
   settings_ui: ^2.0.2
 
 
   video_player: any
-  tusc: any
-#    path: ../../tusc
+  tusc: #any
+    path: ../../tusc
 dev_dependencies:
   flutter_test:
     sdk: flutter

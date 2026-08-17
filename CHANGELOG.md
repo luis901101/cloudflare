@@ -9,6 +9,24 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 11.0.0
+### Added
+- Added `uploadUrl` to `TusAPI`, `tusStream` and `tusDirectStreamUpload` to resume an upload created by a previous run, even from a process that is long gone, instead of starting the file over.
+- Added `onUploadCreated` callback to `TusAPI.startUpload()` to get the upload URI to persist as soon as it is known.
+- Added `TusAPI.dataUploadDraft` to get the draft with the id of the video the upload produces.
+- Added `progressSliceSize`, `retryDelays` and `fingerprintGenerator` to `TusAPI`, `tusStream` and `tusDirectStreamUpload`.
+- Added `onError` callback to `TusAPI.startUpload()` to get errors through a callback instead of thrown exceptions.
+- Added `TusAPI.close()` to dispose the http client used for tus uploads.
+- Added `TusAPI.offset` to get the amount of bytes the tus server has confirmed.
+
+### Changed
+- Dependency breaking change version updated to `tusc: ^4.0.0`.
+- A tus upload backed by a cache now resumes the upload previously started for the same fingerprint instead of creating a new one.
+- `dataUploadDraft` is now optional in `TusAPI` and `tusDirectStreamUpload`, since an upload resumed through `uploadUrl` has already been created.
+- `TusAPI.startUpload()` called while an upload is already running now adopts the callbacks given to it and joins that upload instead of starting a second one.
+- `TusAPI`'s `onTimeoutCallback` is now used as the fallback for the `onTimeout` of `startUpload()`, instead of being ignored.
+- `TusAPI.startUpload()`'s `onComplete` now reports `null` when nothing identifies the uploaded video, instead of a video with an empty id.
+
 ## 10.1.0
 ### Changed
 - Changed `CopyWith` dependency.

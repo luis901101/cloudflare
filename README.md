@@ -39,6 +39,7 @@ It uses [retrofit](https://pub.dev/packages/retrofit) for REST requests and [tus
     - [TUS stream upload](#tus-stream-upload)
     - [Create a TUS direct stream upload](#create-a-tus-direct-stream-upload)
     - [Doing a TUS direct stream upload](#doing-a-tus-direct-stream-upload)
+    - [Resuming a TUS upload after an app restart](#resuming-a-tus-upload-after-an-app-restart)
     - [About TUS implementation](#about-tus-implementation)
     - [Get all videos](#get-all-videos)
     - [Get video by id](#get-video-by-id)
@@ -403,25 +404,30 @@ final tusAPI = await cloudflare.streamAPI.tusStream(
   name: 'test-video-upload',   
   cache: TusMemoryCache()    
 );   
-tusAPI?.startUpload(  
+final upload = tusAPI.startUpload(  
   onProgress: (count, total) {  
 	print('tus stream video: $count/$total');  
   },  
   onComplete: (cloudflareStreamVideo) { 
   	print('tus stream video completed');   
   },  
+  onError: (error) {
+	print('tus stream video failed: $error');
+  },
   onTimeout: () {  
 	print('tus request timeout');  
   }
 );
-await Future.delayed(const Duration(seconds: 2), () {  
-  print('Upload paused');  
-  tusAPI.pauseUpload();  
-});  
-await Future.delayed(const Duration(seconds: 4), () {  
-  print('Upload resumed');  
-  tusAPI.resumeUpload();  
-});
+await Future.delayed(const Duration(seconds: 2));
+print('Upload paused');
+await tusAPI.pauseUpload();
+await upload; // Waits for the chunk in flight to land and the upload to stop
+
+await Future.delayed(const Duration(seconds: 4));
+print('Upload resumed');
+await tusAPI.resumeUpload();
+
+tusAPI.close(); // Disposes the http client used to talk to the tus server
 ```
 
 ### Create a TUS direct stream upload
@@ -455,29 +461,83 @@ final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
   file: videoFile,
   cache: TusPersistentCache(''),    
 );   
-tusAPI?.startUpload(  
+final upload = tusAPI.startUpload(  
   onProgress: (count, total) {  
 	print('tus stream video: $count/$total');  
   },  
   onComplete: (cloudflareStreamVideo) { 
   	print('tus stream video completed');   
   },  
+  onError: (error) {
+	print('tus stream video failed: $error');
+  },
   onTimeout: () {  
 	print('tus request timeout');  
   }
 );
-await Future.delayed(const Duration(seconds: 2), () {  
-  print('Upload paused');  
-  tusAPI.pauseUpload();  
-});  
-await Future.delayed(const Duration(seconds: 4), () {  
-  print('Upload resumed');  
-  tusAPI.resumeUpload();  
-});
+await Future.delayed(const Duration(seconds: 2));
+print('Upload paused');
+await tusAPI.pauseUpload();
+await upload; // Waits for the chunk in flight to land and the upload to stop
+
+await Future.delayed(const Duration(seconds: 4));
+print('Upload resumed');
+await tusAPI.resumeUpload();
+
+tusAPI.close(); // Disposes the http client used to talk to the tus server
 ```
+
+### Resuming a TUS upload after an app restart
+A `DataUploadDraft.uploadURL` is a one-time URL: **tus** POSTs it once to create the upload and Cloudflare answers with the real upload URI, which is the durable handle of that upload. Persist that URI, together with the id of the video, and a later run — or a whole new process, after the app was killed mid upload — can carry the same upload on from where it stopped instead of requesting a new direct upload URL and sending a large video again from byte 0.
+
+Capture the upload URI with `onUploadCreated`, which fires as soon as it is known:
+```dart
+final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
+  dataUploadDraft: dataUploadDraft!,
+  file: videoFile,
+);
+await tusAPI.startUpload(
+  onUploadCreated: (uploadUrl) => myStorage.saveUpload(
+    uploadUrl: uploadUrl,             // The durable upload handle
+    videoId: dataUploadDraft.id,      // The video the upload produces
+  ),
+  onComplete: (cloudflareStreamVideo) => myStorage.clearUpload(),
+);
+```
+
+Then resume it with `uploadUrl`, passing no `dataUploadDraft` at all, or one carrying only the video id:
+```dart
+final tusAPI = await cloudflare.streamAPI.tusDirectStreamUpload(
+  file: videoFile,                                       // The very same file
+  uploadUrl: myStorage.uploadUrl,                        // From the previous run
+  dataUploadDraft: DataUploadDraft(id: myStorage.videoId),
+);
+await tusAPI.startUpload(
+  onProgress: (count, total) => print('resumed at $count/$total'),
+  onComplete: (cloudflareStreamVideo) => myStorage.clearUpload(),
+  onError: (error) {
+    // A 403, 404 or 410 means the upload is gone and a new direct upload URL
+    // has to be requested.
+    print('tus resume failed: ${error.statusCode}');
+  },
+);
+```
+The upload creation request is skipped, the offset is read from Cloudflare, and only the bytes it is missing are sent. `tusStream` takes the same `uploadUrl` for authenticated uploads.
+
+**How long a resume stays possible:** for direct creator uploads the window is the `expiry` passed to `createTusDirectStreamUpload`, whose documented range is `Now + 2 minutes` to `Now + 6 hours` and which defaults to `Now + 30 minutes`. Cloudflare's own wording is that "if the video errors or is not received before the link expires, the entire reservation will be released". Beyond that, Cloudflare documents no retention window for the resolved upload URI — neither for direct nor for authenticated uploads — so treat a `403`, `404` or `410` on resume as "this upload is gone, request a new direct upload URL and start over". Note that an upload built from an `uploadUrl` alone has no draft to fall back on, so that failure is reported instead of silently uploading to a different video.
 
 #### About TUS implementation
 This package uses the [tusc](https://pub.dev/packages/tusc) package implementation, which brings two kinds of cache, `TusMemoryCache` which allows you to pause/resume uploads as long as app keeps running and `TusPersistentCache` which allows you to pause/resume uploads no matter if app closes or even device gets restarted.
+
+**Resuming:** an upload is stored in the cache under a fingerprint built from the upload url, the file name and the file size, and a `startUpload` that finds a cached upload for that fingerprint **resumes it instead of creating a new one**. So streaming the same file again continues the upload that was interrupted, rather than creating a second video, until that upload completes or is cancelled. Pass a `fingerprintGenerator` to `tusStream` or `tusDirectStreamUpload` to key uploads by something of your own, such as the id of a video in your database.
+
+For a direct stream upload the fingerprint is built from the one-time `dataUploadDraft.uploadURL`, so resuming after an app restart means storing that `DataUploadDraft` and reusing it. Requesting a new one with `createTusDirectStreamUpload` creates a new video and therefore starts over.
+
+**Progress:** `onProgress` reports the bytes *sent*, not the bytes the server has acknowledged, and it is called while a chunk is still on its way, every `progressSliceSize` bytes (64 KB by default). A chunk that fails is reported as sent and then reported again at the offset the server confirms, so `count` can go backwards after a failure.
+
+**Retries:** a request that fails on a transport error or on 408, 429 or a 5xx is retried three times by default, after 1, 3 and 5 seconds. Pass `retryDelays: []` to fail on the first error instead, or your own list of delays.
+
+**Pause, cancel and dispose:** `pauseUpload` and `cancelUpload` flag the upload right away, but the chunk in flight still has to land, so await the future returned by `startUpload`/`resumeUpload` to know the upload really stopped. Calling `startUpload` again while an upload is running joins it, adopting the callbacks given to it, rather than starting a second one, so a double tap or a rebuild that fires it twice is harmless. Cancelling abandons the upload, dropping its cache entry, so the next `startUpload` starts a new one from the beginning. Call `close()` when you are done with a `TusAPI` to dispose the http client it uses.
 
 ### Get all videos
 Up to 1000 videos can be listed with one request, use optional parameters to get a specific range of videos. Please note that Cloudflare Stream does not use pagination, instead it uses a cursor pattern to list more than 1000 videos. In order to list all videos, make multiple requests to the API using the created date-time of the last item in the previous request as the before or after parameter.

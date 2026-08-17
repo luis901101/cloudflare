@@ -632,6 +632,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
           dataVideo?.dataTransmit.progressCallback?.call(count, total);
         },
         onComplete: (cloudflareStreamVideo) {
+          // The tus client holds an http client of its own, so it has to be
+          // disposed once the upload is done with it.
+          tusAPI?.close();
           tusAPI = null;
           if (cloudflareStreamVideo != null) {
             awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
@@ -748,6 +751,9 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
             dataVideo?.dataTransmit.progressCallback?.call(count, total);
           },
           onComplete: (cloudflareStreamVideo) {
+            // The tus client holds an http client of its own, so it has to be
+            // disposed once the upload is done with it.
+            tusAPI?.close();
             tusAPI = null;
             if (cloudflareStreamVideo != null) {
               awaitForVideoToBeReadyToStream(cloudflareStreamVideo);
@@ -877,6 +883,12 @@ class _StreamAPIDemoPageState extends State<StreamAPIDemoPage> {
   @override
   void dispose() {
     clearAllVideoControllers();
+    // Closing does not stop the upload, so it is cancelled first. The
+    // cancellation is flagged right away, which is what keeps the request the
+    // closed http client is about to fail from being retried or reported.
+    tusAPI?.cancelUpload();
+    tusAPI?.close();
+    tusAPI = null;
     super.dispose();
   }
 }
