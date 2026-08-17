@@ -1,3 +1,8 @@
+// The tus server these tests run against is a dart:io HttpServer, so they are
+// native only. What they exercise, TusAPI itself, is not.
+@TestOn('vm')
+library;
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';

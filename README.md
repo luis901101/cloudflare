@@ -537,6 +537,8 @@ For a direct stream upload the fingerprint is built from the one-time `dataUploa
 
 **Retries:** a request that fails on a transport error or on 408, 429 or a 5xx is retried three times by default, after 1, 3 and 5 seconds. Pass `retryDelays: []` to fail on the first error instead, or your own list of delays.
 
+**On the web:** the whole tus path is web compatible — no `dart:io` in it, chunks are read as `Blob` slices, and `TusPersistentCache` keeps its entries in IndexedDB. Two things behave differently in a browser: each chunk is materialized in memory before being sent, so `chunkSize` is also the memory cost per chunk, and the chunk is buffered whole before the request is issued, so all of its progress is reported up front and `progressSliceSize` makes no visible difference. A browser can also only read the response headers the server exposes through CORS, so pass the `dataUploadDraft` id when you have it rather than relying on `onComplete` to identify the video from Cloudflare's `stream-media-id` header.
+
 **Pause, cancel and dispose:** `pauseUpload` and `cancelUpload` flag the upload right away, but the chunk in flight still has to land, so await the future returned by `startUpload`/`resumeUpload` to know the upload really stopped. Calling `startUpload` again while an upload is running joins it, adopting the callbacks given to it, rather than starting a second one, so a double tap or a rebuild that fires it twice is harmless. Cancelling abandons the upload, dropping its cache entry, so the next `startUpload` starts a new one from the beginning. Call `close()` when you are done with a `TusAPI` to dispose the http client it uses.
 
 ### Get all videos
