@@ -9,6 +9,13 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## 11.0.1
+### Changed
+- Example project migrated to Flutter 3.50 and `apivideo_live_stream: ^1.2.0`.
+
+### Fixed
+- Fixed the web implementation falling back to its non-web stub in Wasm builds and with `--no-deprecated-js-interop`.
+
 ## 11.0.0
 ### Added
 - Added `uploadUrl` to `TusAPI`, `tusStream` and `tusDirectStreamUpload` to resume an upload created by a previous run, even from a process that is long gone, instead of starting the file over.

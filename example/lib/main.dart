@@ -1,6 +1,6 @@
 import 'package:cloudflare/cloudflare.dart';
 import 'package:cloudflare_example/src/app.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Make sure to put environment variables in your
 /// flutter run command or in your Additional run args in your selected

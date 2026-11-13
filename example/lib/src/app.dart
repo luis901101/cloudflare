@@ -2,7 +2,7 @@ import 'package:cloudflare_example/main.dart';
 import 'package:cloudflare_example/src/page/image_api_sample_page.dart';
 import 'package:cloudflare_example/src/page/live_input_api_sample_page.dart';
 import 'package:cloudflare_example/src/page/stream_api_sample_page.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class App extends StatelessWidget {
   static const pages = [

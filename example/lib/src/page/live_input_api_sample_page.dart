@@ -9,7 +9,7 @@ import 'package:cloudflare_example/src/page/types/params.dart';
 import 'package:cloudflare_example/src/page/types/resolution.dart';
 import 'package:cloudflare_example/src/page/types/sample_rate.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:video_player/video_player.dart';
@@ -663,8 +663,9 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   final ButtonStyle buttonStyle =
       ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
   Params config = Params();
-  late final LiveStreamController _controller;
-  late final Future<int> textureId;
+  late final ApiVideoLiveStreamController _controller;
+  late final Future<void> _initialization;
+  bool _isStreaming = false;
 
   @override
   void dispose() {
@@ -685,12 +686,8 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
     _controller = initLiveStreamController();
 
-    textureId = _controller
-        .create(
-          initialAudioConfig: config.audio,
-          initialVideoConfig: config.video,
-        )
-        .whenComplete(() => Future.delayed(
+    _initialization = _controller.initialize().whenComplete(() =>
+        Future.delayed(
             const Duration(milliseconds: 500), onStartStreamingButtonPressed));
     super.initState();
   }
@@ -704,21 +701,27 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
     }
   }
 
-  LiveStreamController initLiveStreamController() {
-    return LiveStreamController(onConnectionSuccess: () {
-      print('Connection succeeded');
-    }, onConnectionFailed: (error) {
-      print('Connection failed: $error');
-      _showDialog(context, 'Connection failed', error);
-      if (mounted) {
-        setState(() {});
-      }
-    }, onDisconnection: () {
-      showInSnackBar('Disconnected');
-      if (mounted) {
-        setState(() {});
-      }
-    });
+  ApiVideoLiveStreamController initLiveStreamController() {
+    return ApiVideoLiveStreamController(
+        initialAudioConfig: config.audio,
+        initialVideoConfig: config.video,
+        onConnectionSuccess: () {
+          print('Connection succeeded');
+        },
+        onConnectionFailed: (error) {
+          print('Connection failed: $error');
+          _showDialog(context, 'Connection failed', error);
+          if (mounted) {
+            setState(() {});
+          }
+        },
+        onDisconnection: () {
+          _isStreaming = false;
+          showInSnackBar('Disconnected');
+          if (mounted) {
+            setState(() {});
+          }
+        });
   }
 
   @override
@@ -751,8 +754,6 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _controlRowWidget() {
-    final LiveStreamController liveStreamController = _controller;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
@@ -770,16 +771,12 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
         IconButton(
           icon: const Icon(Icons.fiber_manual_record),
           color: Colors.red,
-          onPressed: !liveStreamController.isStreaming
-              ? onStartStreamingButtonPressed
-              : null,
+          onPressed: !_isStreaming ? onStartStreamingButtonPressed : null,
         ),
         IconButton(
           icon: const Icon(Icons.stop),
           color: Colors.red,
-          onPressed: liveStreamController.isStreaming
-              ? onStopStreamingButtonPressed
-              : null,
+          onPressed: _isStreaming ? onStopStreamingButtonPressed : null,
         ),
         IconButton(
           icon: const Icon(Icons.menu),
@@ -799,7 +796,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> switchCamera() async {
-    final LiveStreamController liveStreamController = _controller;
+    final ApiVideoLiveStreamController liveStreamController = _controller;
 
     try {
       liveStreamController.switchCamera();
@@ -814,7 +811,7 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> toggleMicrophone() async {
-    final LiveStreamController liveStreamController = _controller;
+    final ApiVideoLiveStreamController liveStreamController = _controller;
 
     try {
       liveStreamController.toggleMute();
@@ -829,11 +826,12 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> startStreaming() async {
-    final LiveStreamController liveStreamController = _controller;
+    final ApiVideoLiveStreamController liveStreamController = _controller;
 
     try {
       await liveStreamController.startStreaming(
           streamKey: config.streamKey, url: config.rtmpUrl);
+      _isStreaming = true;
     } catch (error) {
       if (error is PlatformException) {
         print('Error: failed to start stream: ${error.message}');
@@ -844,11 +842,13 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
   }
 
   Future<void> stopStreaming() async {
-    final LiveStreamController liveStreamController = _controller;
+    final ApiVideoLiveStreamController liveStreamController = _controller;
 
     try {
-      liveStreamController.stopStreaming();
+      await liveStreamController.stopStreaming();
+      _isStreaming = false;
     } catch (error) {
+      if (!mounted) return;
       if (error is PlatformException) {
         _showDialog(
             context, 'Error', 'Failed to stop stream: ${error.message}');
@@ -890,18 +890,18 @@ class _LiveStreamingViewState extends State<LiveStreamingView>
     });
   }
 
-  Widget buildPreview({required LiveStreamController controller}) {
-    // Wait for [LiveStreamController.create] to finish.
-    return FutureBuilder<int>(
-        future: textureId,
-        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-          if (!snapshot.hasData) {
+  Widget buildPreview({required ApiVideoLiveStreamController controller}) {
+    // Wait for [ApiVideoLiveStreamController.initialize] to finish.
+    return FutureBuilder<void>(
+        future: _initialization,
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
             // while data is loading:
             return const Center(
               child: CircularProgressIndicator(),
             );
           } else {
-            return CameraPreview(controller: controller);
+            return ApiVideoCameraPreview(controller: controller);
           }
         });
   }
